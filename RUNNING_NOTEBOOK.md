@@ -1,3 +1,13 @@
+# 8/7/2018
+
+If I want to use sklearn, these posts might be useful so as to reproduce the TMVA stuff!
+
+* https://betatim.github.io/posts/sklearn-for-TMVA-users/
+* https://betatim.github.io/posts/advanced-sklearn-for-TMVA/
+
+
+
+
 # 8/6/2018
 
 Running on Google Cloud Engine like a cluster. 
