@@ -32,6 +32,13 @@ for infilename in infilenames:
     ROOT.gROOT.cd();
     selectedTree = originalTree.CopyTree("np>0 && ( ne>0 || nmu>0 )")
 
+    # Drop branches
+    for branchname in ["gammanCrys", "gammaCentz", "gammaCenty", "gammaCentx"]:
+        print(branchname)
+        b = selectedTree.GetBranch(branchname)
+        selectedTree.GetListOfBranches().Remove(b)
+
+
     print("Selected {0} events.".format(selectedTree.GetEntries()))
 
     #outfilename = "%s/TRIGGER_APPLIED_%s" % (topdir,basename)
