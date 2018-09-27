@@ -186,9 +186,19 @@ for i in range(nentries):
     beammass = invmass([beamp4])
     beam = np.array([beammass, 0.0, 0.0, 0.0, 0, 0])
 
+    nmc = tree.mcLen
+    print("MC ----{0}----".format(nmc))
+    for j in range(nmc):
+        print(tree.mcLund[j], tree.mothIdx[j], tree.dauLen[j], tree.dauIdx[j])
+        
     ntrks = tree.nTRK
-    #print("----{0}----".format(ntrks))
+    print("----{0}----".format(ntrks))
+    print("{0} {1} {2} {3} {4}".format(tree.np, tree.nK, tree.npi, tree.ne, tree.nmu))
     for j in range(ntrks):
+        idx = tree.TRKMCIdx[j]
+        #print("idx,len: ",idx,tree.mcLen, ntrks)
+        if idx>0:
+            print(tree.TRKLund[j], idx, tree.mcLund[idx])
         #print("track", j)
         ebit,mubit,pibit,Kbit,pbit = tree.eSelectorsMap[j],tree.muSelectorsMap[j],tree.piSelectorsMap[j],tree.KSelectorsMap[j],tree.pSelectorsMap[j]
         #print(ebit,mubit,pibit,Kbit,pbit)
@@ -210,6 +220,7 @@ for i in range(nentries):
         new_energy = recalc_energy(particle_masses[max_particle],[px,py,pz])
         particle = [new_energy,px,py,pz,q,particle_lunds[max_particle]]
         myparticles.append(particle)
+    #exit()
 
     ############################################################################
     # Print out the photons
