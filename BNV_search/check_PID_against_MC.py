@@ -50,6 +50,7 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
     return max_particle,max_pid
 '''
 
+################################################################################
 def selectPID(eps,mups,pips,Kps,pps,verbose=False):
     #verbose = True
     max_pid = 2 # Pion
@@ -71,6 +72,15 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
             if eps.IsSelectorSet(i):
                 return 0,1.0 # Electron
     
+    s = pps.selectors
+    #print(s)
+    for i in s:
+        #print(i)
+        #if i.find("SuperTightKM")>=0 or i.find("SuperTightKM")>=0:
+        if i.find("TightKM")>=0 or i.find("TightKM")>=0:
+            if pps.IsSelectorSet(i):
+                return 4,1.0 # proton
+
     s = Kps.selectors
     #print(s)
     for i in s:
@@ -79,15 +89,7 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
             if Kps.IsSelectorSet(i):
                 return 3,1.0 # Kaon
     
-    s = pps.selectors
-    #print(s)
-    for i in s:
-        #print(i)
-        if i.find("SuperTightKM")>=0 or i.find("SuperTightKM")>=0:
-            if pps.IsSelectorSet(i):
-                return 4,1.0 # proton
-
-     # Otherwise it is a pion
+    # Otherwise it is a pion
     
     return max_pid,max_particle
 ################################################################################
@@ -162,6 +164,8 @@ sigbcandMES = []
 sigbcandDeltaE = []
 sigbcandMM = []
 
+match_max = []
+
 for i in range(nentries):
 
     #myparticles = {"electrons":[], "muons":[], "pions":[], "kaons":[], "protons":[], "gammas":[]}
@@ -186,19 +190,28 @@ for i in range(nentries):
     beammass = invmass([beamp4])
     beam = np.array([beammass, 0.0, 0.0, 0.0, 0, 0])
 
+    matchIdx = -1
     nmc = tree.mcLen
-    print("MC ----{0}----".format(nmc))
+    #print("MC ----{0}----".format(nmc))
+    bidx = []
     for j in range(nmc):
-        print(tree.mcLund[j], tree.mothIdx[j], tree.dauLen[j], tree.dauIdx[j])
+        #print(tree.mcLund[j], tree.mothIdx[j], tree.dauLen[j], tree.dauIdx[j])
+        pid = abs(tree.mcLund[j])
+        mothIdx = tree.mothIdx[j]
+        if pid==511:
+            bidx.append(j)
+        if mothIdx in bidx:
+            #print("B child: ",pid, j)
+            if pid==2212:
+                matchIdx = j
+
         
     ntrks = tree.nTRK
-    print("----{0}----".format(ntrks))
-    print("{0} {1} {2} {3} {4}".format(tree.np, tree.nK, tree.npi, tree.ne, tree.nmu))
+    #print("----{0}----".format(ntrks))
+    #print("{0} {1} {2} {3} {4}".format(tree.np, tree.nK, tree.npi, tree.ne, tree.nmu))
     for j in range(ntrks):
         idx = tree.TRKMCIdx[j]
         #print("idx,len: ",idx,tree.mcLen, ntrks)
-        if idx>0:
-            print(tree.TRKLund[j], idx, tree.mcLund[idx])
         #print("track", j)
         ebit,mubit,pibit,Kbit,pbit = tree.eSelectorsMap[j],tree.muSelectorsMap[j],tree.piSelectorsMap[j],tree.KSelectorsMap[j],tree.pSelectorsMap[j]
         #print(ebit,mubit,pibit,Kbit,pbit)
@@ -209,6 +222,14 @@ for i in range(nentries):
         #p3 = tree.TRKp3[j]
         #phi = tree.TRKphi[j]
         #costh = tree.TRKcosth[j]
+        if idx>0:
+            mcLund = abs(tree.mcLund[idx])
+            if mcLund==2212: #or mcLund==13:
+                #print("Matched! ",tree.TRKLund[j], idx, tree.mcLund[idx], max_particle,max_pid," -- ",ebit,mubit,pibit,Kbit,pbit)
+                print(idx,matchIdx)
+                if idx==matchIdx:
+                    match_max.append(max_particle)
+
         e = tree.TRKenergyCM[j]
         p3 = tree.TRKp3CM[j]
         phi = tree.TRKphiCM[j]
@@ -317,6 +338,13 @@ for i in range(nentries):
         sigbcandDeltaE.append(sigdE)
         sigbcandMM.append(invmass([beam-sigbc]))
         
+
+
+plt.figure()
+plt.hist(match_max,bins=5,range=(0,5))
+
+plt.show()
+exit()
 
 plt.figure()
 plt.subplot(3,3,1)
