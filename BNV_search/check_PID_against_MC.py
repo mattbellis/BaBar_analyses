@@ -10,6 +10,8 @@ import zipfile
 import myPIDselector
 from myPIDselector import *
 
+import lichen.lichen as lch
+
 eps = PIDselector("e")
 pps = PIDselector("p")
 pips = PIDselector("pi")
@@ -51,13 +53,13 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
 '''
 
 ################################################################################
-def pmag(vec):
+def vec_mag(vec):
     mag = np.sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2])
     return mag
 ################################################################################
 def angle(vec0, vec1, returncos=False):
-    mag0 = pmag(vec0)
-    mag1 = pmag(vec1)
+    mag0 = vec_mag(vec0)
+    mag1 = vec_mag(vec1)
 
     costheta = (vec0[0]*vec1[0] + vec0[1]*vec1[1] + vec0[2]*vec1[2])/(mag0*mag1)
 
@@ -140,7 +142,7 @@ def invmass(p4):
 
 ################################################################################
 def recalc_energy(mass,p3):
-    energy = np.sqrt(mass*mass + pmag(p3)**2)
+    energy = np.sqrt(mass*mass + vec_mag(p3)**2)
     return energy
 ################################################################################
 
@@ -186,6 +188,8 @@ tagbcandMM = []
 match_max = []
 angles = []
 
+nbcands = []
+
 lep_p = []
 prot_p = []
 
@@ -199,7 +203,7 @@ for i in range(nentries):
     if i%1000==0:
         print(i)
 
-    if i>1000:
+    if i>10000:
         break
 
     output = "Event: %d\n" % (i)
@@ -267,9 +271,11 @@ for i in range(nentries):
         new_energy = recalc_energy(particle_masses[max_particle],[px,py,pz])
         particle = [new_energy,px,py,pz,q,particle_lunds[max_particle]]
         myparticles.append(particle)
-        if particle[-1]==13 and pmag(particle[1:4])>2.25:
+
+        pmag = vec_mag(particle[1:4])
+        if particle[-1]==13 and pmag>2.25 and pmag<2.8:
             leptons.append(np.array(particle + [j]))
-        elif particle[-1]==2212 and pmag(particle[1:4])>2.25:
+        elif particle[-1]==2212 and pmag>2.25 and pmag<2.8:
             protons.append(np.array(particle + [j]))
     #exit()
 
@@ -299,10 +305,14 @@ for i in range(nentries):
 
             # Add Brehm photons
             # WHAT IF PHOTON IS CLOSE TO TWO OR MORE leptons????
+            #'''
             if ang>=0.9958:
+                #print(electron)
                 electron[0:4] += particle[0:4]
+                #print(electron)
             else:
                 myparticles.append(particle)
+            #'''
 
     myparticles = np.array(myparticles)
 
@@ -321,6 +331,7 @@ for i in range(nentries):
     '''
 
     totq = 0
+    nbcand = 0
     for proton in protons:
         for lepton in leptons:
 
@@ -328,9 +339,9 @@ for i in range(nentries):
             if proton[4] == lepton[4]:
                 continue
 
-            p = pmag(proton[1:4])
+            p = vec_mag(proton[1:4])
             prot_p.append(p)
-            p = pmag(lepton[1:4])
+            p = vec_mag(lepton[1:4])
             lep_p.append(p)
 
             # B candidates
@@ -363,8 +374,11 @@ for i in range(nentries):
             tagbcandMES.append(tagmes)
             tagbcandDeltaE.append(tagdE)
             tagbcandMM.append(invmass([beam-tagbc]))
+
+            nbcand += 1
         
     totqs.append(totq)
+    nbcands.append(nbcand)
 
 plt.figure()
 plt.hist(match_max,bins=5,range=(0,5))
@@ -385,8 +399,23 @@ plt.hist(lep_p,bins=100)
 plt.subplot(3,3,4)
 plt.hist(totqs,bins=52,range=(-5,5))
 
+plt.subplot(3,3,5)
+plt.hist(nbcands,bins=7,range=(-1,6))
+
 plt.tight_layout()
 
+
+###################
+plt.figure(figsize=(8,3))
+plt.subplot(1,2,1)
+lch.hist_err(bcandMES,bins=200,range=(5.2,5.3))
+plt.xlabel(r'M$_{\rm ES}$ [GeV/c$^{2}$]',fontsize=18)
+
+plt.subplot(1,2,2)
+lch.hist_err(bcandDeltaE,bins=200,range=(-0.2,0.2))
+plt.xlabel(r'$\Delta$E [GeV]',fontsize=18)
+
+plt.tight_layout()
 
 ###################
 plt.figure()
