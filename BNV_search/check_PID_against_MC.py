@@ -51,6 +51,25 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
 '''
 
 ################################################################################
+def pmag(vec):
+    mag = np.sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2])
+    return mag
+################################################################################
+def angle(vec0, vec1, returncos=False):
+    mag0 = pmag(vec0)
+    mag1 = pmag(vec1)
+
+    costheta = (vec0[0]*vec1[0] + vec0[1]*vec1[1] + vec0[2]*vec1[2])/(mag0*mag1)
+
+    if returncos:
+        return costheta
+
+    return np.arccos(costheta)
+    
+################################################################################
+################################################################################
+
+################################################################################
 def selectPID(eps,mups,pips,Kps,pps,verbose=False):
     #verbose = True
     max_pid = 2 # Pion
@@ -60,7 +79,7 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
     #print(s)
     for i in s:
         #print(i)
-        if i.find("Tight")>=0:
+        if i.find("BDT")>=0 and (i.find("TightMuon")>=0 or i.find("LooseMuon")>=0):
             if mups.IsSelectorSet(i):
                 return 1,1.0 # Muon
     
@@ -68,7 +87,7 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
     #print(s)
     for i in s:
         #print(i)
-        if i.find("Tight")>=0:
+        if i.find("TightKM")>=0:
             if eps.IsSelectorSet(i):
                 return 0,1.0 # Electron
     
@@ -77,7 +96,7 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
     for i in s:
         #print(i)
         #if i.find("SuperTightKM")>=0 or i.find("SuperTightKM")>=0:
-        if i.find("TightKM")>=0 or i.find("TightKM")>=0:
+        if i.find("LooseKM")>=0 or i.find("TightKM")>=0:
             if pps.IsSelectorSet(i):
                 return 4,1.0 # proton
 
@@ -121,7 +140,7 @@ def invmass(p4):
 
 ################################################################################
 def recalc_energy(mass,p3):
-    energy = np.sqrt(mass*mass + p3[0]*p3[0] + p3[1]*p3[1] + p3[2]*p3[2] )
+    energy = np.sqrt(mass*mass + pmag(p3)**2)
     return energy
 ################################################################################
 
@@ -153,18 +172,22 @@ nentries = tree.GetEntries()
 invmasses = []
 missmasses = []
 nprotons = []
-totq = []
+totqs = []
 
 bcand = []
 bcandMES = []
 bcandDeltaE = []
 bcandMM = []
-sigbcand = []
-sigbcandMES = []
-sigbcandDeltaE = []
-sigbcandMM = []
+tagbcand = []
+tagbcandMES = []
+tagbcandDeltaE = []
+tagbcandMM = []
 
 match_max = []
+angles = []
+
+lep_p = []
+prot_p = []
 
 for i in range(nentries):
 
@@ -191,6 +214,7 @@ for i in range(nentries):
     beam = np.array([beammass, 0.0, 0.0, 0.0, 0, 0])
 
     matchIdx = -1
+    LUNDTOMATCH = 211
     nmc = tree.mcLen
     #print("MC ----{0}----".format(nmc))
     bidx = []
@@ -202,10 +226,12 @@ for i in range(nentries):
             bidx.append(j)
         if mothIdx in bidx:
             #print("B child: ",pid, j)
-            if pid==2212:
+            if pid==LUNDTOMATCH:
                 matchIdx = j
 
         
+    leptons = []
+    protons = []
     ntrks = tree.nTRK
     #print("----{0}----".format(ntrks))
     #print("{0} {1} {2} {3} {4}".format(tree.np, tree.nK, tree.npi, tree.ne, tree.nmu))
@@ -224,9 +250,9 @@ for i in range(nentries):
         #costh = tree.TRKcosth[j]
         if idx>0:
             mcLund = abs(tree.mcLund[idx])
-            if mcLund==2212: #or mcLund==13:
+            if mcLund==LUNDTOMATCH: #or mcLund==13:
                 #print("Matched! ",tree.TRKLund[j], idx, tree.mcLund[idx], max_particle,max_pid," -- ",ebit,mubit,pibit,Kbit,pbit)
-                print(idx,matchIdx)
+                #print(idx,matchIdx)
                 if idx==matchIdx:
                     match_max.append(max_particle)
 
@@ -241,6 +267,10 @@ for i in range(nentries):
         new_energy = recalc_energy(particle_masses[max_particle],[px,py,pz])
         particle = [new_energy,px,py,pz,q,particle_lunds[max_particle]]
         myparticles.append(particle)
+        if particle[-1]==13 and pmag(particle[1:4])>2.25:
+            leptons.append(np.array(particle + [j]))
+        elif particle[-1]==2212 and pmag(particle[1:4])>2.25:
+            protons.append(np.array(particle + [j]))
     #exit()
 
     ############################################################################
@@ -262,7 +292,17 @@ for i in range(nentries):
         new_energy = recalc_energy(0,[px,py,pz])
         #particle = [e,px,py,pz,0,22]
         particle = [new_energy,px,py,pz,0,22]
-        myparticles.append(particle)
+
+        for electron in leptons:
+            ang = angle(electron[1:4],particle[1:4],returncos=True)
+            angles.append(ang)
+
+            # Add Brehm photons
+            # WHAT IF PHOTON IS CLOSE TO TWO OR MORE leptons????
+            if ang>=0.9958:
+                electron[0:4] += particle[0:4]
+            else:
+                myparticles.append(particle)
 
     myparticles = np.array(myparticles)
 
@@ -280,84 +320,70 @@ for i in range(nentries):
     print(qs.sum())
     '''
 
-    for p in myparticles:
-        #print(p)
-        #print("{0:-5.3} {1:-5.3} {2:-5.3} {3:-5.3} {4} {5}".format(p[0], p[1], p[2], p[3], int(p[4]), int(p[5])))
-        tot -= p
+    totq = 0
+    for proton in protons:
+        for lepton in leptons:
 
-        key = p[-1]
-        allparts[0][key].append(p[1])
-        allparts[1][key].append(p[2])
-        allparts[2][key].append(p[3])
+            # Make sure the charges are not the same
+            if proton[4] == lepton[4]:
+                continue
 
-    #print("mass:         ",invmass(myparticles))
-    #print(tot)
-    #print("missing mass: ",invmass([tot]))
-    #print(qs,qs.sum())
-    #if qs.sum()==0:
-    if 1:
-    #if qs.sum()==0 and len(pids[pids==2212])>0:
-        invmasses.append(invmass(myparticles))
-        missmasses.append(invmass([tot]))
-        nprotons.append(len(pids[pids==2212]))
-        totq.append(qs.sum())
-        #break
+            p = pmag(proton[1:4])
+            prot_p.append(p)
+            p = pmag(lepton[1:4])
+            lep_p.append(p)
 
+            # B candidates
+            bc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+            tagbc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
-    solo = 2212
-    #solo = 13
-    #if qs.sum()==0 and len(pids[pids==solo])==1:
-    if len(pids[pids==2212])==1 and len(pids[pids==13])==1:
-    #if 1:
-        # B candidates
-        bc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        sigbc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-        proton = None
-        for p in myparticles:
-            totx.append(p[1])
-            toty.append(p[2])
-            totz.append(p[3])
-            if p[-1] != 2212 and p[-1] != 13:
-                bc += p
-            else:
-                sigbc += p
+            bc = proton[0:-1] + lepton[0:-1]
 
-        bcand.append(invmass([bc]))
-        dE = bc[0] - beam[0]/2.0
-        bc[0] = beam[0]/2.0
-        mes = invmass([bc])
-        bcandMES.append(mes)
-        bcandDeltaE.append(dE)
-        bcandMM.append(invmass([beam-bc]))
+            pidx = proton[-1]
+            lidx = lepton[-1]
+            
+            # Get the tag side and don't count the proton or lepton
+            for k,p in enumerate(myparticles):
+                if k!=pidx and k!=lidx:
+                    totq += p[4]
+                    tagbc += p
 
-        sigbcand.append(invmass([sigbc]))
-        sigdE = sigbc[0] - beam[0]/2.0
-        sigbc[0] = beam[0]/2.0
-        sigmes = invmass([sigbc])
-        sigbcandMES.append(sigmes)
-        sigbcandDeltaE.append(sigdE)
-        sigbcandMM.append(invmass([beam-sigbc]))
+            bcand.append(invmass([bc]))
+            dE = bc[0] - beam[0]/2.0
+            bc[0] = beam[0]/2.0
+            mes = invmass([bc])
+            bcandMES.append(mes)
+            bcandDeltaE.append(dE)
+            bcandMM.append(invmass([beam-bc]))
+
+            tagbcand.append(invmass([tagbc]))
+            tagdE = tagbc[0] - beam[0]/2.0
+            tagbc[0] = beam[0]/2.0
+            tagmes = invmass([tagbc])
+            tagbcandMES.append(tagmes)
+            tagbcandDeltaE.append(tagdE)
+            tagbcandMM.append(invmass([beam-tagbc]))
         
-
+    totqs.append(totq)
 
 plt.figure()
 plt.hist(match_max,bins=5,range=(0,5))
 
-plt.show()
-exit()
-
+# Brehm at 0.9958 in cos(theta)?
 plt.figure()
 plt.subplot(3,3,1)
-plt.hist(invmasses,bins=200,range=(0,20))
-    
-plt.subplot(3,3,2)
-plt.hist(missmasses,bins=200,range=(-10,10))
+plt.hist(angles,bins=1000)
 
+#plt.show()
+#exit()
+
+plt.subplot(3,3,2)
+plt.hist(prot_p,bins=100)
 plt.subplot(3,3,3)
-plt.hist(nprotons,bins=11,range=(0,10))
+plt.hist(lep_p,bins=100)
 
 plt.subplot(3,3,4)
-plt.hist(totq,bins=52,range=(-5,5))
+plt.hist(totqs,bins=52,range=(-5,5))
 
 plt.tight_layout()
 
@@ -374,7 +400,7 @@ plt.hist(bcandMES,bins=200,range=(5,5.3))
 plt.xlabel(r'M$_{\rm ES}$ [GeV/c$^{2}$]',fontsize=10)
 
 plt.subplot(3,3,3)
-plt.hist(bcandDeltaE,bins=200,range=(-10,10))
+plt.hist(bcandDeltaE,bins=200,range=(-1,1))
 plt.xlabel(r'$\Delta$E [GeV]',fontsize=10)
 
 plt.subplot(3,3,4)
@@ -387,86 +413,33 @@ plt.plot(bcandMES,bcandDeltaE,'.',alpha=0.8,markersize=1.0)
 plt.xlabel(r'M$_{\rm ES}$ [GeV/c$^{2}$]',fontsize=10)
 plt.ylabel(r'$\Delta$E [GeV]',fontsize=10)
 
-plt.subplot(3,3,7)
-plt.plot(totx,toty,'.',alpha=0.5,markersize=0.5)
-plt.xlabel(r'p$_{x}$ [GeV/c]',fontsize=10)
-plt.ylabel(r'p$_{y}$ [GeV/c]',fontsize=10)
-
-plt.subplot(3,3,8)
-plt.plot(totx,totz,'.',alpha=0.5,markersize=0.5)
-plt.xlabel(r'p$_{x}$ [GeV/c]',fontsize=10)
-plt.ylabel(r'p$_{z}$ [GeV/c]',fontsize=10)
-
-plt.subplot(3,3,9)
-plt.plot(toty,totz,'.',alpha=0.5,markersize=0.5)
-plt.xlabel(r'p$_{y}$ [GeV/c]',fontsize=10)
-plt.ylabel(r'p$_{z}$ [GeV/c]',fontsize=10)
-
 plt.tight_layout()
 
 ###################
 plt.figure()
 plt.subplot(3,3,1)
-plt.hist(sigbcand,bins=200,range=(0,15))
-plt.xlabel(r'sigB-cand mass [GeV/c$^{2}$]',fontsize=10)
+plt.hist(tagbcand,bins=200,range=(0,15))
+plt.xlabel(r'tagB-cand mass [GeV/c$^{2}$]',fontsize=10)
     
 plt.subplot(3,3,2)
-plt.hist(sigbcandMES,bins=200,range=(5,5.3))
-plt.xlabel(r'sigM$_{\rm ES}$ [GeV/c$^{2}$]',fontsize=10)
+plt.hist(tagbcandMES,bins=200,range=(5,5.3))
+plt.xlabel(r'tagM$_{\rm ES}$ [GeV/c$^{2}$]',fontsize=10)
 
 plt.subplot(3,3,3)
-plt.hist(sigbcandDeltaE,bins=200,range=(-10,10))
-plt.xlabel(r'sig$\Delta$E [GeV]',fontsize=10)
+plt.hist(tagbcandDeltaE,bins=200,range=(-10,10))
+plt.xlabel(r'tag$\Delta$E [GeV]',fontsize=10)
 
 plt.subplot(3,3,4)
-plt.hist(sigbcandMM,bins=200,range=(-5,7))
-plt.xlabel(r'sigMissing mass [GeV/c$^{2}$]',fontsize=10)
+plt.hist(tagbcandMM,bins=200,range=(-5,7))
+plt.xlabel(r'tagMissing mass [GeV/c$^{2}$]',fontsize=10)
 
 plt.subplot(3,3,5)
-plt.plot(sigbcandMES,sigbcandDeltaE,'.',alpha=0.8,markersize=1.0)
-plt.xlabel(r'sigM$_{\rm ES}$ [GeV/c$^{2}$]',fontsize=10)
-plt.ylabel(r'sig$\Delta$E [GeV]',fontsize=10)
+plt.plot(tagbcandMES,tagbcandDeltaE,'.',alpha=0.8,markersize=1.0)
+plt.xlabel(r'tagM$_{\rm ES}$ [GeV/c$^{2}$]',fontsize=10)
+plt.ylabel(r'tag$\Delta$E [GeV]',fontsize=10)
 
 
 plt.tight_layout()
-# Momentum
-
-for i,id in enumerate(particle_lunds):
-    plt.figure(figsize=(12,4))
-
-    x = allparts[0][id]
-    y = allparts[1][id]
-    z = allparts[2][id]
-
-    print(id)
-    #print(x)
-
-    plt.subplot(1,3,1)
-    plt.title(str(id))
-    plt.plot(x,y,'.',alpha=0.5,markersize=0.5)
-    plt.xlabel(r'p$_{x}$ [GeV/c]',fontsize=10)
-    plt.ylabel(r'p$_{y}$ [GeV/c]',fontsize=10)
-    plt.xlim(-7,7)
-    plt.ylim(-7,7)
-
-    plt.subplot(1,3,2)
-    plt.plot(x,z,'.',alpha=0.5,markersize=0.5)
-    plt.xlabel(r'p$_{x}$ [GeV/c]',fontsize=10)
-    plt.ylabel(r'p$_{z}$ [GeV/c]',fontsize=10)
-    plt.xlim(-7,7)
-    plt.ylim(-7,7)
-
-    plt.subplot(1,3,3)
-    plt.plot(y,z,'.',alpha=0.5,markersize=0.5)
-    plt.xlabel(r'p$_{y}$ [GeV/c]',fontsize=10)
-    plt.ylabel(r'p$_{z}$ [GeV/c]',fontsize=10)
-    plt.xlim(-7,7)
-    plt.ylim(-7,7)
-
-    plt.tight_layout()
-
-
-
 
 
 plt.show()
