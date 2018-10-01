@@ -275,7 +275,7 @@ for i in range(nentries):
     solo = 2212
     #solo = 13
     #if qs.sum()==0 and len(pids[pids==solo])==1:
-    if len(pids[pids==2212])==1 and len(pids[pids==13])==1:
+    if len(pids[pids==2212])>=1 and len(pids[pids==13])>=1:
     #if 1:
         # B candidates
         bc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
