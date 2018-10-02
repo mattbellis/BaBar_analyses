@@ -203,7 +203,7 @@ for i in range(nentries):
     if i%1000==0:
         print(i,nentries)
 
-    if i>1000:
+    if i>100000:
         break
 
     output = "Event: %d\n" % (i)
@@ -273,7 +273,7 @@ for i in range(nentries):
         myparticles.append(particle)
 
         pmag = vec_mag(particle[1:4])
-        if particle[-1]==13 and pmag>2.25 and pmag<2.8:
+        if particle[-1]==11 and pmag>2.25 and pmag<2.8:
             leptons.append(np.array(particle + [j]))
         elif particle[-1]==2212 and pmag>2.25 and pmag<2.8:
             protons.append(np.array(particle + [j]))
@@ -300,13 +300,15 @@ for i in range(nentries):
         particle = [new_energy,px,py,pz,0,22]
 
         for electron in leptons:
-            ang = angle(electron[1:4],particle[1:4],returncos=True)
+            ang = angle(electron[1:4],particle[1:4])#,returncos=True)
             angles.append(ang)
 
             # Add Brehm photons
             # WHAT IF PHOTON IS CLOSE TO TWO OR MORE leptons????
             #'''
-            if ang>=0.9958:
+            #if ang>=0.9958: # Do this for cos
+            #if ang<=0.20:
+            if ang<=0.05:
                 #print(electron)
                 electron[0:4] += particle[0:4]
                 #print(electron)
@@ -408,13 +410,13 @@ plt.tight_layout()
 ###################
 plt.figure(figsize=(8,3))
 plt.subplot(1,2,1)
-#lch.hist_err(bcandMES,bins=200,range=(5.2,5.3))
-lch.hist_err(bcandMES,bins=200,range=(0,5.3))
+lch.hist_err(bcandMES,bins=200,range=(5.2,5.3))
+#lch.hist_err(bcandMES,bins=200,range=(0,5.3))
 plt.xlabel(r'M$_{\rm ES}$ [GeV/c$^{2}$]',fontsize=18)
 
 plt.subplot(1,2,2)
-#lch.hist_err(bcandDeltaE,bins=200,range=(-0.2,0.2))
-lch.hist_err(bcandDeltaE,bins=200,range=(-10,10))
+lch.hist_err(bcandDeltaE,bins=200,range=(-0.2,0.2))
+#lch.hist_err(bcandDeltaE,bins=200,range=(-10,10))
 plt.xlabel(r'$\Delta$E [GeV]',fontsize=18)
 
 plt.tight_layout()
