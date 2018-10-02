@@ -1,18 +1,29 @@
 from array import array
+import numpy as np
 class PIDselector:
   ''' PIDselector function.
   A helper function to more easily test to see if 
   a PID selector is set for a given track/particle.'''
   # Always remember the *self* argument
-  bits = []
+  #bits = []
+  bits = None
   def __init__(self,particle=None):
     self.particle = particle or []
     self.max_bits = 0
-    self.bits = []
+    #self.bits = []
     self.selectors = []
+    self.bits = np.zeros(32,dtype=int)
+    #self.selectors = np.ndarray(32,dtype='str')
+    #'''
+    self.binary_digits = np.ones(32,dtype=int)
+    digit = 1
     for i in range(0,32):
-      self.bits.append(0)
+        #self.bits.append(0)
       self.selectors.append(" ")
+      digit *= 2
+      self.binary_digits[i] = digit
+    #print(self.binary_digits)
+    #'''
     # Set the particle info
     if self.particle == "p" or self.particle == "proton":
       self.max_bits = 18 
@@ -37,7 +48,7 @@ class PIDselector:
       self.selectors[15] =  "TightKMProtonSelection"
       self.selectors[16] =  "VeryTightKMProtonSelection"
       self.selectors[17] =  "SuperTightKMProtonSelection"
-      
+
     elif self.particle=="K" or self.particle == "k" or self.particle == "kaon":
       self.max_bits = 30 
       self.selectors[0] =  "NotPionKaonMicroSelection"
@@ -97,6 +108,7 @@ class PIDselector:
       self.selectors[13] =  "TightKMPionSelection"
       self.selectors[14] =  "VeryTightKMPionSelection"
       self.selectors[15] =  "SuperTightKMPionSelection"
+      print(self.selectors)
     elif  self.particle == "e" or self.particle == "electron":
       self.max_bits = 12 
       self.selectors[0] =  "NoCalElectronMicroSelection"
@@ -148,12 +160,17 @@ class PIDselector:
       self.selectors[24] =  "BDTLoPLooseMuonSelection"
       self.selectors[25] =  "BDTLoPTightMuonSelection "
 
+    #self.selectors = np.array(self.selectors)
+      
   ##############################################
   def SetBits(self, val=0 ):
     '''Set the bits for the PID selctors by passing in \'val\'.
     This is the number in the XXXSelectorMap.'''
+    self.bits = np.zeros(self.max_bits,dtype=int)
+    '''
     for i in range(0,32):
       self.bits[i] = 0
+    '''
 
     if val > 2.0**(self.max_bits):
       print("WARNING: value is set higher than 2^(max_bits-1)!!!!")
@@ -161,6 +178,7 @@ class PIDselector:
       print(self.max_bits)
       print(2.0**(self.max_bits))
 
+    '''
     digit = 1
     for i in range(0,self.max_bits):
       #digit = int(2.0**(i+1))
@@ -171,15 +189,26 @@ class PIDselector:
       else:
         self.bits[i] = 0
       val -= test
+    '''
+    #'''
+    binrep = np.binary_repr(val)
+    # Make sure we flip the string
+    tempbits = np.array(list(binrep[::-1])).astype(int)
+    self.bits[0:len(tempbits)] = tempbits[:]
+    #'''
+    #print(self.bits)
 
   ##############################################
   def HighestBitSet(self):
     '''Check what is the highest bit set.
     Returns the highest bit or -999 if none are set'''
     highest_bit = -999
+    '''
     for i in range(self.max_bits-1,-1,-1):
         if(self.bits[i]>0):
           return i+1
+    '''
+    highest_bit = len(bits) - 1 - bits[::-1].tolist().index(0)
     return highest_bit
 
   ##############################################
@@ -204,12 +233,22 @@ class PIDselector:
     '''Check to see if a particular selector is set, based
     on the string \'selector\'.
     Returns True or False.'''
+    '''
     for i in range(0,self.max_bits):
       if self.selectors[i] == selector:
         if self.bits[i]:
           return True
         return False
     print("Warning!!!!  " + selector + " is not a valid choice for particle " + self.particle)
+    '''
+    if selector not in self.selectors:
+        print("Warning!!!!  " + selector + " is not a valid choice for particle " + self.particle)
+        return False
+    idx = self.selectors.index(selector)
+    if self.bits[idx]:
+        return True
+    else:
+        return False
     return False
 
   ##############################################
@@ -217,8 +256,11 @@ class PIDselector:
     '''Print to the screen the bit selectors that are set 
     to True.'''
     output = "bits: "
+    output += ' '.join(self.bits.astype(str))
+    '''
     for i in range(0,self.max_bits):
       output += str(self.bits[i])
+    '''
     print(output)
 
   ##############################################

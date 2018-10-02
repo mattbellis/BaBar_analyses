@@ -155,14 +155,17 @@ def sph2cart(pmag,costh,phi):
     return x,y,z
 ################################################################################
 
-f = ROOT.TFile(sys.argv[1])
+#f = ROOT.TFile(sys.argv[1])
+#f.ls()
+#tree = f.Get("ntp1")
 
-f.ls()
+tree = ROOT.TChain("ntp1")
+for infile in sys.argv[1:]:
+    print(infile)
+    tree.AddFile(infile)
 
-tree = f.Get("ntp1")
 
 #tree.Print()
-
 #exit()
 
 nentries = tree.GetEntries()
@@ -193,6 +196,30 @@ nbcands = []
 lep_p = []
 prot_p = []
 
+#filenames = sys.argv[1:]
+outfilename = None
+if outfilename is None:
+    #outfilename = filenames[0].split('/')[-1].split('.root')[0] + "_OUTPUT.root"
+    outfilename = "testing_the_skim_output.root"
+outfile = ROOT.TFile(outfilename, "RECREATE")
+outfile.cd()
+
+outtree = ROOT.TTree("Tskim", "Our tree of everything")
+
+npi = array('i', [-1])
+outtree.Branch('npi', npi, 'npi/I')
+pie = array('f', 64*[-1.])
+outtree.Branch('pie', pie, 'pie[npi]/F')
+pipx = array('f', 64*[-1.])
+outtree.Branch('pipx', pipx, 'pipx[npi]/F')
+pipy = array('f', 64*[-1.])
+outtree.Branch('pipy', pipy, 'pipy[npi]/F')
+pipz = array('f', 64*[-1.])
+outtree.Branch('pipz', pipz, 'pipz[npi]/F')
+piq = array('i', 64*[-1])
+outtree.Branch('piq', piq, 'piq[npi]/I')
+
+
 for i in range(nentries):
 
     #myparticles = {"electrons":[], "muons":[], "pions":[], "kaons":[], "protons":[], "gammas":[]}
@@ -203,7 +230,7 @@ for i in range(nentries):
     if i%1000==0:
         print(i,nentries)
 
-    if i>100000:
+    if i>100000000:
         break
 
     output = "Event: %d\n" % (i)
@@ -239,6 +266,7 @@ for i in range(nentries):
     ntrks = tree.nTRK
     #print("----{0}----".format(ntrks))
     #print("{0} {1} {2} {3} {4}".format(tree.np, tree.nK, tree.npi, tree.ne, tree.nmu))
+    npi[0] = 0
     for j in range(ntrks):
         idx = tree.TRKMCIdx[j]
         #print("idx,len: ",idx,tree.mcLen, ntrks)
@@ -271,6 +299,15 @@ for i in range(nentries):
         new_energy = recalc_energy(particle_masses[max_particle],[px,py,pz])
         particle = [new_energy,px,py,pz,q,particle_lunds[max_particle]]
         myparticles.append(particle)
+
+        if lund==211:
+            pie[npi[0]] = e
+            pipx[npi[0]] = px
+            pipy[npi[0]] = py
+            pipz[npi[0]] = pz
+            piq[npi[0]] = q
+
+            npi[0] += 1
 
         pmag = vec_mag(particle[1:4])
         if particle[-1]==11 and pmag>2.25 and pmag<2.8:
@@ -381,6 +418,14 @@ for i in range(nentries):
         
     totqs.append(totq)
     nbcands.append(nbcand)
+
+    outtree.Fill()
+
+outfile.cd()
+outfile.Write()
+outfile.Close()
+
+
 
 plt.figure()
 plt.hist(match_max,bins=5,range=(0,5))
