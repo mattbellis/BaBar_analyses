@@ -270,8 +270,8 @@ protonpy = array('f', 64*[-1.])
 outtree.Branch('protonpy', protonpy, 'protonpy[nproton]/F')
 protonpz = array('f', 64*[-1.])
 outtree.Branch('protonpz', protonpz, 'protonpz[nproton]/F')
-pq = array('i', 64*[-1])
-outtree.Branch('pq', pq, 'pq[nproton]/I')
+protonq = array('i', 64*[-1])
+outtree.Branch('protonq', protonq, 'protonq[nproton]/I')
 
 
 ne = array('i', [-1])
@@ -324,7 +324,7 @@ for i in range(nentries):
     if i>100000000:
         break
 
-    output = "Event: %d\n" % (i)
+    #output = "Event: %d\n" % (i)
     #output = ""
     tree.GetEntry(i)
 
@@ -406,39 +406,42 @@ for i in range(nentries):
         lund = tree.TRKLund[j]
         q = int(lund/np.abs(lund))
 
+        mylund = particle_lunds[max_particle]
+
         new_energy = recalc_energy(particle_masses[max_particle],[px,py,pz])
-        particle = [new_energy,px,py,pz,q,particle_lunds[max_particle]]
+        particle = [new_energy,px,py,pz,q,mylund]
         myparticles.append(particle)
 
-        if lund==211:
+
+        if mylund==211:
             pie[npi[0]] = e
             pipx[npi[0]] = px
             pipy[npi[0]] = py
             pipz[npi[0]] = pz
             piq[npi[0]] = q
             npi[0] += 1
-        elif lund==321:
+        elif mylund==321:
             ke[nk[0]] = e
             kpx[nk[0]] = px
             kpy[nk[0]] = py
             kpz[nk[0]] = pz
             kq[nk[0]] = q
             nk[0] += 1
-        elif lund==2212:
+        elif mylund==2212:
             protone[nproton[0]] = e
             protonpx[nproton[0]] = px
             protonpy[nproton[0]] = py
             protonpz[nproton[0]] = pz
             protonq[nproton[0]] = q
             nproton[0] += 1
-        elif lund==11:
+        elif mylund==11:
             ee[ne[0]] = e
             epx[ne[0]] = px
             epy[ne[0]] = py
             epz[ne[0]] = pz
             eq[ne[0]] = q
             ne[0] += 1
-        elif lund==13:
+        elif mylund==13:
             mue[nmu[0]] = e
             mupx[nmu[0]] = px
             mupy[nmu[0]] = py
@@ -460,7 +463,7 @@ for i in range(nentries):
     ############################################################################
     ngamma[0] = 0
     nphotons = tree.ngamma
-    output += "%d\n" % (nphotons)
+    #output += "%d\n" % (nphotons)
     for j in range(nphotons):
         #e = tree.gammaenergy[j]
         #p3 = tree.gammap3[j]
@@ -482,7 +485,9 @@ for i in range(nentries):
         gammapz[ngamma[0]] = pz
         ngamma[0] += 1
 
+    #print(len(leptons),len(protons),nproton[0])
     if len(leptons)>0 and len(protons)>0:
+        #print("FILLING!!!!!!!!!!!")
         outtree.Fill()
 
 outfile.cd()

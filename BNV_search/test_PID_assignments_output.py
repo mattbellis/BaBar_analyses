@@ -130,6 +130,7 @@ for i in range(nentries):
     beamp4 = np.array([tree.beame, tree.beampx, tree.beampy, tree.beampz])
     beammass = invmass([beamp4])
     beam = np.array([beammass, 0.0, 0.0, 0.0, 0, 0])
+    #print(beammass)
 
         
     '''
@@ -161,37 +162,48 @@ for i in range(nentries):
     '''
 
     nbcand = 0
+    #print(tree.nproton,tree.ne)
     for iprot in range(tree.nproton):
         for ilep in range(tree.ne):
+        #for ilep in range(tree.nmu):
 
-            proton = [tree.protone[iprot],tree.protonpz[iprot],tree.protonpy[iprot],tree.protonpz[iprot],tree.protonq[iprot]]
-            lepton = [tree.ee[iprot],tree.epz[iprot],tree.epy[iprot],tree.epz[iprot],tree.eq[iprot]]
+            proton = np.array([tree.protone[iprot],tree.protonpx[iprot],tree.protonpy[iprot],tree.protonpz[iprot],tree.protonq[iprot]])
+            lepton = np.array([tree.ee[ilep],tree.epx[ilep],tree.epy[ilep],tree.epz[ilep],tree.eq[ilep]])
+            #lepton = [tree.mue[ilep],tree.mupx[ilep],tree.mupy[ilep],tree.mupz[ilep],tree.muq[ilep]]
+
+            #print("hi")
+            #print(proton)
+            #print(lepton)
 
             # Make sure the charges are not the same
             if proton[4] == lepton[4]:
                 continue
 
-            p = vec_mag(proton[1:4])
-            prot_p.append(p)
-            p = vec_mag(lepton[1:4])
-            lep_p.append(p)
+            pp = vec_mag(proton[1:4])
+            prot_p.append(pp)
+            lp = vec_mag(lepton[1:4])
+            lep_p.append(lp)
+
 
             # B candidates
             bc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
             tagbc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
             bc = proton[0:-1] + lepton[0:-1]
+            #print(bc)
 
             pidx = proton[-1]
             lidx = lepton[-1]
             
-            bcand.append(invmass([bc]))
-            dE = bc[0] - beam[0]/2.0
-            bc[0] = beam[0]/2.0
-            mes = invmass([bc])
-            bcandMES.append(mes)
-            bcandDeltaE.append(dE)
-            bcandMM.append(invmass([beam-bc]))
+            if pp>2.2 and pp<2.8 and lp>2.2 and lp<2.8:
+                bcand.append(invmass([bc]))
+                dE = bc[0] - beam[0]/2.0
+                bc[0] = beam[0]/2.0
+                mes = invmass([bc])
+                bcandMES.append(mes)
+                bcandDeltaE.append(dE)
+
+            #bcandMM.append(invmass([beam-bc]))
 
             #tagbcand.append(invmass([tagbc]))
             #tagdE = tagbc[0] - beam[0]/2.0
@@ -212,7 +224,23 @@ for i in range(nentries):
 #outfile.Write()
 #outfile.Close()
 
-plt.figure()
-plt.hist(bcand)
+#print(bcand)
+
+plt.figure(figsize=(12,5))
+plt.subplot(1,3,1)
+plt.hist(bcand,range=(0,6),bins=50)
+
+plt.subplot(1,3,2)
+plt.hist(bcandDeltaE,range=(-2,2),bins=50)
+
+plt.subplot(1,3,3)
+plt.hist(bcandMES,range=(5.2,5.3),bins=50)
+
+plt.figure(figsize=(12,5))
+plt.subplot(1,3,1)
+plt.hist(prot_p,range=(0,3),bins=50)
+
+plt.subplot(1,3,2)
+plt.hist(lep_p,range=(0,3),bins=50)
 
 plt.show()
