@@ -5,13 +5,33 @@ import ROOT
 
 import sys
 
-#import lichen.lichen as lch
+import lichen.lichen as lch
 
 #plt.switch_backend('Agg')
 
 #particles = ["mu","e","pi","K","p"]
 particle_masses = [0.000511, 0.105, 0.139, 0.494, 0.938, 0]
 particle_lunds = [11, 13, 211, 321, 2212, 22]
+
+plotvars = {}
+plotvars["bcandmass"] = {"values":[], "xlabel":r"Mass B-candidate [GeV/c$^{2}$]", "ylabel":r"# entries","range":(0,6)} 
+plotvars["bcandMES"] = {"values":[], "xlabel":r"M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# entries","range":(5.2,5.3)} 
+plotvars["bcandDeltaE"] = {"values":[], "xlabel":r"$\Delta E$ [GeV]", "ylabel":r"# entries","range":(-2,2)} 
+plotvars["pmom"] = {"values":[], "xlabel":r"proton $|p|$ [GeV/c]", "ylabel":r"# entries","range":(0,5.5)} 
+plotvars["lepmom"] = {"values":[], "xlabel":r"lepton $|p|$ [GeV/c]", "ylabel":r"# entries","range":(0,5.5)} 
+plotvars["r2"] = {"values":[], "xlabel":r"R2", "ylabel":r"# entries","range":(0,1)} 
+plotvars["r2all"] = {"values":[], "xlabel":r"R2 all", "ylabel":r"# entries","range":(0,1)} 
+plotvars["thrustmag"] = {"values":[], "xlabel":r"Thrust mag", "ylabel":r"# entries","range":(0,1)} 
+plotvars["thrustmagall"] = {"values":[], "xlabel":r"Thrust mag all", "ylabel":r"# entries","range":(0,1)} 
+plotvars["thrustcosth"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$", "ylabel":r"# entries","range":(-1,1)} 
+plotvars["thrustcosthall"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$ all", "ylabel":r"# entries","range":(-1,1)} 
+plotvars["sphericityall"] = {"values":[], "xlabel":r"Sphericity all", "ylabel":r"# entries","range":(0,1)} 
+
+cuts = []
+ncuts = 4
+for n in range(ncuts):
+    for key in plotvars.keys():
+        plotvars[key]["values"].append([])
 
 ################################################################################
 def vec_mag(vec):
@@ -131,7 +151,13 @@ for i in range(nentries):
     beammass = invmass([beamp4])
     beam = np.array([beammass, 0.0, 0.0, 0.0, 0, 0])
     #print(beammass)
-
+    r2 = tree.r2
+    r2all = tree.r2all
+    thrustmag = tree.thrustmag
+    thrustmagall = tree.thrustmagall
+    thrustcosth = tree.thrustcosth
+    thrustcosthall = tree.thrustcosthall
+    sphericityall = tree.sphericityall
         
     '''
     if particle[-1]==11 and pmag>2.25 and pmag<2.8:
@@ -180,28 +206,42 @@ for i in range(nentries):
                 continue
 
             pp = vec_mag(proton[1:4])
-            prot_p.append(pp)
             lp = vec_mag(lepton[1:4])
-            lep_p.append(lp)
 
-
-            # B candidates
-            bc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-            tagbc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+            
 
             bc = proton[0:-1] + lepton[0:-1]
-            #print(bc)
+            bc_mass = invmass([bc])
+
+            dE = bc[0] - beam[0]/2.0
+            bc[0] = beam[0]/2.0
+            mes = invmass([bc])
 
             pidx = proton[-1]
             lidx = lepton[-1]
             
-            if pp>2.2 and pp<2.8 and lp>2.2 and lp<2.8:
-                bcand.append(invmass([bc]))
-                dE = bc[0] - beam[0]/2.0
-                bc[0] = beam[0]/2.0
-                mes = invmass([bc])
-                bcandMES.append(mes)
-                bcandDeltaE.append(dE)
+            # Should the low cut be 2.2 or 2.3? 
+            cut1 = pp>2.3 and pp<2.8 and lp>2.3 and lp<2.8
+            cut2 = dE>-0.5
+
+            cuts = [1, cut1, (cut2*cut1)]
+            for icut,cut in enumerate(cuts):
+                if cut:
+                    plotvars["bcandmass"]["values"][icut].append(bc_mass)
+
+                    plotvars["bcandMES"]["values"][icut].append(mes)
+                    plotvars["bcandDeltaE"]["values"][icut].append(dE)
+
+                    plotvars["pmom"]["values"][icut].append(pp)
+                    plotvars["lepmom"]["values"][icut].append(lp)
+
+                    plotvars["r2"]["values"][icut].append(r2)
+                    plotvars["r2all"]["values"][icut].append(r2all)
+                    plotvars["thrustmag"]["values"][icut].append(thrustmag)
+                    plotvars["thrustmagall"]["values"][icut].append(thrustmagall)
+                    plotvars["thrustcosth"]["values"][icut].append(thrustcosth)
+                    plotvars["thrustcosthall"]["values"][icut].append(thrustcosthall)
+                    plotvars["sphericityall"]["values"][icut].append(sphericityall)
 
             #bcandMM.append(invmass([beam-bc]))
 
@@ -226,21 +266,29 @@ for i in range(nentries):
 
 #print(bcand)
 
-plt.figure(figsize=(12,5))
-plt.subplot(1,3,1)
-plt.hist(bcand,range=(0,6),bins=50)
+for icut,cut in enumerate(cuts):
+    plt.figure(figsize=(14,9))
+    for j,key in enumerate(plotvars.keys()):
+        var = plotvars[key]
+        plt.subplot(3,4,1+j)
+        plt.hist(var["values"][icut],range=var["range"],bins=50)
+        plt.xlabel(var["xlabel"],fontsize=18)
+        plt.ylabel(var["ylabel"],fontsize=18)
+        print(len(var["values"][icut]))
 
-plt.subplot(1,3,2)
-plt.hist(bcandDeltaE,range=(-2,2),bins=50)
+    plt.tight_layout()
 
-plt.subplot(1,3,3)
-plt.hist(bcandMES,range=(5.2,5.3),bins=50)
-
-plt.figure(figsize=(12,5))
-plt.subplot(1,3,1)
-plt.hist(prot_p,range=(0,3),bins=50)
-
-plt.subplot(1,3,2)
-plt.hist(lep_p,range=(0,3),bins=50)
+#plt.subplot(1,3,2)
+#plt.hist(bcandDeltaE,range=(-2,2),bins=50)
+#
+#plt.subplot(1,3,3)
+#plt.hist(bcandMES,range=(5.2,5.3),bins=50)
+#
+#plt.figure(figsize=(12,5))
+#plt.subplot(1,3,1)
+#plt.hist(prot_p,range=(0,3),bins=50)
+#
+#plt.subplot(1,3,2)
+#plt.hist(lep_p,range=(0,3),bins=50)
 
 plt.show()
