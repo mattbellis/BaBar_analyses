@@ -246,6 +246,16 @@ pipz = array('f', 64*[-1.])
 outtree.Branch('pipz', pipz, 'pipz[npi]/F')
 piq = array('i', 64*[-1])
 outtree.Branch('piq', piq, 'piq[npi]/I')
+pipibit = array('i', 64*[-1])
+outtree.Branch('pipibit', pipibit, 'pipibit[npi]/I')
+pikbit = array('i', 64*[-1])
+outtree.Branch('pikbit', pikbit, 'pikbit[npi]/I')
+pipbit = array('i', 64*[-1])
+outtree.Branch('pipbit', pipbit, 'pipbit[npi]/I')
+piebit = array('i', 64*[-1])
+outtree.Branch('piebit', piebit, 'piebit[npi]/I')
+pimubit = array('i', 64*[-1])
+outtree.Branch('pimubit', pimubit, 'pimubit[npi]/I')
 
 nk = array('i', [-1])
 outtree.Branch('nk', nk, 'nk/I')
@@ -259,6 +269,16 @@ kpz = array('f', 64*[-1.])
 outtree.Branch('kpz', kpz, 'kpz[nk]/F')
 kq = array('i', 64*[-1])
 outtree.Branch('kq', kq, 'kq[nk]/I')
+kpibit = array('i', 64*[-1])
+outtree.Branch('kpibit', kpibit, 'kpibit[nk]/I')
+kkbit = array('i', 64*[-1])
+outtree.Branch('kkbit', kkbit, 'kkbit[nk]/I')
+kpbit = array('i', 64*[-1])
+outtree.Branch('kpbit', kpbit, 'kpbit[nk]/I')
+kebit = array('i', 64*[-1])
+outtree.Branch('kebit', kebit, 'kebit[nk]/I')
+kmubit = array('i', 64*[-1])
+outtree.Branch('kmubit', kmubit, 'kmubit[nk]/I')
 
 nproton = array('i', [-1])
 outtree.Branch('nproton', nproton, 'nproton/I')
@@ -272,6 +292,16 @@ protonpz = array('f', 64*[-1.])
 outtree.Branch('protonpz', protonpz, 'protonpz[nproton]/F')
 protonq = array('i', 64*[-1])
 outtree.Branch('protonq', protonq, 'protonq[nproton]/I')
+protonpibit = array('i', 64*[-1])
+outtree.Branch('protonpibit', protonpibit, 'protonpibit[nproton]/I')
+protonkbit = array('i', 64*[-1])
+outtree.Branch('protonkbit', protonkbit, 'protonkbit[nproton]/I')
+protonpbit = array('i', 64*[-1])
+outtree.Branch('protonpbit', protonpbit, 'protonpbit[nproton]/I')
+protonebit = array('i', 64*[-1])
+outtree.Branch('protonebit', protonebit, 'protonebit[nproton]/I')
+protonmubit = array('i', 64*[-1])
+outtree.Branch('protonmubit', protonmubit, 'protonmubit[nproton]/I')
 
 
 ne = array('i', [-1])
@@ -286,6 +316,16 @@ epz = array('f', 64*[-1.])
 outtree.Branch('epz', epz, 'epz[ne]/F')
 eq = array('i', 64*[-1])
 outtree.Branch('eq', eq, 'eq[ne]/I')
+epibit = array('i', 64*[-1])
+outtree.Branch('epibit', epibit, 'epibit[ne]/I')
+ekbit = array('i', 64*[-1])
+outtree.Branch('ekbit', ekbit, 'ekbit[ne]/I')
+epbit = array('i', 64*[-1])
+outtree.Branch('epbit', epbit, 'epbit[ne]/I')
+eebit = array('i', 64*[-1])
+outtree.Branch('eebit', eebit, 'eebit[ne]/I')
+emubit = array('i', 64*[-1])
+outtree.Branch('emubit', emubit, 'emubit[ne]/I')
 
 nmu = array('i', [-1])
 outtree.Branch('nmu', nmu, 'nmu/I')
@@ -299,16 +339,26 @@ mupz = array('f', 64*[-1.])
 outtree.Branch('mupz', mupz, 'mupz[nmu]/F')
 muq = array('i', 64*[-1])
 outtree.Branch('muq', muq, 'muq[nmu]/I')
+mupibit = array('i', 64*[-1])
+outtree.Branch('mupibit', mupibit, 'mupibit[nmu]/I')
+mukbit = array('i', 64*[-1])
+outtree.Branch('mukbit', mukbit, 'mukbit[nmu]/I')
+mupbit = array('i', 64*[-1])
+outtree.Branch('mupbit', mupbit, 'mupbit[nmu]/I')
+muebit = array('i', 64*[-1])
+outtree.Branch('muebit', muebit, 'muebit[nmu]/I')
+mumubit = array('i', 64*[-1])
+outtree.Branch('mumubit', mumubit, 'mumubit[nmu]/I')
 
 ngamma = array('i', [-1])
 outtree.Branch('ngamma', ngamma, 'ngamma/I')
-gammae = array('f', 64*[-1.])
+gammae = array('f', 128*[-1.])
 outtree.Branch('gammae', gammae, 'gammae[ngamma]/F')
-gammapx = array('f', 64*[-1.])
+gammapx = array('f', 128*[-1.])
 outtree.Branch('gammapx', gammapx, 'gammapx[ngamma]/F')
-gammapy = array('f', 64*[-1.])
+gammapy = array('f', 128*[-1.])
 outtree.Branch('gammapy', gammapy, 'gammapy[ngamma]/F')
-gammapz = array('f', 64*[-1.])
+gammapz = array('f', 128*[-1.])
 outtree.Branch('gammapz', gammapz, 'gammapz[ngamma]/F')
 
 for i in range(nentries):
@@ -419,6 +469,11 @@ for i in range(nentries):
             pipy[npi[0]] = py
             pipz[npi[0]] = pz
             piq[npi[0]] = q
+            pipibit[npi[0]] = pibit
+            pikbit[npi[0]] = Kbit
+            pipbit[npi[0]] = pbit
+            piebit[npi[0]] = ebit
+            pimubit[npi[0]] = mubit
             npi[0] += 1
         elif mylund==321:
             ke[nk[0]] = e
@@ -426,6 +481,11 @@ for i in range(nentries):
             kpy[nk[0]] = py
             kpz[nk[0]] = pz
             kq[nk[0]] = q
+            kpibit[nk[0]] = pibit
+            kkbit[nk[0]] = Kbit
+            kpbit[nk[0]] = pbit
+            kebit[nk[0]] = ebit
+            kmubit[nk[0]] = mubit
             nk[0] += 1
         elif mylund==2212:
             protone[nproton[0]] = e
@@ -433,6 +493,11 @@ for i in range(nentries):
             protonpy[nproton[0]] = py
             protonpz[nproton[0]] = pz
             protonq[nproton[0]] = q
+            protonpibit[nproton[0]] = pibit
+            protonkbit[nproton[0]] = Kbit
+            protonpbit[nproton[0]] = pbit
+            protonebit[nproton[0]] = ebit
+            protonmubit[nproton[0]] = mubit
             nproton[0] += 1
         elif mylund==11:
             ee[ne[0]] = e
@@ -440,6 +505,11 @@ for i in range(nentries):
             epy[ne[0]] = py
             epz[ne[0]] = pz
             eq[ne[0]] = q
+            epibit[ne[0]] = pibit
+            ekbit[ne[0]] = Kbit
+            epbit[ne[0]] = pbit
+            eebit[ne[0]] = ebit
+            emubit[ne[0]] = mubit
             ne[0] += 1
         elif mylund==13:
             mue[nmu[0]] = e
@@ -447,6 +517,11 @@ for i in range(nentries):
             mupy[nmu[0]] = py
             mupz[nmu[0]] = pz
             muq[nmu[0]] = q
+            mupibit[nmu[0]] = pibit
+            mukbit[nmu[0]] = Kbit
+            mupbit[nmu[0]] = pbit
+            muebit[nmu[0]] = ebit
+            mumubit[nmu[0]] = mubit
             nmu[0] += 1
 
 
@@ -479,10 +554,11 @@ for i in range(nentries):
         #particle = [e,px,py,pz,0,22]
         particle = [new_energy,px,py,pz,0,22]
 
-        gammae[ngamma[0]] = e
-        gammapx[ngamma[0]] = px
-        gammapy[ngamma[0]] = py
-        gammapz[ngamma[0]] = pz
+        if ngamma[0]<128:
+            gammae[ngamma[0]] = e
+            gammapx[ngamma[0]] = px
+            gammapy[ngamma[0]] = py
+            gammapz[ngamma[0]] = pz
         ngamma[0] += 1
 
     #print(len(leptons),len(protons),nproton[0])
