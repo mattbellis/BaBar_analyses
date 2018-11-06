@@ -7,7 +7,7 @@ import sys
 
 #import lichen.lichen as lch
 
-plt.switch_backend('Agg')
+#plt.switch_backend('Agg')
 
 #particles = ["mu","e","pi","K","p"]
 particle_masses = [0.000511, 0.105, 0.139, 0.494, 0.938, 0]
@@ -212,3 +212,7 @@ for i in range(nentries):
 #outfile.Write()
 #outfile.Close()
 
+plt.figure()
+plt.hist(bcand)
+
+plt.show()
