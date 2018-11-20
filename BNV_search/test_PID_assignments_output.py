@@ -7,6 +7,15 @@ import sys
 
 import lichen.lichen as lch
 
+from myPIDselector import *
+
+eps = PIDselector("e")
+pps = PIDselector("p")
+pips = PIDselector("pi")
+Kps = PIDselector("K")
+mups = PIDselector("mu")
+
+
 #plt.switch_backend('Agg')
 
 #particles = ["mu","e","pi","K","p"]
@@ -124,6 +133,9 @@ nbcands = []
 lep_p = []
 prot_p = []
 
+lepbits = [[], [], [], [], []]
+protbits = [[], [], [], [], []]
+
 #filenames = sys.argv[1:]
 outfilename = None
 if outfilename is None:
@@ -190,12 +202,25 @@ for i in range(nentries):
     nbcand = 0
     #print(tree.nproton,tree.ne)
     for iprot in range(tree.nproton):
+        pbits = []
+        pbits.append(tree.protonpibit[iprot])
+        pbits.append(tree.protonkbit[iprot])
+        pbits.append(tree.protonpbit[iprot])
+        pbits.append(tree.protonebit[iprot])
+        pbits.append(tree.protonmubit[iprot])
         for ilep in range(tree.ne):
         #for ilep in range(tree.nmu):
 
             proton = np.array([tree.protone[iprot],tree.protonpx[iprot],tree.protonpy[iprot],tree.protonpz[iprot],tree.protonq[iprot]])
             lepton = np.array([tree.ee[ilep],tree.epx[ilep],tree.epy[ilep],tree.epz[ilep],tree.eq[ilep]])
             #lepton = [tree.mue[ilep],tree.mupx[ilep],tree.mupy[ilep],tree.mupz[ilep],tree.muq[ilep]]
+            #protbits[0].append(tree.protonpibit[iprot])
+            lepbits = []
+            lepbits.append(tree.epibit[ilep])
+            lepbits.append(tree.ekbit[ilep])
+            lepbits.append(tree.epbit[ilep])
+            lepbits.append(tree.eebit[ilep])
+            lepbits.append(tree.emubit[ilep])
 
             #print("hi")
             #print(proton)
@@ -223,8 +248,9 @@ for i in range(nentries):
             # Should the low cut be 2.2 or 2.3? 
             cut1 = pp>2.3 and pp<2.8 and lp>2.3 and lp<2.8
             cut2 = dE>-0.5
+            cut3 = r2all<0.5
 
-            cuts = [1, cut1, (cut2*cut1)]
+            cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3)]
             for icut,cut in enumerate(cuts):
                 if cut:
                     plotvars["bcandmass"]["values"][icut].append(bc_mass)
@@ -242,6 +268,17 @@ for i in range(nentries):
                     plotvars["thrustcosth"]["values"][icut].append(thrustcosth)
                     plotvars["thrustcosthall"]["values"][icut].append(thrustcosthall)
                     plotvars["sphericityall"]["values"][icut].append(sphericityall)
+
+                    if 0:#icut==2 and mes>5.2:
+                        print("---------")
+                        print(pbits)
+                        print(lepbits)
+                        #pps.SetBits(pbits[2]); pps.PrintSelectors(); #Kps.PrintBits()
+                        #Kps.SetBits(pbits[1]); Kps.PrintSelectors(); #Kps.PrintBits()
+                        #pips.SetBits(pbits[0]); pips.PrintSelectors(); #Kps.PrintBits()
+                        eps.SetBits(lepbits[3]); eps.PrintSelectors(); #Kps.PrintBits()
+                        pips.SetBits(lepbits[0]); pips.PrintSelectors(); #Kps.PrintBits()
+                        Kps.SetBits(lepbits[1]); Kps.PrintSelectors(); #Kps.PrintBits()
 
             #bcandMM.append(invmass([beam-bc]))
 
@@ -265,17 +302,33 @@ for i in range(nentries):
 #outfile.Close()
 
 #print(bcand)
+for icut,cut in enumerate(cuts):
+    for j,key in enumerate(plotvars.keys()):
+        var = plotvars[key]
+        print(len(var["values"][icut])/nentries)
+#exit()
 
 for icut,cut in enumerate(cuts):
-    plt.figure(figsize=(14,9))
+    plt.figure(figsize=(10,6))
     for j,key in enumerate(plotvars.keys()):
         var = plotvars[key]
         plt.subplot(3,4,1+j)
-        plt.hist(var["values"][icut],range=var["range"],bins=50)
-        plt.xlabel(var["xlabel"],fontsize=18)
-        plt.ylabel(var["ylabel"],fontsize=18)
+        lch.hist_err(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5)
+        plt.xlabel(var["xlabel"],fontsize=12)
+        plt.ylabel(var["ylabel"],fontsize=12)
         print(len(var["values"][icut]))
 
+    if icut==len(cuts)-1:
+        plt.figure(figsize=(10,6))
+        plt.subplot(1,1,1)
+        plt.plot(plotvars["bcandMES"]["values"][icut],plotvars["bcandDeltaE"]["values"][icut],'.',alpha=0.8,markersize=2.0)
+        plt.xlabel(plotvars["bcandMES"]["xlabel"],fontsize=12)
+        plt.ylabel(plotvars["bcandMES"]["ylabel"],fontsize=12)
+        plt.xlim(5.2,5.3)
+        plt.ylim(-0.4,0.1)
+
+
+        plt.tight_layout()
     plt.tight_layout()
 
 #plt.subplot(1,3,2)

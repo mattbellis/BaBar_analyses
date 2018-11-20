@@ -1,1 +1,2 @@
-rm batch*.root.sh bellis*.root.log
+rm batch*.root.sh 
+rm bellis*.root.log

@@ -94,7 +94,8 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
     for i in s:
         #print(i)
         #if i.find("SuperTightKM")>=0 or i.find("SuperTightKM")>=0:
-        if i.find("LooseKM")>=0 or i.find("TightKM")>=0:
+        #if i.find("LooseKM")>=0 or i.find("TightKM")>=0:
+        if i.find("LooseKM")==0 or i.find("TightKM")>=0:
             if pps.IsSelectorSet(i):
                 return 4,1.0 # proton
 
