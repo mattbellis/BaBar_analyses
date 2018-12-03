@@ -35,6 +35,8 @@ plotvars["thrustmagall"] = {"values":[], "xlabel":r"Thrust mag all", "ylabel":r"
 plotvars["thrustcosth"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$", "ylabel":r"# entries","range":(-1,1)} 
 plotvars["thrustcosthall"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$ all", "ylabel":r"# entries","range":(-1,1)} 
 plotvars["sphericityall"] = {"values":[], "xlabel":r"Sphericity all", "ylabel":r"# entries","range":(0,1)} 
+plotvars["ncharged"] = {"values":[], "xlabel":r"# charged particles", "ylabel":r"# entries","range":(0,20)} 
+plotvars["nphot"] = {"values":[], "xlabel":r"# photons","ylabel":r"# entries","range":(0,20)} 
 
 cuts = []
 ncuts = 4
@@ -136,6 +138,9 @@ prot_p = []
 lepbits = [[], [], [], [], []]
 protbits = [[], [], [], [], []]
 
+ncharged = []
+nphot = []
+
 #filenames = sys.argv[1:]
 outfilename = None
 if outfilename is None:
@@ -171,6 +176,9 @@ for i in range(nentries):
     thrustcosthall = tree.thrustcosthall
     sphericityall = tree.sphericityall
         
+    nphot = tree.ngamma
+    ncharged = tree.npi + tree.nk + tree.nproton + tree.ne + tree.nmu
+
     '''
     if particle[-1]==11 and pmag>2.25 and pmag<2.8:
         leptons.append(np.array(particle + [j]))
@@ -198,6 +206,7 @@ for i in range(nentries):
         else:
             myparticles.append(particle)
     '''
+
 
     nbcand = 0
     #print(tree.nproton,tree.ne)
@@ -269,6 +278,9 @@ for i in range(nentries):
                     plotvars["thrustcosthall"]["values"][icut].append(thrustcosthall)
                     plotvars["sphericityall"]["values"][icut].append(sphericityall)
 
+                    plotvars["nphot"]["values"][icut].append(nphot)
+                    plotvars["ncharged"]["values"][icut].append(ncharged)
+
                     if 0:#icut==2 and mes>5.2:
                         print("---------")
                         print(pbits)
@@ -312,8 +324,11 @@ for icut,cut in enumerate(cuts):
     plt.figure(figsize=(10,6))
     for j,key in enumerate(plotvars.keys()):
         var = plotvars[key]
-        plt.subplot(3,4,1+j)
-        lch.hist_err(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5)
+        plt.subplot(4,4,1+j)
+        if key=="nphot" or key=="ncharged":
+            lch.hist_err(var["values"][icut],range=var["range"],bins=20,alpha=0.2,markersize=0.5)
+        else:
+            lch.hist_err(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5)
         plt.xlabel(var["xlabel"],fontsize=12)
         plt.ylabel(var["ylabel"],fontsize=12)
         print(len(var["values"][icut]))

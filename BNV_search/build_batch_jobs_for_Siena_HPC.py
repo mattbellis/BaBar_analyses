@@ -1,6 +1,7 @@
 import numpy as np
 import subprocess as sp
 
+import os
 import sys
 
 ###############################################################################
@@ -61,9 +62,17 @@ def write_output_file(infile, tag, batchfilename):
 ################################################################################
 def main():
 
-    infiles = sys.argv[1:]
+    topdir = sys.argv[1]
+    infiles = os.listdir(topdir)
+    for file in infiles:
+        if file.find('SKIMMED.root')<0:
+            print("REMOVING: ",file)
+            infiles.remove(file)
+    #print(infiles)
+    #exit()
+    #infiles = sys.argv[1:]
 
-    mastertag = "cms"
+    mastertag = "babar"
 
     for infile in infiles:
 
