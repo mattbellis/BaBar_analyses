@@ -63,12 +63,15 @@ def write_output_file(infile, tag, batchfilename):
 def main():
 
     topdir = sys.argv[1]
-    infiles = os.listdir(topdir)
-    for file in infiles:
-        if file.find('SKIMMED.root')<0:
-            print("REMOVING: ",file)
-            infiles.remove(file)
-    #print(infiles)
+    infiles = []
+    infilestemp = os.listdir(topdir)
+    for file in infilestemp:
+        if file.find('SKIMMED.root')>=0:
+            file = "{0}/{1}".format(topdir,file)
+            infiles.append(file)
+            #print("REMOVING: ",file)
+            #infiles.remove(file)
+    print(infiles)
     #exit()
     #infiles = sys.argv[1:]
 
