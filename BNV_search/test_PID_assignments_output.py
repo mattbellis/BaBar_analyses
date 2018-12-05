@@ -9,6 +9,8 @@ import lichen.lichen as lch
 
 from myPIDselector import *
 
+import pickle
+
 eps = PIDselector("e")
 pps = PIDselector("p")
 pips = PIDselector("pi")
@@ -102,16 +104,13 @@ def sph2cart(pmag,costh,phi):
     return x,y,z
 ################################################################################
 
+infilenames = sys.argv[1:]
 tree = ROOT.TChain("Tskim")
-for infile in sys.argv[1:]:
+for infile in infilenames:
     print(infile)
     tree.AddFile(infile)
 
 nentries = tree.GetEntries()
-
-#outfilename = "%s.dat" % (sys.argv[1].split('/')[-1].split('.root')[0])
-#outfilename = "%s.dat" % (sys.argv[1].split('.root')[0])
-#outfile = open(outfilename,'w')
 
 invmasses = []
 missmasses = []
@@ -142,14 +141,19 @@ ncharged = []
 nphot = []
 
 #filenames = sys.argv[1:]
-outfilename = None
-if outfilename is None:
-    #outfilename = filenames[0].split('/')[-1].split('.root')[0] + "_OUTPUT.root"
-    outfilename = "output_testing_the_PID_assignment_skim.root"
-outfile = ROOT.TFile(outfilename, "RECREATE")
-outfile.cd()
 
-#outtree = ROOT.TTree("Tskim", "Our tree of everything")
+def get_sptag(name):
+    tag = name.split('basicPID_R24-SP-')[1].split('-R24-')[0]
+    return tag
+
+
+outfilename = None
+sptag = None
+if outfilename is None:
+    sptag = get_sptag(infilenames[0]) 
+    outfilename = 'OUTPUT_' + sptag + ".pkl"
+    #outfilename = "output_testing_the_PID_assignment_skim.pkl"
+
 
 for i in range(nentries):
 
@@ -307,11 +311,15 @@ for i in range(nentries):
     #totqs.append(totq)
     nbcands.append(nbcand)
 
-    #outtree.Fill()
 
-#outfile.cd()
-#outfile.Write()
-#outfile.Close()
+outfilename
+outfile = open(outfilename,'wb')
+pickle.dump(plotvars,outfile)
+outfile.close()
+
+print('Processed {0} files for {1}'.format(len(infilenames),sptag))
+
+exit()
 
 #print(bcand)
 for icut,cut in enumerate(cuts):
@@ -319,6 +327,7 @@ for icut,cut in enumerate(cuts):
         var = plotvars[key]
         print(len(var["values"][icut])/nentries)
 #exit()
+
 
 for icut,cut in enumerate(cuts):
     plt.figure(figsize=(10,6))
@@ -345,18 +354,5 @@ for icut,cut in enumerate(cuts):
 
         plt.tight_layout()
     plt.tight_layout()
-
-#plt.subplot(1,3,2)
-#plt.hist(bcandDeltaE,range=(-2,2),bins=50)
-#
-#plt.subplot(1,3,3)
-#plt.hist(bcandMES,range=(5.2,5.3),bins=50)
-#
-#plt.figure(figsize=(12,5))
-#plt.subplot(1,3,1)
-#plt.hist(prot_p,range=(0,3),bins=50)
-#
-#plt.subplot(1,3,2)
-#plt.hist(lep_p,range=(0,3),bins=50)
 
 plt.show()
