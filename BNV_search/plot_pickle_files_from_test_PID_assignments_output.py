@@ -41,26 +41,36 @@ apvkeys = list(allplotvars.keys())
 varnames = list(allplotvars[apvkeys[0]].keys())
 nvars = len(varnames)
 
+print(nsp,ncuts)
+
 for j in range(nvars):
-    width = 2*ncuts
-    height = 2*nvars
+    if j>30:
+        break
+
+    width = 3*ncuts
+    height = 0.5*nvars
     plt.figure(figsize=(width,height))
 
     varname = varnames[j]
+    print(varname)
 
-    for apvkey in apvkeys:
+    for i,apvkey in enumerate(apvkeys):
         plotvars = allplotvars[apvkey]
 
         for icut in range(ncuts):
+
+            plotindex = 1 + icut +  (i*ncuts)
+            plt.subplot(nsp,ncuts,plotindex)
+
             var = plotvars[varname]
-            plt.subplot(4,4,1+j)
+
             if varname=="nphot" or varname=="ncharged":
-                lch.hist_err(var["values"][icut],range=var["range"],bins=20,alpha=0.2,markersize=0.5)
+                lch.hist_err(var["values"][icut],range=var["range"],bins=20,alpha=0.2,markersize=0.5,label=apvkey)
             else:
-                lch.hist_err(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5)
+                lch.hist_err(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5,label=apvkey)
             plt.xlabel(var["xlabel"],fontsize=12)
             plt.ylabel(var["ylabel"],fontsize=12)
-            print(len(var["values"][icut]))
+            #print(len(var["values"][icut]))
 
             '''
             if icut==len(cuts)-1:
@@ -72,7 +82,10 @@ for j in range(nvars):
                 plt.xlim(5.2,5.3)
                 plt.ylim(-0.4,0.1)
             '''
+            if icut==0:
+                plt.legend()
 
+    #plt.tight_layout()
 plt.show()
 
 exit()
