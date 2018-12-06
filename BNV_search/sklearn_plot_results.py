@@ -189,21 +189,36 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
     ypts0 = np.array(ypts0)
     ypts1 = np.array(ypts1)
 
-    plt.figure(figsize=(10,3))
-    plt.subplot(1,3,1)
+    plt.figure(figsize=(8,8))
+    plt.subplot(2,2,1)
     plt.plot(xpts,ypts0)
     plt.xlabel("Cut on probability of being signal")
     plt.ylabel("# of signal remaining")
 
-    plt.subplot(1,3,2)
+    plt.subplot(2,2,2)
     plt.plot(xpts,ypts1)
     plt.xlabel("Cut on probability of being signal")
     plt.ylabel("# of background remaining")
 
-    plt.subplot(1,3,3)
+    plt.subplot(2,2,3)
     plt.plot(ypts1/n1,ypts0/n0)
     plt.xlabel("Fraction of background remaining")
     plt.ylabel("Fraction of signal remaining")
+
+    # For Punzi calculation
+    a = 4.0
+    B0 = 100.0
+
+    sig_eps = ypts0/n0
+    bkg_eps = ypts1/n1
+
+    fom = sig_eps/((a/2.0) + np.sqrt(bkg_eps*B0))
+
+    plt.subplot(2,2,4)
+    plt.plot(sig_eps, fom)
+    plt.xlabel("Fraction of signal remaining")
+    plt.ylabel("Punzi figure of merit")
+
 
     plt.tight_layout()
 
