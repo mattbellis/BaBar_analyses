@@ -6,20 +6,72 @@ import sys
 import lichen.lichen as lch
 import pickle
 
+from raw_event_numbers_and_cross_section import *
+
+ren = raw_event_numbers
+
+scale_factors = {}
+for key in ren["data"].keys():
+
+    bkg = [1235, 1237, 1005, 998, 3429, 3981, 2400]
+    for sp in bkg:
+        key = "{0}".format(sp)
+        xsec = ren["MC"][key]["xsec"]
+        raw = ren["MC"][key]["raw"]
+        sf = (raw/1e6)/(xsec*intlumi)
+        scale_factors[key] = 1.0/sf
+
+
+print(scale_factors)
+#import seaborn as sns
+#sns.set()
+
 ################################################################################
 
-#OUTPUT_1235.pkl
+#tag = "ELECTRON"
+tag = "MUON"
 
-infilenames = sys.argv[1:]
+infilenames = ['OUTPUT_1235.pkl',
+               'OUTPUT_1237.pkl',
+               'OUTPUT_1005.pkl',
+               'OUTPUT_998.pkl',
+               'OUTPUT_3429.pkl',
+               'OUTPUT_3981.pkl',
+               #'OUTPUT_2400.pkl',
+               ]
+if tag=='ELECTRON':
+    infilenames.append('OUTPUT_9457.pkl')
+elif tag=='MUON':
+    infilenames.append('OUTPUT_9456.pkl')
+
+for i,infilename in enumerate(infilenames):
+    infilenames[i] = infilename.replace('_','_{0}_'.format(tag))
+print(infilenames)
+#exit()
+
+spnumbers = [name.split('_')[-1].split('.')[0] for name in infilenames]
+labels = [r'$B^+B^-$',
+          r'$B^0\bar{B}^0$',
+          r'$c\bar{c}$',
+          r'$u\bar{u},d\bar{d},s\bar{s}$',
+          r'$\tau^+\tau^-$',
+          r'$\mu^+\mu^-$',
+          #r'$e^+e^-$',
+          r'$B\rightarrow p e^-$']
+
+
+
+#infilenames = sys.argv[1:]
 allplotvars = {}
 for infile in infilenames:
     print("Loading " + infile)
     x = pickle.load(open(infile,'rb'))
-    sptag = infile.split('OUTPUT_')[1].split('.pkl')[0]
+    sptag = infile.split('_')[-1].split('.pkl')[0]
     allplotvars[sptag] = x
 
+#print(allplotvars)
 print()
-ncuts = 4
+ncuts = 5
 for apvkey in allplotvars.keys():
     plotvars = allplotvars[apvkey]
     #for icut,cut in enumerate(cuts):
@@ -43,69 +95,56 @@ nvars = len(varnames)
 
 print(nsp,ncuts)
 
-#for j in range(nvars):
-for j in range(4):
-    if j>30:
-        break
+# Variables to plot
+vtp = ['bcandMES', 'bcandDeltaE']
 
-    width = 3*ncuts
+for varname in vtp:
+
+    width = 4*ncuts
     height = 4
     plt.figure(figsize=(width,height))
 
-    varname = varnames[j]
-    print(varname)
+    for icut in range(ncuts):
 
-    plot_data = []
-    for i,apvkey in enumerate(apvkeys):
-        plotvars = allplotvars[apvkey]
+        plot_data = []
+        weights = []
 
-        for icut in range(ncuts):
+        sig_data = None
 
-            plotindex = 1 + icut 
-            plt.subplot(1,ncuts,plotindex)
-
+        for i,apvkey in enumerate(apvkeys):
+            plotvars = allplotvars[apvkey]
+            plotvars["bcandDeltaE"]["range"] = (-0.5,0.5)
             var = plotvars[varname]
+            if apvkey!='9457' and apvkey!='9456': 
 
-            if varname=="nphot" or varname=="ncharged":
-                lch.hist_err(var["values"][icut],range=var["range"],bins=20,alpha=0.2,markersize=0.5,label=apvkey)
+                data = var["values"][icut]
+                plot_data.append(data)
+
+                wt = scale_factors[apvkey]
+                weights.append(wt*np.ones(len(data)))
             else:
-                lch.hist_err(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5,label=apvkey)
-            plt.xlabel(var["xlabel"],fontsize=12)
-            plt.ylabel(var["ylabel"],fontsize=12)
-            #print(len(var["values"][icut]))
+                #plotvars["bcandDeltaE"]["range"] = (-0.5,0.5)
+                #plotvars = allplotvars[apvkey]
+                #var = plotvars[varname]
+                data = var["values"][icut]
+                sig_data = data
 
-            '''
-            if icut==len(cuts)-1:
-                plt.figure(figsize=(10,6))
-                plt.subplot(1,1,1)
-                plt.plot(plotvars["bcandMES"]["values"][icut],plotvars["bcandDeltaE"]["values"][icut],'.',alpha=0.8,markersize=2.0)
-                plt.xlabel(plotvars["bcandMES"]["xlabel"],fontsize=12)
-                plt.ylabel(plotvars["bcandMES"]["ylabel"],fontsize=12)
-                plt.xlim(5.2,5.3)
-                plt.ylim(-0.4,0.1)
-            '''
-            if icut==0:
-                plt.legend()
+        plotindex = 1 + icut 
+        plt.subplot(1,ncuts,plotindex)
 
-    #plt.tight_layout()
-plt.show()
+        plt.hist(plot_data,range=var["range"],bins=50,alpha=1.0,weights=weights,label=labels,stacked=True)
+        #print(sig_data[0:10])
+        tot = 0
+        for entry in plot_data:
+            tot += len(entry)
+        #wt = 0.01*(tot/len(sig_data))*np.ones(len(sig_data))
+        wt = 0.005**np.ones(len(sig_data))
+        plt.hist(sig_data,range=var["range"],bins=50,weights=wt,fill=False,label=labels[-1],color='k',histtype='step',linewidth=2)
 
-exit()
+        plt.xlabel(var["xlabel"],fontsize=12)
+        plt.ylabel(var["ylabel"],fontsize=12)
 
-for a in range(4):
-    for icut,cut in enumerate(cuts):
-        plt.figure(figsize=(10,6))
-        for j,key in enumerate(plotvars.keys()):
-            var = plotvars[key]
-            plt.subplot(4,4,1+j)
-            if key=="nphot" or key=="ncharged":
-                lch.hist_err(var["values"][icut],range=var["range"],bins=20,alpha=0.2,markersize=0.5)
-            else:
-                lch.hist_err(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5)
-            plt.xlabel(var["xlabel"],fontsize=12)
-            plt.ylabel(var["ylabel"],fontsize=12)
-            print(len(var["values"][icut]))
-
+        '''
         if icut==len(cuts)-1:
             plt.figure(figsize=(10,6))
             plt.subplot(1,1,1)
@@ -114,9 +153,10 @@ for a in range(4):
             plt.ylabel(plotvars["bcandMES"]["ylabel"],fontsize=12)
             plt.xlim(5.2,5.3)
             plt.ylim(-0.4,0.1)
+        '''
+        if icut==0:
+            plt.legend()
 
-
-            plt.tight_layout()
-        plt.tight_layout()
-
+    plt.tight_layout()
 plt.show()
+
