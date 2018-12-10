@@ -4,6 +4,7 @@ import matplotlib.pylab as plt
 import ROOT
 
 import sys
+import os
 
 import lichen.lichen as lch
 
@@ -41,7 +42,7 @@ plotvars["ncharged"] = {"values":[], "xlabel":r"# charged particles", "ylabel":r
 plotvars["nphot"] = {"values":[], "xlabel":r"# photons","ylabel":r"# entries","range":(0,20)} 
 
 cuts = []
-ncuts = 4
+ncuts = 5
 for n in range(ncuts):
     for key in plotvars.keys():
         plotvars[key]["values"].append([])
@@ -104,7 +105,20 @@ def sph2cart(pmag,costh,phi):
     return x,y,z
 ################################################################################
 
-infilenames = sys.argv[1:]
+#infilenames = sys.argv[1:]
+topdir = sys.argv[1]
+filestemp = os.listdir(topdir)
+
+infilenames = []
+for f in filestemp:
+    if f.find('PID_skim.root')>=0:
+        #files.append(f)
+        infilenames.append(topdir+"/"+f)
+
+print(len(infilenames))
+print(infilenames[0])
+#exit()
+
 tree = ROOT.TChain("Tskim")
 for infile in infilenames:
     print(infile)
@@ -151,7 +165,8 @@ outfilename = None
 sptag = None
 if outfilename is None:
     sptag = get_sptag(infilenames[0]) 
-    outfilename = 'OUTPUT_' + sptag + ".pkl"
+    outfilename = 'OUTPUT_MUON_' + sptag + ".pkl"
+    #outfilename = 'OUTPUT_ELECTRON_' + sptag + ".pkl"
     #outfilename = "output_testing_the_PID_assignment_skim.pkl"
 
 
@@ -221,19 +236,30 @@ for i in range(nentries):
         pbits.append(tree.protonpbit[iprot])
         pbits.append(tree.protonebit[iprot])
         pbits.append(tree.protonmubit[iprot])
-        for ilep in range(tree.ne):
-        #for ilep in range(tree.nmu):
+        #for ilep in range(tree.ne):
+        for ilep in range(tree.nmu):
 
             proton = np.array([tree.protone[iprot],tree.protonpx[iprot],tree.protonpy[iprot],tree.protonpz[iprot],tree.protonq[iprot]])
-            lepton = np.array([tree.ee[ilep],tree.epx[ilep],tree.epy[ilep],tree.epz[ilep],tree.eq[ilep]])
-            #lepton = [tree.mue[ilep],tree.mupx[ilep],tree.mupy[ilep],tree.mupz[ilep],tree.muq[ilep]]
-            #protbits[0].append(tree.protonpibit[iprot])
+            new_energy = recalc_energy(0.938272,[proton[1],proton[2],proton[3]])
+            proton[0] = new_energy
+            # ELECTRON
+            #lepton = np.array([tree.ee[ilep],tree.epx[ilep],tree.epy[ilep],tree.epz[ilep],tree.eq[ilep]])
+            # MUON
+            lepton = [tree.mue[ilep],tree.mupx[ilep],tree.mupy[ilep],tree.mupz[ilep],tree.muq[ilep]]
+            
             lepbits = []
-            lepbits.append(tree.epibit[ilep])
-            lepbits.append(tree.ekbit[ilep])
-            lepbits.append(tree.epbit[ilep])
-            lepbits.append(tree.eebit[ilep])
-            lepbits.append(tree.emubit[ilep])
+
+            #lepbits.append(tree.epibit[ilep])
+            #lepbits.append(tree.ekbit[ilep])
+            #lepbits.append(tree.epbit[ilep])
+            #lepbits.append(tree.eebit[ilep])
+            #lepbits.append(tree.emubit[ilep])
+
+            lepbits.append(tree.mupibit[ilep])
+            lepbits.append(tree.mukbit[ilep])
+            lepbits.append(tree.mupbit[ilep])
+            lepbits.append(tree.muebit[ilep])
+            lepbits.append(tree.mumubit[ilep])
 
             #print("hi")
             #print(proton)
@@ -245,8 +271,6 @@ for i in range(nentries):
 
             pp = vec_mag(proton[1:4])
             lp = vec_mag(lepton[1:4])
-
-            
 
             bc = proton[0:-1] + lepton[0:-1]
             bc_mass = invmass([bc])
@@ -262,8 +286,9 @@ for i in range(nentries):
             cut1 = pp>2.3 and pp<2.8 and lp>2.3 and lp<2.8
             cut2 = dE>-0.5
             cut3 = r2all<0.5
+            cut4 = ncharged>5
 
-            cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3)]
+            cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3),(cut1*cut2*cut3*cut4)]
             for icut,cut in enumerate(cuts):
                 if cut:
                     plotvars["bcandmass"]["values"][icut].append(bc_mass)
