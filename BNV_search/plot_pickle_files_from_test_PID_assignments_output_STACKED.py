@@ -28,8 +28,8 @@ print(scale_factors)
 
 ################################################################################
 
-#tag = "ELECTRON"
-tag = "MUON"
+tag = "ELECTRON"
+#tag = "MUON"
 
 infilenames = ['OUTPUT_1235.pkl',
                'OUTPUT_1237.pkl',
@@ -102,9 +102,10 @@ for varname in vtp:
 
     width = 4*ncuts
     height = 4
-    plt.figure(figsize=(width,height))
+    #plt.figure(figsize=(width,height))
 
     for icut in range(ncuts):
+        plt.figure(figsize=(6,4))
 
         plot_data = []
         weights = []
@@ -130,7 +131,8 @@ for varname in vtp:
                 sig_data = data
 
         plotindex = 1 + icut 
-        plt.subplot(1,ncuts,plotindex)
+        #plt.subplot(1,ncuts,plotindex)
+        plt.subplot(1,1,1)
 
         plt.hist(plot_data,range=var["range"],bins=50,alpha=1.0,weights=weights,label=labels,stacked=True)
         #print(sig_data[0:10])
@@ -138,7 +140,7 @@ for varname in vtp:
         for entry in plot_data:
             tot += len(entry)
         #wt = 0.01*(tot/len(sig_data))*np.ones(len(sig_data))
-        wt = 0.005**np.ones(len(sig_data))
+        wt = 0.001**np.ones(len(sig_data))
         plt.hist(sig_data,range=var["range"],bins=50,weights=wt,fill=False,label=labels[-1],color='k',histtype='step',linewidth=2)
 
         plt.xlabel(var["xlabel"],fontsize=12)
@@ -154,8 +156,13 @@ for varname in vtp:
             plt.xlim(5.2,5.3)
             plt.ylim(-0.4,0.1)
         '''
-        if icut==0:
+        #if icut==0:
+        if 1:
             plt.legend()
+
+        plt.tight_layout()
+        name = "plots/{0}_{1}_{2}.png".format(tag,varname,icut)
+        plt.savefig(name)
 
     plt.tight_layout()
 plt.show()

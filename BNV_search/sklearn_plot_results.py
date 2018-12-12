@@ -32,6 +32,7 @@ def plot_corr_matrix(ccmat,labels,title="Correlation matrix"):
         ax.set_yticklabels(labels, minor=False)
 
     plt.tight_layout()
+    plt.savefig("plots/{0}.png".format(title.replace(' ','_').replace('.pkl','').replace('(','').replace(')','')))
     
     return fig1,ax1
 ################################################################################
@@ -77,6 +78,7 @@ def compare_train_test(clf, X_train, y_train, X_test, y_test, bins=30):
     plt.ylabel("Arbitrary units")
     plt.legend(loc='best')
 
+    plt.savefig("plots/BDT_output.png")
     return fig
  
 
@@ -121,7 +123,7 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
     # Plot data
     ################################################################################
 
-    plt.figure()
+    plt.figure(figsize=(14,11))
     for i in range(len(param_labels)):
         plt.subplot(3,3,1+i)
         x0 = data0[i]
@@ -135,11 +137,16 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
         if hi1>hi0:
             hi = hi1
 
-        plt.hist(x0, color='r', alpha=0.5, range=(lo,hi), bins=50, histtype='stepfilled', density=True, label=dataset0name)
-        plt.hist(x1, color='b', alpha=0.5, range=(lo,hi), bins=50, histtype='stepfilled', density=True, label=dataset1name)
-        plt.xlabel(param_labels[i])
+        if param_labels[i]=='ncharged' or param_labels[i]=='nphot':
+            plt.hist(x0, color='r', alpha=0.5, range=(0,25), bins=25, histtype='stepfilled', density=True, label=dataset0name)
+            plt.hist(x1, color='b', alpha=0.5, range=(0,25), bins=25, histtype='stepfilled', density=True, label=dataset1name)
+        else:
+            plt.hist(x0, color='r', alpha=0.5, range=(lo,hi), bins=50, histtype='stepfilled', density=True, label=dataset0name)
+            plt.hist(x1, color='b', alpha=0.5, range=(lo,hi), bins=50, histtype='stepfilled', density=True, label=dataset1name)
+        plt.xlabel(param_labels[i],fontsize=14)
         plt.legend(fontsize=8)
     plt.tight_layout()
+    plt.savefig("plots/BDT_data.png")
 
     ################################################################################
     # Train test split
@@ -214,10 +221,13 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
 
     fom = sig_eps/((a/2.0) + np.sqrt(bkg_eps*B0))
 
-    plt.subplot(2,2,4)
+    #plt.subplot(2,2,4)
+    plt.figure(figsize=(6,5))
     plt.plot(sig_eps, fom)
-    plt.xlabel("Fraction of signal remaining")
-    plt.ylabel("Punzi figure of merit")
+    plt.xlabel("Fraction of signal remaining",fontsize=14)
+    plt.ylabel("Punzi figure of merit",fontsize=14)
+    plt.tight_layout()
+    plt.savefig("plots/BDT_fom.png")
 
 
     plt.tight_layout()
@@ -256,6 +266,7 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
     plt.title('Receiver operating characteristic')
     plt.legend(loc="lower right")
     plt.grid()
+    plt.savefig("plots/roc_curve.png")
     
     figctt = compare_train_test(bdt, X_train, y_train, X_test, y_test)
     
