@@ -465,7 +465,7 @@ for i in range(nentries):
 
 
         if mylund==211:
-            pie[npi[0]] = e
+            pie[npi[0]] = new_energy
             pipx[npi[0]] = px
             pipy[npi[0]] = py
             pipz[npi[0]] = pz
@@ -477,7 +477,7 @@ for i in range(nentries):
             pimubit[npi[0]] = mubit
             npi[0] += 1
         elif mylund==321:
-            ke[nk[0]] = e
+            ke[nk[0]] = new_energy
             kpx[nk[0]] = px
             kpy[nk[0]] = py
             kpz[nk[0]] = pz
@@ -489,7 +489,7 @@ for i in range(nentries):
             kmubit[nk[0]] = mubit
             nk[0] += 1
         elif mylund==2212:
-            protone[nproton[0]] = e
+            protone[nproton[0]] = new_energy
             protonpx[nproton[0]] = px
             protonpy[nproton[0]] = py
             protonpz[nproton[0]] = pz
@@ -501,7 +501,7 @@ for i in range(nentries):
             protonmubit[nproton[0]] = mubit
             nproton[0] += 1
         elif mylund==11:
-            ee[ne[0]] = e
+            ee[ne[0]] = new_energy
             epx[ne[0]] = px
             epy[ne[0]] = py
             epz[ne[0]] = pz
@@ -513,7 +513,7 @@ for i in range(nentries):
             emubit[ne[0]] = mubit
             ne[0] += 1
         elif mylund==13:
-            mue[nmu[0]] = e
+            mue[nmu[0]] = new_energy
             mupx[nmu[0]] = px
             mupy[nmu[0]] = py
             mupz[nmu[0]] = pz
@@ -556,7 +556,7 @@ for i in range(nentries):
         particle = [new_energy,px,py,pz,0,22]
 
         if ngamma[0]<128:
-            gammae[ngamma[0]] = e
+            gammae[ngamma[0]] = new_energy
             gammapx[ngamma[0]] = px
             gammapy[ngamma[0]] = py
             gammapz[ngamma[0]] = pz
