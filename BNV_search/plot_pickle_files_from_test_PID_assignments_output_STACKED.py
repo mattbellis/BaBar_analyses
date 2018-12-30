@@ -28,9 +28,10 @@ print(scale_factors)
 
 ################################################################################
 
-tag = "ELECTRON"
-#tag = "MUON"
+#tag = "ELECTRON"
+tag = "MUON"
 
+'''
 infilenames = ['OUTPUT_1235.pkl',
                'OUTPUT_1237.pkl',
                'OUTPUT_1005.pkl',
@@ -39,6 +40,16 @@ infilenames = ['OUTPUT_1235.pkl',
                'OUTPUT_3981.pkl',
                #'OUTPUT_2400.pkl',
                ]
+'''
+infilenames = ['OUTPUT_Run1.pkl',
+               'OUTPUT_Run2.pkl',
+               'OUTPUT_Run3.pkl',
+               'OUTPUT_Run4.pkl',
+               'OUTPUT_Run5.pkl',
+               'OUTPUT_Run6.pkl',
+               ]
+
+
 if tag=='ELECTRON':
     infilenames.append('OUTPUT_9457.pkl')
 elif tag=='MUON':
@@ -50,6 +61,7 @@ print(infilenames)
 #exit()
 
 spnumbers = [name.split('_')[-1].split('.')[0] for name in infilenames]
+'''
 labels = [r'$B^+B^-$',
           r'$B^0\bar{B}^0$',
           r'$c\bar{c}$',
@@ -58,7 +70,15 @@ labels = [r'$B^+B^-$',
           r'$\mu^+\mu^-$',
           #r'$e^+e^-$',
           r'$B\rightarrow p e^-$']
+'''
 
+labels = [r'Run 1',
+          r'Run 2',
+          r'Run 3',
+          r'Run 4',
+          r'Run 5',
+          r'Run 6',
+          ]
 
 
 #infilenames = sys.argv[1:]
@@ -121,7 +141,10 @@ for varname in vtp:
                 data = var["values"][icut]
                 plot_data.append(data)
 
-                wt = scale_factors[apvkey]
+                # MC
+                #wt = scale_factors[apvkey]
+                # Data
+                wt = 1
                 weights.append(wt*np.ones(len(data)))
             else:
                 #plotvars["bcandDeltaE"]["range"] = (-0.5,0.5)
