@@ -157,7 +157,9 @@ nphot = []
 #filenames = sys.argv[1:]
 
 def get_sptag(name):
-    tag = name.split('basicPID_R24-SP-')[1].split('-R24-')[0]
+    #tag = name.split('basicPID_R24-SP-')[1].split('-R24-')[0]
+    # basicPID_R24-AllEvents-Run1-OnPeak-R24-9_SKIMMED.root
+    tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
     return tag
 
 
@@ -165,8 +167,8 @@ outfilename = None
 sptag = None
 if outfilename is None:
     sptag = get_sptag(infilenames[0]) 
-    #outfilename = 'OUTPUT_MUON_' + sptag + ".pkl"
-    outfilename = 'OUTPUT_ELECTRON_' + sptag + ".pkl"
+    outfilename = 'OUTPUT_MUON_' + sptag + ".pkl"
+    #outfilename = 'OUTPUT_ELECTRON_' + sptag + ".pkl"
     #outfilename = "output_testing_the_PID_assignment_skim.pkl"
 
 
@@ -236,31 +238,32 @@ for i in range(nentries):
         pbits.append(tree.protonpbit[iprot])
         pbits.append(tree.protonebit[iprot])
         pbits.append(tree.protonmubit[iprot])
-        for ilep in range(tree.ne):
-        #for ilep in range(tree.nmu):
+        # ELECTRON MUON
+        #for ilep in range(tree.ne):
+        for ilep in range(tree.nmu):
 
             proton = np.array([tree.protone[iprot],tree.protonpx[iprot],tree.protonpy[iprot],tree.protonpz[iprot],tree.protonq[iprot]])
             #new_energy = recalc_energy(0.938272,[proton[1],proton[2],proton[3]])
             #proton[0] = new_energy
 
             # ELECTRON
-            lepton = np.array([tree.ee[ilep],tree.epx[ilep],tree.epy[ilep],tree.epz[ilep],tree.eq[ilep]])
+            #lepton = np.array([tree.ee[ilep],tree.epx[ilep],tree.epy[ilep],tree.epz[ilep],tree.eq[ilep]])
             # MUON
-            #lepton = [tree.mue[ilep],tree.mupx[ilep],tree.mupy[ilep],tree.mupz[ilep],tree.muq[ilep]]
+            lepton = [tree.mue[ilep],tree.mupx[ilep],tree.mupy[ilep],tree.mupz[ilep],tree.muq[ilep]]
             
             lepbits = []
 
-            lepbits.append(tree.epibit[ilep])
-            lepbits.append(tree.ekbit[ilep])
-            lepbits.append(tree.epbit[ilep])
-            lepbits.append(tree.eebit[ilep])
-            lepbits.append(tree.emubit[ilep])
+            #lepbits.append(tree.epibit[ilep])
+            #lepbits.append(tree.ekbit[ilep])
+            #lepbits.append(tree.epbit[ilep])
+            #lepbits.append(tree.eebit[ilep])
+            #lepbits.append(tree.emubit[ilep])
 
-            #lepbits.append(tree.mupibit[ilep])
-            #lepbits.append(tree.mukbit[ilep])
-            #lepbits.append(tree.mupbit[ilep])
-            #lepbits.append(tree.muebit[ilep])
-            #lepbits.append(tree.mumubit[ilep])
+            lepbits.append(tree.mupibit[ilep])
+            lepbits.append(tree.mukbit[ilep])
+            lepbits.append(tree.mupbit[ilep])
+            lepbits.append(tree.muebit[ilep])
+            lepbits.append(tree.mumubit[ilep])
 
             #print("hi")
             #print(proton)
