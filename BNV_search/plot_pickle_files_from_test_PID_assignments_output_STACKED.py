@@ -8,6 +8,10 @@ import pickle
 
 from raw_event_numbers_and_cross_section import *
 
+unblinded = False
+if len(sys.argv)>1 and sys.argv[1]=="unblinded":
+    unblinded = True
+
 ren = raw_event_numbers
 
 scale_factors = {}
@@ -28,10 +32,10 @@ print(scale_factors)
 
 ################################################################################
 
-#tag = "ELECTRON"
-tag = "MUON"
+tag = "ELECTRON"
+#tag = "MUON"
 
-'''
+#'''
 infilenames = ['OUTPUT_1235.pkl',
                'OUTPUT_1237.pkl',
                'OUTPUT_1005.pkl',
@@ -40,6 +44,7 @@ infilenames = ['OUTPUT_1235.pkl',
                'OUTPUT_3981.pkl',
                #'OUTPUT_2400.pkl',
                ]
+#'''
 '''
 infilenames = ['OUTPUT_Run1.pkl',
                'OUTPUT_Run2.pkl',
@@ -48,7 +53,7 @@ infilenames = ['OUTPUT_Run1.pkl',
                'OUTPUT_Run5.pkl',
                'OUTPUT_Run6.pkl',
                ]
-
+'''
 
 if tag=='ELECTRON':
     infilenames.append('OUTPUT_9457.pkl')
@@ -61,7 +66,7 @@ print(infilenames)
 #exit()
 
 spnumbers = [name.split('_')[-1].split('.')[0] for name in infilenames]
-'''
+#'''
 labels = [r'$B^+B^-$',
           r'$B^0\bar{B}^0$',
           r'$c\bar{c}$',
@@ -70,8 +75,9 @@ labels = [r'$B^+B^-$',
           r'$\mu^+\mu^-$',
           #r'$e^+e^-$',
           r'$B\rightarrow p e^-$']
-'''
+#'''
 
+'''
 labels = [r'Run 1',
           r'Run 2',
           r'Run 3',
@@ -79,6 +85,7 @@ labels = [r'Run 1',
           r'Run 5',
           r'Run 6',
           ]
+'''
 
 
 #infilenames = sys.argv[1:]
@@ -136,9 +143,21 @@ for varname in vtp:
             plotvars = allplotvars[apvkey]
             plotvars["bcandDeltaE"]["range"] = (-0.5,0.5)
             var = plotvars[varname]
-            if apvkey!='9457' and apvkey!='9456': 
 
-                data = var["values"][icut]
+            selection = np.ones(len(var["values"][icut]),dtype=bool)
+            if not unblinded:
+                # Get slices
+                # Mes = [5.265,5.29]
+                # DeltaE = [-0.12,0.12]
+                mes =  plotvars["bcandMES"]["values"][icut]
+                dE =  plotvars["bcandDeltaE"]["values"][icut]
+                mes = np.array(mes)
+                dE = np.array(dE)
+
+                selection = np.invert((mes>5.265)*(dE>-0.12)*(dE<0.12))
+    
+            if apvkey!='9457' and apvkey!='9456': 
+                data = np.array(var["values"][icut])[selection]
                 plot_data.append(data)
 
                 # MC
@@ -150,7 +169,7 @@ for varname in vtp:
                 #plotvars["bcandDeltaE"]["range"] = (-0.5,0.5)
                 #plotvars = allplotvars[apvkey]
                 #var = plotvars[varname]
-                data = var["values"][icut]
+                data = np.array(var["values"][icut])[selection]
                 sig_data = data
 
         plotindex = 1 + icut 
@@ -188,5 +207,44 @@ for varname in vtp:
         plt.savefig(name)
 
     plt.tight_layout()
+
+
+#####################
+# 2D plot
+#####################
+# Blinding
+# Mes = [5.265,5.29]
+# DeltaE = [-0.12,0.12]
+icut = 4
+plt.figure(figsize=(12,4))
+for i,apvkey in enumerate(apvkeys):
+    plotvars = allplotvars[apvkey]
+    selection = np.ones(len(plotvars["bcandMES"]["values"][icut]),dtype=bool)
+    if not unblinded:
+        # Get slices
+        # Mes = [5.265,5.29]
+        # DeltaE = [-0.12,0.12]
+        mes =  plotvars["bcandMES"]["values"][icut]
+        dE =  plotvars["bcandDeltaE"]["values"][icut]
+        mes = np.array(mes)
+        dE = np.array(dE)
+
+        selection = np.invert((mes>5.265)*(dE>-0.12)*(dE<0.12))
+    xpts = np.array(plotvars["bcandMES"]['values'][icut])[selection]
+    ypts = np.array(plotvars["bcandDeltaE"]['values'][icut])[selection]
+
+    if apvkey!='9457' and apvkey!='9456': 
+        plt.subplot(1,2,2)
+    else:
+        plt.subplot(1,2,1)
+
+    plt.plot(xpts,ypts,'.',markersize=1,alpha=0.5,label=labels[i])
+    plt.xlim(5.2,5.3)
+    plt.ylim(-0.3,0.3)
+
+    plt.legend()
+plt.tight_layout()
+
+
 plt.show()
 
