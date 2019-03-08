@@ -269,7 +269,7 @@ class PIDselector:
     to True.'''
     output = "selectors:\n"
     for i in range(0,self.max_bits):
-      if i>=self.max_bits-7:
+      if i>=self.max_bits-6:
         if self.bits[i]:
           output += "\t" + str(self.selectors[i]) + "\n" 
         else:

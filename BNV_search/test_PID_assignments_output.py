@@ -42,7 +42,7 @@ plotvars["ncharged"] = {"values":[], "xlabel":r"# charged particles", "ylabel":r
 plotvars["nphot"] = {"values":[], "xlabel":r"# photons","ylabel":r"# entries","range":(0,20)} 
 
 cuts = []
-ncuts = 5
+ncuts = 6
 for n in range(ncuts):
     for key in plotvars.keys():
         plotvars[key]["values"].append([])
@@ -120,9 +120,14 @@ print(infilenames[0])
 #exit()
 
 tree = ROOT.TChain("Tskim")
-for infile in infilenames:
+for i,infile in enumerate(infilenames):
     print(infile)
     tree.AddFile(infile)
+    
+    '''
+    if i>100:
+        break
+    '''
 
 nentries = tree.GetEntries()
 
@@ -157,9 +162,11 @@ nphot = []
 #filenames = sys.argv[1:]
 
 def get_sptag(name):
-    #tag = name.split('basicPID_R24-SP-')[1].split('-R24-')[0]
+    # MC
+    tag = name.split('basicPID_R24-SP-')[1].split('-R24-')[0]
     # basicPID_R24-AllEvents-Run1-OnPeak-R24-9_SKIMMED.root
-    tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
+    # Data
+    #tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
     return tag
 
 
@@ -253,12 +260,14 @@ for i in range(nentries):
             
             lepbits = []
 
+            # ELECTRON
             #lepbits.append(tree.epibit[ilep])
             #lepbits.append(tree.ekbit[ilep])
             #lepbits.append(tree.epbit[ilep])
             #lepbits.append(tree.eebit[ilep])
             #lepbits.append(tree.emubit[ilep])
 
+            # MUON
             lepbits.append(tree.mupibit[ilep])
             lepbits.append(tree.mukbit[ilep])
             lepbits.append(tree.mupbit[ilep])
@@ -292,7 +301,10 @@ for i in range(nentries):
             cut3 = r2all<0.5
             cut4 = ncharged>5
 
-            cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3),(cut1*cut2*cut3*cut4)]
+            pps.SetBits(pbits[2]); 
+            cut5 = pps.IsSelectorSet("SuperTightKMProtonSelection")
+
+            cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3), (cut1*cut2*cut3*cut4), (cut1*cut2*cut3*cut4*cut5) ]
             for icut,cut in enumerate(cuts):
                 if cut:
                     plotvars["bcandmass"]["values"][icut].append(bc_mass)
@@ -314,16 +326,26 @@ for i in range(nentries):
                     plotvars["nphot"]["values"][icut].append(nphot)
                     plotvars["ncharged"]["values"][icut].append(ncharged)
 
-                    if 0:#icut==2 and mes>5.2:
-                        print("---------")
-                        print(pbits)
+
+                    '''
+                    if icut==5 and mes>5.2:
+                        print("-----------------------------")
+                        print("   --- LEPTON ")
                         print(lepbits)
-                        #pps.SetBits(pbits[2]); pps.PrintSelectors(); #Kps.PrintBits()
-                        #Kps.SetBits(pbits[1]); Kps.PrintSelectors(); #Kps.PrintBits()
-                        #pips.SetBits(pbits[0]); pips.PrintSelectors(); #Kps.PrintBits()
-                        eps.SetBits(lepbits[3]); eps.PrintSelectors(); #Kps.PrintBits()
-                        pips.SetBits(lepbits[0]); pips.PrintSelectors(); #Kps.PrintBits()
-                        Kps.SetBits(lepbits[1]); Kps.PrintSelectors(); #Kps.PrintBits()
+                        print("pi"); pips.SetBits(lepbits[0]); pips.PrintSelectors(); #Kps.PrintBits()
+                        print("K "); Kps.SetBits(lepbits[1]); Kps.PrintSelectors(); #Kps.PrintBits()
+                        print("p "); pps.SetBits(lepbits[2]); pps.PrintSelectors(); #Kps.PrintBits()
+                        print("e"); eps.SetBits(lepbits[3]); eps.PrintSelectors(); #Kps.PrintBits()
+                        print("mu"); mups.SetBits(lepbits[4]); mups.PrintSelectors(); #Kps.PrintBits()
+
+                        print("\n   --- PROTON ")
+                        print(pbits)
+                        print("pi"); pips.SetBits(pbits[0]); pips.PrintSelectors(); #Kps.PrintBits()
+                        print("K "); Kps.SetBits(pbits[1]); Kps.PrintSelectors(); #Kps.PrintBits()
+                        print("p "); pps.SetBits(pbits[2]); pps.PrintSelectors(); #Kps.PrintBits()
+                        print("e"); eps.SetBits(pbits[3]); eps.PrintSelectors(); #Kps.PrintBits()
+                        print("mu"); mups.SetBits(pbits[4]); mups.PrintSelectors(); #Kps.PrintBits()
+                    '''
 
             #bcandMM.append(invmass([beam-bc]))
 
@@ -340,8 +362,8 @@ for i in range(nentries):
     #totqs.append(totq)
     nbcands.append(nbcand)
 
+#exit()
 
-outfilename
 outfile = open(outfilename,'wb')
 pickle.dump(plotvars,outfile)
 outfile.close()

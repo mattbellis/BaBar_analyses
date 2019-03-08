@@ -20,7 +20,7 @@ for infile in infilenames:
     allplotvars[sptag] = x
 
 print()
-ncuts = 4
+ncuts = 6
 for apvkey in allplotvars.keys():
     plotvars = allplotvars[apvkey]
     #for icut,cut in enumerate(cuts):
