@@ -3,7 +3,7 @@ import matplotlib.pylab as plt
 
 import sys
 
-import lichen.lichen as lch
+import lichen as lch
 import pickle
 
 from raw_event_numbers_and_cross_section import *
@@ -98,7 +98,7 @@ for infile in infilenames:
 
 #print(allplotvars)
 print()
-ncuts = 5
+ncuts = 6
 for apvkey in allplotvars.keys():
     plotvars = allplotvars[apvkey]
     #for icut,cut in enumerate(cuts):
