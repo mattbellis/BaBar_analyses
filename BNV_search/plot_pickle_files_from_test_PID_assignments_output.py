@@ -3,7 +3,8 @@ import matplotlib.pylab as plt
 
 import sys
 
-import lichen.lichen as lch
+#import lichen.lichen as lch
+import lichen as lch
 import pickle
 
 ################################################################################
@@ -20,7 +21,7 @@ for infile in infilenames:
     allplotvars[sptag] = x
 
 print()
-ncuts = 4
+ncuts = 6
 for apvkey in allplotvars.keys():
     plotvars = allplotvars[apvkey]
     #for icut,cut in enumerate(cuts):
@@ -66,9 +67,9 @@ for j in range(nvars):
             var = plotvars[varname]
 
             if varname=="nphot" or varname=="ncharged":
-                lch.hist_err(var["values"][icut],range=var["range"],bins=20,alpha=0.2,markersize=0.5,label=apvkey)
+                lch.hist(var["values"][icut],range=var["range"],bins=20,alpha=0.2,markersize=0.5,label=apvkey)
             else:
-                lch.hist_err(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5,label=apvkey)
+                lch.hist(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5,label=apvkey)
             plt.xlabel(var["xlabel"],fontsize=12)
             plt.ylabel(var["ylabel"],fontsize=12)
             #print(len(var["values"][icut]))
@@ -98,9 +99,9 @@ for a in range(4):
             var = plotvars[key]
             plt.subplot(4,4,1+j)
             if key=="nphot" or key=="ncharged":
-                lch.hist_err(var["values"][icut],range=var["range"],bins=20,alpha=0.2,markersize=0.5)
+                lch.hist(var["values"][icut],range=var["range"],bins=20,alpha=0.2,markersize=0.5)
             else:
-                lch.hist_err(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5)
+                lch.hist(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5)
             plt.xlabel(var["xlabel"],fontsize=12)
             plt.ylabel(var["ylabel"],fontsize=12)
             print(len(var["values"][icut]))
