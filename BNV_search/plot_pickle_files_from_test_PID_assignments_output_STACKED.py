@@ -34,31 +34,32 @@ print(scale_factors)
 
 tag = "ELECTRON"
 #tag = "MUON"
+data_or_mc = "MC"
 
-#'''
-infilenames = ['OUTPUT_1235.pkl',
-               'OUTPUT_1237.pkl',
-               'OUTPUT_1005.pkl',
-               'OUTPUT_998.pkl',
-               'OUTPUT_3429.pkl',
-               'OUTPUT_3981.pkl',
-               #'OUTPUT_2400.pkl',
-               ]
-#'''
-'''
-infilenames = ['OUTPUT_Run1.pkl',
-               'OUTPUT_Run2.pkl',
-               'OUTPUT_Run3.pkl',
-               'OUTPUT_Run4.pkl',
-               'OUTPUT_Run5.pkl',
-               'OUTPUT_Run6.pkl',
-               ]
-'''
+if data_or_mc == "MC":
+    infilenames = ['OUTPUT_1235.pkl',
+                   'OUTPUT_1237.pkl',
+                   'OUTPUT_1005.pkl',
+                   'OUTPUT_998.pkl',
+                   'OUTPUT_3429.pkl',
+                   'OUTPUT_3981.pkl',
+                   #'OUTPUT_2400.pkl',
+                   ]
 
-if tag=='ELECTRON':
-    infilenames.append('OUTPUT_9457.pkl')
-elif tag=='MUON':
-    infilenames.append('OUTPUT_9456.pkl')
+else:
+    infilenames = ['OUTPUT_Run1.pkl',
+                   'OUTPUT_Run2.pkl',
+                   'OUTPUT_Run3.pkl',
+                   'OUTPUT_Run4.pkl',
+                   'OUTPUT_Run5.pkl',
+                   'OUTPUT_Run6.pkl',
+                   ]
+
+if data_or_mc == "MC":
+    if tag=='ELECTRON':
+        infilenames.append('OUTPUT_9457.pkl')
+    elif tag=='MUON':
+        infilenames.append('OUTPUT_9456.pkl')
 
 for i,infilename in enumerate(infilenames):
     infilenames[i] = infilename.replace('_','_{0}_'.format(tag))
