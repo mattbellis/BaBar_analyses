@@ -12,18 +12,23 @@ from myPIDselector import *
 
 import pickle
 
-eps = PIDselector("e")
-pps = PIDselector("p")
-pips = PIDselector("pi")
-Kps = PIDselector("K")
-mups = PIDselector("mu")
-
+from babar_tools import vec_mag,angle,selectPID,invmass,recalc_energy,sph2cart
+from babar_tools import particle_masses,particle_lunds
+from babar_tools import eps,pps,pips,Kps,mups # The PID selectors for each particle
 
 #plt.switch_backend('Agg')
 
+#eps = PIDselector("e")
+#pps = PIDselector("p")
+#pips = PIDselector("pi")
+#Kps = PIDselector("K")
+#mups = PIDselector("mu")
+
+
+
 #particles = ["mu","e","pi","K","p"]
-particle_masses = [0.000511, 0.105, 0.139, 0.494, 0.938, 0]
-particle_lunds = [11, 13, 211, 321, 2212, 22]
+#particle_masses = [0.000511, 0.105, 0.139, 0.494, 0.938, 0]
+#particle_lunds = [11, 13, 211, 321, 2212, 22]
 
 plotvars = {}
 plotvars["bcandmass"] = {"values":[], "xlabel":r"Mass B-candidate [GeV/c$^{2}$]", "ylabel":r"# entries","range":(0,6)} 
@@ -42,71 +47,14 @@ plotvars["ncharged"] = {"values":[], "xlabel":r"# charged particles", "ylabel":r
 plotvars["nphot"] = {"values":[], "xlabel":r"# photons","ylabel":r"# entries","range":(0,20)} 
 
 cuts = []
-ncuts = 6
+ncuts = 7
 for n in range(ncuts):
     for key in plotvars.keys():
         plotvars[key]["values"].append([])
 
-################################################################################
-def vec_mag(vec):
-    mag = np.sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2])
-    return mag
-################################################################################
-def angle(vec0, vec1, returncos=False):
-    mag0 = vec_mag(vec0)
-    mag1 = vec_mag(vec1)
-
-    costheta = (vec0[0]*vec1[0] + vec0[1]*vec1[1] + vec0[2]*vec1[2])/(mag0*mag1)
-
-    if returncos:
-        return costheta
-
-    return np.arccos(costheta)
-    
-################################################################################
-################################################################################
-
-################################################################################
-# Invariant Mass Function
-################################################################################
-def invmass(p4):
-    if type(p4[0]) != float:
-        p4 = list(p4)
-
-    totp4 = np.array([0., 0., 0., 0.])
-    for p in p4:
-        totp4[0] += p[0]
-        totp4[1] += p[1]
-        totp4[2] += p[2]
-        totp4[3] += p[3]
-
-    m2 = totp4[0]**2 - totp4[1]**2 - totp4[2]**2 - totp4[3]**2
-
-    m = -999
-    if m2 >= 0:
-        m = np.sqrt(m2)
-    else:
-        m = -np.sqrt(np.abs(m2))
-    return m
-################################################################################
-
-################################################################################
-def recalc_energy(mass,p3):
-    energy = np.sqrt(mass*mass + vec_mag(p3)**2)
-    return energy
-################################################################################
-
-################################################################################
-def sph2cart(pmag,costh,phi):
-    theta = np.arccos(costh)
-    x = pmag*np.sin(theta)*np.cos(phi)
-    y = pmag*np.sin(theta)*np.sin(phi)
-    z = pmag*costh
-    return x,y,z
-################################################################################
-
 #infilenames = sys.argv[1:]
-topdir = sys.argv[1]
+lepton_to_study = sys.argv[1] # This should be ELECTRON OR MUON
+topdir = sys.argv[2]
 filestemp = os.listdir(topdir)
 
 infilenames = []
@@ -161,20 +109,25 @@ nphot = []
 
 #filenames = sys.argv[1:]
 
+################################################################################
 def get_sptag(name):
-    # MC
-    tag = name.split('basicPID_R24-SP-')[1].split('-R24-')[0]
-    # basicPID_R24-AllEvents-Run1-OnPeak-R24-9_SKIMMED.root
-    # Data
-    #tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
+    tag = None
+    if name.find('AllEvents')>=0:
+        # Data
+        # basicPID_R24-AllEvents-Run1-OnPeak-R24-9_SKIMMED.root
+        tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
+    else:
+        # MC
+        tag = name.split('basicPID_R24-SP-')[1].split('-R24-')[0]
     return tag
-
+################################################################################
 
 outfilename = None
 sptag = None
 if outfilename is None:
     sptag = get_sptag(infilenames[0]) 
-    outfilename = 'OUTPUT_MUON_' + sptag + ".pkl"
+    outfilename = 'OUTPUT_' + lepton_to_study + '_' + sptag + ".pkl"
+    #outfilename = 'OUTPUT_MUON_' + sptag + ".pkl"
     #outfilename = 'OUTPUT_ELECTRON_' + sptag + ".pkl"
     #outfilename = "output_testing_the_PID_assignment_skim.pkl"
 
@@ -237,7 +190,7 @@ for i in range(nentries):
 
 
     nbcand = 0
-    #print(tree.nproton,tree.ne)
+    #print(tree.nproton,tree.ne,tree.nmu,sum(tree.protonq),sum(tree.eq),sum(tree.muq))
     for iprot in range(tree.nproton):
         pbits = []
         pbits.append(tree.protonpibit[iprot])
@@ -246,33 +199,35 @@ for i in range(nentries):
         pbits.append(tree.protonebit[iprot])
         pbits.append(tree.protonmubit[iprot])
         # ELECTRON MUON
+        counter = tree.nmu
+        if lepton_to_study == 'ELECTRON':
+            counter = tree.ne
         #for ilep in range(tree.ne):
-        for ilep in range(tree.nmu):
+        #for ilep in range(tree.nmu):
+        for ilep in range(counter):
 
             proton = np.array([tree.protone[iprot],tree.protonpx[iprot],tree.protonpy[iprot],tree.protonpz[iprot],tree.protonq[iprot]])
             #new_energy = recalc_energy(0.938272,[proton[1],proton[2],proton[3]])
             #proton[0] = new_energy
-
-            # ELECTRON
-            #lepton = np.array([tree.ee[ilep],tree.epx[ilep],tree.epy[ilep],tree.epz[ilep],tree.eq[ilep]])
-            # MUON
-            lepton = [tree.mue[ilep],tree.mupx[ilep],tree.mupy[ilep],tree.mupz[ilep],tree.muq[ilep]]
             
+            lepton = None
             lepbits = []
-
-            # ELECTRON
-            #lepbits.append(tree.epibit[ilep])
-            #lepbits.append(tree.ekbit[ilep])
-            #lepbits.append(tree.epbit[ilep])
-            #lepbits.append(tree.eebit[ilep])
-            #lepbits.append(tree.emubit[ilep])
-
-            # MUON
-            lepbits.append(tree.mupibit[ilep])
-            lepbits.append(tree.mukbit[ilep])
-            lepbits.append(tree.mupbit[ilep])
-            lepbits.append(tree.muebit[ilep])
-            lepbits.append(tree.mumubit[ilep])
+            if lepton_to_study == 'ELECTRON':
+                # ELECTRON
+                lepton = np.array([tree.ee[ilep],tree.epx[ilep],tree.epy[ilep],tree.epz[ilep],tree.eq[ilep]])
+                lepbits.append(tree.epibit[ilep])
+                lepbits.append(tree.ekbit[ilep])
+                lepbits.append(tree.epbit[ilep])
+                lepbits.append(tree.eebit[ilep])
+                lepbits.append(tree.emubit[ilep])
+            else:
+                # MUON
+                lepton = [tree.mue[ilep],tree.mupx[ilep],tree.mupy[ilep],tree.mupz[ilep],tree.muq[ilep]]
+                lepbits.append(tree.mupibit[ilep])
+                lepbits.append(tree.mukbit[ilep])
+                lepbits.append(tree.mupbit[ilep])
+                lepbits.append(tree.muebit[ilep])
+                lepbits.append(tree.mumubit[ilep])
 
             #print("hi")
             #print(proton)
@@ -304,9 +259,21 @@ for i in range(nentries):
             pps.SetBits(pbits[2]); 
             cut5 = pps.IsSelectorSet("SuperTightKMProtonSelection")
 
-            cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3), (cut1*cut2*cut3*cut4), (cut1*cut2*cut3*cut4*cut5) ]
+            if lepton_to_study == 'ELECTRON':
+                # ELECTRON
+                eps.SetBits(lepbits[3]); 
+                cut5 *= eps.IsSelectorSet("SuperTightKMElectronMicroSelection")
+                cut6 = (tree.nproton%2==1 or (tree.nproton==2 and sum(tree.protonq)!=0)) and (tree.ne%2==1 or (tree.ne==2 and sum(tree.eq)!=0))
+            else:
+                # MUON
+                mups.SetBits(lepbits[4]); 
+                cut5 *= mups.IsSelectorSet("BDTVeryTightMuonSelectionFakeRate") or mups.IsSelectorSet("BDTVeryTightMuonSelection") 
+                cut6 = (tree.nproton%2==1 or (tree.nproton==2 and sum(tree.protonq)!=0)) and (tree.nmu%2==1 or (tree.nmu==2 and sum(tree.muq)!=0))
+
+            cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3), (cut1*cut2*cut3*cut4), (cut1*cut2*cut3*cut4*cut5), (cut1*cut2*cut3*cut4*cut5*cut6)]
             for icut,cut in enumerate(cuts):
                 if cut:
+                    #print(icut)
                     plotvars["bcandmass"]["values"][icut].append(bc_mass)
 
                     plotvars["bcandMES"]["values"][icut].append(mes)
