@@ -27,14 +27,34 @@ for key in ren["data"].keys():
 
 
 print(scale_factors)
-#import seaborn as sns
-#sns.set()
+print()
+
+
+tot = 0
+for key in ren['MC']:
+    sp = ren['MC'][key]
+    print('{0:6} {1:10}  {2}'.format(key,sp['raw'],sp['xsec']))
+    if int(key)<9400:
+        tot += sp['raw']
+print(tot,tot/1e9)
+
+print()
+tot = 0
+for key in ren['data']:
+    sp = ren['data'][key]
+    print('{0:6} {1:10}'.format(key,sp['raw']))
+    tot += sp['raw']
+print(tot,tot/1e9)
+
+
+#exit()
 
 ################################################################################
 
 tag = "ELECTRON"
 #tag = "MUON"
 data_or_mc = "MC"
+#data_or_mc = "DATA"
 
 if data_or_mc == "MC":
     infilenames = ['OUTPUT_1235.pkl',
@@ -104,16 +124,18 @@ for apvkey in allplotvars.keys():
     plotvars = allplotvars[apvkey]
     #for icut,cut in enumerate(cuts):
     #print(plotvars.keys())
-    nentries = len(plotvars['r2']['values'][0])
-    output = "{0:4}   ".format(apvkey)
+    #nentries = len(plotvars['r2']['values'][0])
+    nentries = ren['MC'][apvkey]['raw']
+    output = "{0:4} {1:10}  ".format(apvkey,nentries)
     for icut in range(ncuts):
         for j,key in enumerate([list(plotvars.keys())[0]]):
             var = plotvars[key]
-            output += "{0:5.4f}   ".format(len(var["values"][icut])/nentries)
+            #print(len(var["values"][icut]))
+            output += "{0:5.4e}   ".format(len(var["values"][icut])/nentries)
 
     print(output)
 print()
-#exit()
+exit()
 
 
 nsp = len(infilenames)
@@ -182,9 +204,11 @@ for varname in vtp:
         tot = 0
         for entry in plot_data:
             tot += len(entry)
-        #wt = 0.01*(tot/len(sig_data))*np.ones(len(sig_data))
-        wt = 0.001**np.ones(len(sig_data))
-        plt.hist(sig_data,range=var["range"],bins=50,weights=wt,fill=False,label=labels[-1],color='k',histtype='step',linewidth=2)
+
+        if data_or_mc=="MC":
+            #wt = 0.01*(tot/len(sig_data))*np.ones(len(sig_data))
+            wt = 0.001**np.ones(len(sig_data))
+            plt.hist(sig_data,range=var["range"],bins=50,weights=wt,fill=False,label=labels[-1],color='k',histtype='step',linewidth=2)
 
         plt.xlabel(var["xlabel"],fontsize=12)
         plt.ylabel(var["ylabel"],fontsize=12)

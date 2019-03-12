@@ -1,3 +1,5 @@
+# Information about BaBar detector and luminosity
+# https://www.sciencedirect.com/science/article/pii/S0168900213007183
 raw_event_numbers = {}
 raw_event_numbers["data"] = {}
 raw_event_numbers["MC"] = {}
@@ -18,16 +20,16 @@ raw_event_numbers["data"]["Run5"]["raw"] *= 21045
 raw_event_numbers["data"]["Run6"]["raw"] *= 12629
 
 raw_event_numbers["MC"]["1005"]["raw"] *= 11338
-raw_event_numbers["MC"]["11975"]["raw"] *= 12
-raw_event_numbers["MC"]["11976"]["raw"] *= 12
-raw_event_numbers["MC"]["11977"]["raw"] *= 12
+raw_event_numbers["MC"]["11975"]["raw"] *= 1.08
+raw_event_numbers["MC"]["11976"]["raw"] *= 1.08
+raw_event_numbers["MC"]["11977"]["raw"] *= 1.08
 raw_event_numbers["MC"]["1235"]["raw"] *= 7105
 raw_event_numbers["MC"]["1237"]["raw"] *= 7201
 raw_event_numbers["MC"]["2400"]["raw"] *= 4729
 raw_event_numbers["MC"]["3429"]["raw"] *= 16202
 raw_event_numbers["MC"]["3981"]["raw"] *= 6224
-raw_event_numbers["MC"]["9456"]["raw"] *= 23
-raw_event_numbers["MC"]["9457"]["raw"] *= 23
+raw_event_numbers["MC"]["9456"]["raw"] *= 2.17
+raw_event_numbers["MC"]["9457"]["raw"] *= 2.17
 raw_event_numbers["MC"]["998"]["raw"] *= 35959
 
 raw_event_numbers["MC"]["1235"]["xsec"] = 0.54
@@ -40,3 +42,6 @@ raw_event_numbers["MC"]["2400"]["xsec"] = 40
 
 intlumi = 424.18
 
+
+# Section 6.2 of above paper
+# The final dataset contains more than nine billion events passing the pre-reconstruction filter described above, primarily taken on the  resonance. 
