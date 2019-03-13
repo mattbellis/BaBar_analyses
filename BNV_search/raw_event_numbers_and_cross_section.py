@@ -1,23 +1,23 @@
 # Information about BaBar detector and luminosity
 # https://www.sciencedirect.com/science/article/pii/S0168900213007183
 raw_event_numbers = {}
-raw_event_numbers["data"] = {}
+raw_event_numbers["DATA"] = {}
 raw_event_numbers["MC"] = {}
 
 for i in range(1,7):
         key = "Run{0}".format(i)
-        raw_event_numbers["data"][key] = {"raw":100000, "xsec":0}
+        raw_event_numbers["DATA"][key] = {"raw":100000, "xsec":0}
 
 for i in [1235, 1237, 1005, 998, 3429, 3981, 2400, 11975, 11976, 11977, 9456, 9457]:
         key = "{0}".format(i)
         raw_event_numbers["MC"][key] = {"raw":100000, "xsec":0}
 
-raw_event_numbers["data"]["Run1"]["raw"] *= 2929
-raw_event_numbers["data"]["Run2"]["raw"] *= 9590
-raw_event_numbers["data"]["Run3"]["raw"] *= 5014
-raw_event_numbers["data"]["Run4"]["raw"] *= 15936
-raw_event_numbers["data"]["Run5"]["raw"] *= 21045
-raw_event_numbers["data"]["Run6"]["raw"] *= 12629
+raw_event_numbers["DATA"]["Run1"]["raw"] *= 2929
+raw_event_numbers["DATA"]["Run2"]["raw"] *= 9590
+raw_event_numbers["DATA"]["Run3"]["raw"] *= 5014
+raw_event_numbers["DATA"]["Run4"]["raw"] *= 15936
+raw_event_numbers["DATA"]["Run5"]["raw"] *= 21045
+raw_event_numbers["DATA"]["Run6"]["raw"] *= 12629
 
 raw_event_numbers["MC"]["1005"]["raw"] *= 11338
 raw_event_numbers["MC"]["11975"]["raw"] *= 1.08

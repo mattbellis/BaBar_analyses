@@ -15,7 +15,7 @@ if len(sys.argv)>1 and sys.argv[1]=="unblinded":
 ren = raw_event_numbers
 
 scale_factors = {}
-for key in ren["data"].keys():
+for key in ren["DATA"].keys():
 
     bkg = [1235, 1237, 1005, 998, 3429, 3981, 2400]
     for sp in bkg:
@@ -40,8 +40,8 @@ print(tot,tot/1e9)
 
 print()
 tot = 0
-for key in ren['data']:
-    sp = ren['data'][key]
+for key in ren['DATA']:
+    sp = ren['DATA'][key]
     print('{0:6} {1:10}'.format(key,sp['raw']))
     tot += sp['raw']
 print(tot,tot/1e9)
@@ -51,8 +51,8 @@ print(tot,tot/1e9)
 
 ################################################################################
 
-tag = "ELECTRON"
-#tag = "MUON"
+#tag = "ELECTRON"
+tag = "MUON"
 data_or_mc = "MC"
 #data_or_mc = "DATA"
 
@@ -65,6 +65,15 @@ if data_or_mc == "MC":
                    'OUTPUT_3981.pkl',
                    #'OUTPUT_2400.pkl',
                    ]
+    labels = [r'$B^+B^-$',
+              r'$B^0\bar{B}^0$',
+              r'$c\bar{c}$',
+              r'$u\bar{u},d\bar{d},s\bar{s}$',
+              r'$\tau^+\tau^-$',
+              r'$\mu^+\mu^-$',
+              #r'$e^+e^-$',
+              r'$B\rightarrow p \ell^-$']
+#'''
 
 else:
     infilenames = ['OUTPUT_Run1.pkl',
@@ -74,6 +83,13 @@ else:
                    'OUTPUT_Run5.pkl',
                    'OUTPUT_Run6.pkl',
                    ]
+    labels = [r'Run 1',
+              r'Run 2',
+              r'Run 3',
+              r'Run 4',
+              r'Run 5',
+              r'Run 6',
+              ]
 
 if data_or_mc == "MC":
     if tag=='ELECTRON':
@@ -87,26 +103,10 @@ print(infilenames)
 #exit()
 
 spnumbers = [name.split('_')[-1].split('.')[0] for name in infilenames]
-#'''
-labels = [r'$B^+B^-$',
-          r'$B^0\bar{B}^0$',
-          r'$c\bar{c}$',
-          r'$u\bar{u},d\bar{d},s\bar{s}$',
-          r'$\tau^+\tau^-$',
-          r'$\mu^+\mu^-$',
-          #r'$e^+e^-$',
-          r'$B\rightarrow p e^-$']
-#'''
 
-'''
-labels = [r'Run 1',
-          r'Run 2',
-          r'Run 3',
-          r'Run 4',
-          r'Run 5',
-          r'Run 6',
-          ]
-'''
+colors = ['g','y','b','r','c','#ffa500','k']
+markers = ['v','^','<','>','1','s','o']
+
 
 
 #infilenames = sys.argv[1:]
@@ -120,22 +120,92 @@ for infile in infilenames:
 #print(allplotvars)
 print()
 ncuts = 7
+cutflow = {}
 for apvkey in allplotvars.keys():
+    cutflow[apvkey] = []
     plotvars = allplotvars[apvkey]
     #for icut,cut in enumerate(cuts):
     #print(plotvars.keys())
     #nentries = len(plotvars['r2']['values'][0])
-    nentries = ren['MC'][apvkey]['raw']
+    nentries = ren[data_or_mc][apvkey]['raw']
     output = "{0:4} {1:10}  ".format(apvkey,nentries)
+    cutflow[apvkey].append(nentries)
     for icut in range(ncuts):
         for j,key in enumerate([list(plotvars.keys())[0]]):
             var = plotvars[key]
             #print(len(var["values"][icut]))
             output += "{0:5.4e}   ".format(len(var["values"][icut])/nentries)
+            cutflow[apvkey].append(len(var["values"][icut]))
 
     print(output)
 print()
+
+################################################################################
+# Cut flow plots
+################################################################################
+xlabels = ['Raw MC', r'$2.0<p$, PID', r'$2.3<p<2.8$', r'$\Delta E$', r'Loose R2All', r'# charged $>5$','SuperTight PID', r"#'s of p and $\ell$"]
+
+plt.figure(figsize=(12,8))
+plt.subplot(3,1,1)
+for i,key in enumerate(cutflow.keys()):
+    print(key,xlabels[i])
+
+    remaining = np.array(cutflow[key])
+    
+    plt.plot(xlabels,remaining,'-',color=colors[i])
+    plt.plot(xlabels,remaining,markers[i],color=colors[i],markersize=10,label=labels[i])
+#plt.setp(plt.gca().get_xticklabels(), rotation=45, fontsize=12)
+plt.setp(plt.gca().get_xticklabels(), visible=False)
+plt.yscale('log')
+plt.ylabel('Fraction remaining')
+#plt.legend()
+#plt.tight_layout()
+#plt.savefig('plots/CUTFLOW_fraction_{0}.png'.format(tag))
+
+################################################################################
+#plt.figure(figsize=(10,4))
+plt.subplot(3,1,2)
+for i,key in enumerate(cutflow.keys()):
+    print(key,xlabels[i])
+
+    remaining = np.array(cutflow[key])/cutflow[key][0]
+
+    plt.plot(xlabels,remaining,'-',color=colors[i])
+    plt.plot(xlabels,remaining,markers[i],color=colors[i],markersize=10,label=labels[i])
+#plt.setp(plt.gca().get_xticklabels(), rotation=45, fontsize=12)
+plt.setp(plt.gca().get_xticklabels(), visible=False)
+plt.yscale('log')
+plt.ylabel('# of events remaining')
+#plt.legend()
+#plt.tight_layout()
+#plt.savefig('plots/CUTFLOW_raw_numbers_{0}.png'.format(tag))
+
+################################################################################
+#plt.figure(figsize=(10,4))
+plt.subplot(3,1,3)
+for i,key in enumerate(cutflow.keys()):
+    print(key,xlabels[i])
+
+    remaining = np.array(cutflow[key])
+    pct_from_prev = []
+    for j in range(len(remaining)):
+        if j==0:
+            pct_from_prev.append(remaining[j]/remaining[j])
+        else:
+            pct_from_prev.append(remaining[j]/remaining[j-1])
+
+    #plt.plot(xlabels,pct_from_prev,'-',color=colors[i])
+    plt.plot(xlabels,pct_from_prev,markers[i],color=colors[i],markersize=10,label=labels[i])
+plt.setp(plt.gca().get_xticklabels(), rotation=45, fontsize=12)
+plt.ylabel('Fraction remaining from previous cut')
+plt.legend(loc='lower left')
+plt.tight_layout()
+plt.savefig('plots/CUTFLOW_3_plots_{0}_{1}.png'.format(tag,data_or_mc))
+
+#plt.show()
 #exit()
+
+################################################################################
 
 
 nsp = len(infilenames)
@@ -183,10 +253,10 @@ for varname in vtp:
                 data = np.array(var["values"][icut])[selection]
                 plot_data.append(data)
 
-                # MC
-                #wt = scale_factors[apvkey]
-                # Data
                 wt = 1
+                if data_or_mc=="MC":
+                    wt = scale_factors[apvkey]
+
                 weights.append(wt*np.ones(len(data)))
             else:
                 #plotvars["bcandDeltaE"]["range"] = (-0.5,0.5)
@@ -199,7 +269,14 @@ for varname in vtp:
         #plt.subplot(1,ncuts,plotindex)
         plt.subplot(1,1,1)
 
-        plt.hist(plot_data,range=var["range"],bins=50,alpha=1.0,weights=weights,label=labels,stacked=True)
+        if data_or_mc == "MC":
+            plt.hist(plot_data,range=var["range"],bins=50,alpha=1.0,weights=weights,label=labels,color=colors[0:-1],stacked=True)
+        else:
+            tot_data = []
+            for p in plot_data:
+                tot_data += p.tolist()
+            lch.hist(tot_data,range=var["range"],bins=50,alpha=0.0,label='Data')
+
         #print(sig_data[0:10])
         tot = 0
         for entry in plot_data:
@@ -228,7 +305,7 @@ for varname in vtp:
             plt.legend()
 
         plt.tight_layout()
-        name = "plots/{0}_{1}_{2}.png".format(tag,varname,icut)
+        name = "plots/{0}_{3}_{1}_{2}.png".format(tag,varname,icut,data_or_mc)
         plt.savefig(name)
 
     plt.tight_layout()
@@ -241,7 +318,11 @@ for varname in vtp:
 # Mes = [5.265,5.29]
 # DeltaE = [-0.12,0.12]
 icut = 4
-plt.figure(figsize=(12,4))
+if data_or_mc == "MC":
+    plt.figure(figsize=(12,4))
+else:
+    plt.figure(figsize=(6,4))
+
 for i,apvkey in enumerate(apvkeys):
     plotvars = allplotvars[apvkey]
     selection = np.ones(len(plotvars["bcandMES"]["values"][icut]),dtype=bool)
@@ -255,6 +336,8 @@ for i,apvkey in enumerate(apvkeys):
         dE = np.array(dE)
 
         selection = np.invert((mes>5.265)*(dE>-0.12)*(dE<0.12))
+        print(len(selection),len(selection[selection==False]))#, len(selection[selection==False])/len(selection))
+
     xpts = np.array(plotvars["bcandMES"]['values'][icut])[selection]
     ypts = np.array(plotvars["bcandDeltaE"]['values'][icut])[selection]
 
@@ -263,12 +346,19 @@ for i,apvkey in enumerate(apvkeys):
     else:
         plt.subplot(1,2,1)
 
-    plt.plot(xpts,ypts,'.',markersize=1,alpha=0.5,label=labels[i])
+    if data_or_mc == "MC":
+        plt.plot(xpts,ypts,'.',markersize=1,alpha=0.5,label=labels[i],color=colors[i])
+    else:
+        plt.subplot(1,1,1)
+        plt.plot(xpts,ypts,'.',markersize=1,alpha=0.5,label='Data',color='k')
+
     plt.xlim(5.2,5.3)
     plt.ylim(-0.3,0.3)
 
-    plt.legend()
+    plt.legend(loc='lower left')
 plt.tight_layout()
+name = "plots/{0}_{1}_mes_deltaE.png".format(tag,data_or_mc)
+plt.savefig(name)
 
 
 plt.show()
