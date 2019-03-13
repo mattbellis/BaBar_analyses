@@ -51,8 +51,8 @@ print(tot,tot/1e9)
 
 ################################################################################
 
-#tag = "ELECTRON"
-tag = "MUON"
+tag = "ELECTRON"
+#tag = "MUON"
 data_or_mc = "MC"
 #data_or_mc = "DATA"
 
@@ -157,7 +157,7 @@ for i,key in enumerate(cutflow.keys()):
 #plt.setp(plt.gca().get_xticklabels(), rotation=45, fontsize=12)
 plt.setp(plt.gca().get_xticklabels(), visible=False)
 plt.yscale('log')
-plt.ylabel('Fraction remaining')
+plt.ylabel('# of events remaining')
 #plt.legend()
 #plt.tight_layout()
 #plt.savefig('plots/CUTFLOW_fraction_{0}.png'.format(tag))
@@ -175,7 +175,7 @@ for i,key in enumerate(cutflow.keys()):
 #plt.setp(plt.gca().get_xticklabels(), rotation=45, fontsize=12)
 plt.setp(plt.gca().get_xticklabels(), visible=False)
 plt.yscale('log')
-plt.ylabel('# of events remaining')
+plt.ylabel('Fraction remaining')
 #plt.legend()
 #plt.tight_layout()
 #plt.savefig('plots/CUTFLOW_raw_numbers_{0}.png'.format(tag))
