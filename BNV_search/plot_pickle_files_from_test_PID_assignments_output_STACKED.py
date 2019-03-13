@@ -135,7 +135,7 @@ for apvkey in allplotvars.keys():
 
     print(output)
 print()
-exit()
+#exit()
 
 
 nsp = len(infilenames)
