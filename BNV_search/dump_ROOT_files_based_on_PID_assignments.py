@@ -115,7 +115,7 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
 ################################################################################
 # Invariant Mass Function
 ################################################################################
-def invmass(p4):
+def invmass(p4,return_squared=False):
     if type(p4[0]) != float:
         p4 = list(p4)
 
@@ -127,6 +127,9 @@ def invmass(p4):
         totp4[3] += p[3]
 
     m2 = totp4[0]**2 - totp4[1]**2 - totp4[2]**2 - totp4[3]**2
+
+    if return_squared:
+        return m2
 
     m = -999
     if m2 >= 0:
@@ -164,8 +167,9 @@ for infile in sys.argv[1:]:
 
 #tree.Print()
 #exit()
-
 nentries = tree.GetEntries()
+#nentries = 10000
+
 
 #outfilename = "%s.dat" % (sys.argv[1].split('/')[-1].split('.root')[0])
 #outfilename = "%s.dat" % (sys.argv[1].split('.root')[0])
@@ -219,6 +223,9 @@ beamvtxy = array('f', [-1.])
 outtree.Branch('beamvtxy', beamvtxy, 'beamvtxy/F')
 beamvtxz = array('f', [-1.])
 outtree.Branch('beamvtxz', beamvtxz, 'beamvtxz/F')
+
+missingmass = array('f', [-1.])
+outtree.Branch('missingmass', missingmass, 'missingmass/F')
 
 r2 = array('f', [-1.])
 outtree.Branch('r2', r2, 'r2/F')
@@ -382,9 +389,10 @@ for i in range(nentries):
     nvals = 0
 
     #beam = np.array([tree.eeE, tree.eePx, tree.eePy, tree.eePz, 0, 0])
-    #beamp4 = np.array([tree.eeE, tree.eePx, tree.eePy, tree.eePz])
-    #beammass = invmass([beamp4])
-    #beam = np.array([beammass, 0.0, 0.0, 0.0, 0, 0])
+    beamp4 = np.array([tree.eeE, tree.eePx, tree.eePy, tree.eePz])
+    beammass = invmass([beamp4])
+    beam = np.array([beammass, 0.0, 0.0, 0.0, 0, 0])
+
     beame[0] = tree.eeE
     beampx[0] = tree.eePx
     beampy[0] = tree.eePy
@@ -392,6 +400,7 @@ for i in range(nentries):
     beamvtxx[0] = tree.xPrimaryVtx
     beamvtxy[0] = tree.yPrimaryVtx
     beamvtxz[0] = tree.zPrimaryVtx
+
 
     r2[0] = tree.R2
     r2all[0] = tree.R2All
@@ -460,6 +469,7 @@ for i in range(nentries):
         mylund = particle_lunds[max_particle]
 
         new_energy = recalc_energy(particle_masses[max_particle],[px,py,pz])
+        #print(lund,mylund,e, new_energy)
         particle = [new_energy,px,py,pz,q,mylund]
         myparticles.append(particle)
 
@@ -554,6 +564,7 @@ for i in range(nentries):
         new_energy = recalc_energy(0,[px,py,pz])
         #particle = [e,px,py,pz,0,22]
         particle = [new_energy,px,py,pz,0,22]
+        myparticles.append(particle)
 
         if ngamma[0]<128:
             gammae[ngamma[0]] = new_energy
@@ -562,8 +573,24 @@ for i in range(nentries):
             gammapz[ngamma[0]] = pz
         ngamma[0] += 1
 
+    # Missing mass?
+    myparticles = np.array(myparticles)
+    totp4 = beam[0:4]
+    print(totp4)
+    for p in myparticles:
+        #print(totp4,p[0:4])
+        totp4 -= p[0:4]
+    #print(totp4)
+    missingmass[0] = invmass([totp4],return_squared=True)
+    #print(missingmass[0])
+
     #print(len(leptons),len(protons),nproton[0])
-    if len(leptons)>0 and len(protons)>0:
+    # Use this for SP-9445 and SP-9446, p mu/e
+    #flag = len(leptons)>0 and len(protons)>0
+    flag = 1
+    # SP-11975, B --> p neutrino
+    #flag = len(leptons)==0 and len(protons)>0
+    if flag:
         #print("FILLING!!!!!!!!!!!")
         outtree.Fill()
 

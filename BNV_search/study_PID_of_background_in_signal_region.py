@@ -335,13 +335,13 @@ plt.tight_layout()
 ###################
 plt.figure(figsize=(8,3))
 plt.subplot(1,2,1)
-lch.hist_err(bcandMES,bins=200,range=(5.2,5.3))
-#lch.hist_err(bcandMES,bins=200,range=(0,5.3))
+lch.hist(bcandMES,bins=200,range=(5.2,5.3))
+#lch.hist(bcandMES,bins=200,range=(0,5.3))
 plt.xlabel(r'M$_{\rm ES}$ [GeV/c$^{2}$]',fontsize=18)
 
 plt.subplot(1,2,2)
-lch.hist_err(bcandDeltaE,bins=200,range=(-0.2,0.2))
-#lch.hist_err(bcandDeltaE,bins=200,range=(-10,10))
+lch.hist(bcandDeltaE,bins=200,range=(-0.2,0.2))
+#lch.hist(bcandDeltaE,bins=200,range=(-10,10))
 plt.xlabel(r'$\Delta$E [GeV]',fontsize=18)
 
 plt.tight_layout()
