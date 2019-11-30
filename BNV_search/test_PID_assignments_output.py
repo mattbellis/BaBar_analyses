@@ -78,6 +78,8 @@ for i,infile in enumerate(infilenames):
     '''
 
 nentries = tree.GetEntries()
+print(nentries)
+exit()
 
 invmasses = []
 missmasses = []
