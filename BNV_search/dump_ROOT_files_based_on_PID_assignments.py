@@ -437,6 +437,8 @@ for i in range(nentries):
     nproton[0] = 0
     ne[0] = 0
     nmu[0] = 0
+
+    n_high_p = 0
     for j in range(ntrks):
         idx = tree.TRKMCIdx[j]
         #print("idx,len: ",idx,tree.mcLen, ntrks)
@@ -472,6 +474,10 @@ for i in range(nentries):
         #print(lund,mylund,e, new_energy)
         particle = [new_energy,px,py,pz,q,mylund]
         myparticles.append(particle)
+
+        if p3>2.0:
+            n_high_p += 1
+            #print(particle)
 
 
         if mylund==211:
@@ -566,6 +572,10 @@ for i in range(nentries):
         particle = [new_energy,px,py,pz,0,22]
         myparticles.append(particle)
 
+        if p3>2.0:
+            n_high_p += 1
+            #print(particle)
+
         if ngamma[0]<128:
             gammae[ngamma[0]] = new_energy
             gammapx[ngamma[0]] = px
@@ -576,13 +586,14 @@ for i in range(nentries):
     # Missing mass?
     myparticles = np.array(myparticles)
     totp4 = beam[0:4]
-    print(totp4)
+    #print(totp4)
     for p in myparticles:
         #print(totp4,p[0:4])
         totp4 -= p[0:4]
     #print(totp4)
     missingmass[0] = invmass([totp4],return_squared=True)
     #print(missingmass[0])
+    print(n_high_p)
 
     #print(len(leptons),len(protons),nproton[0])
     # Use this for SP-9445 and SP-9446, p mu/e
