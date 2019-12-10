@@ -167,8 +167,8 @@ for infile in sys.argv[1:]:
 
 #tree.Print()
 #exit()
-nentries = tree.GetEntries()
-#nentries = 10000
+#nentries = tree.GetEntries()
+nentries = 10000
 
 
 #outfilename = "%s.dat" % (sys.argv[1].split('/')[-1].split('.root')[0])
@@ -226,6 +226,16 @@ outtree.Branch('beamvtxz', beamvtxz, 'beamvtxz/F')
 
 missingmass = array('f', [-1.])
 outtree.Branch('missingmass', missingmass, 'missingmass/F')
+missingmom = array('f', [-1.])
+outtree.Branch('missingmom', missingmom, 'missingmom/F')
+missingE = array('f', [-1.])
+outtree.Branch('missingE', missingE, 'missingE/F')
+scalarmomsum = array('f', [-1.])
+outtree.Branch('scalarmomsum', scalarmomsum, 'scalarmomsum/F')
+
+nhighmom = array('i', [-1])
+outtree.Branch('nhighmom', nhighmom, 'nhighmom/I')
+
 
 r2 = array('f', [-1.])
 outtree.Branch('r2', r2, 'r2/F')
@@ -374,6 +384,8 @@ for i in range(nentries):
     #myparticles = {"electrons":[], "muons":[], "pions":[], "kaons":[], "protons":[], "gammas":[]}
     #myparticles = [[], [], [], [], [], []]
     myparticles = []
+    nhighmom[0] = 0
+    scalarmomsum[0] = 0
 
 
     if i%1000==0:
@@ -446,7 +458,7 @@ for i in range(nentries):
         ebit,mubit,pibit,Kbit,pbit = tree.eSelectorsMap[j],tree.muSelectorsMap[j],tree.piSelectorsMap[j],tree.KSelectorsMap[j],tree.pSelectorsMap[j]
         #print(ebit,mubit,pibit,Kbit,pbit)
         eps.SetBits(ebit); mups.SetBits(mubit); pips.SetBits(pibit); Kps.SetBits(Kbit); pps.SetBits(pbit);
-        max_particle,max_pid = selectPID(eps,mups,pips,Kps,pps,verbose=True)
+        max_pid,max_particle = selectPID(eps,mups,pips,Kps,pps,verbose=True)
         #print(max_particle,max_pid)
         #e = tree.TRKenergy[j]
         #p3 = tree.TRKp3[j]
@@ -458,7 +470,7 @@ for i in range(nentries):
                 #print("Matched! ",tree.TRKLund[j], idx, tree.mcLund[idx], max_particle,max_pid," -- ",ebit,mubit,pibit,Kbit,pbit)
                 #print(idx,matchIdx)
                 if idx==matchIdx:
-                    match_max.append(max_particle)
+                    match_max.append(max_pid)
 
         e = tree.TRKenergyCM[j]
         p3 = tree.TRKp3CM[j]
@@ -468,15 +480,17 @@ for i in range(nentries):
         lund = tree.TRKLund[j]
         q = int(lund/np.abs(lund))
 
-        mylund = particle_lunds[max_particle]
+        mylund = particle_lunds[max_pid]
 
-        new_energy = recalc_energy(particle_masses[max_particle],[px,py,pz])
+        new_energy = recalc_energy(particle_masses[max_pid],[px,py,pz])
         #print(lund,mylund,e, new_energy)
         particle = [new_energy,px,py,pz,q,mylund]
         myparticles.append(particle)
+        scalarmomsum[0] += vec_mag(particle[1:4])
 
         if p3>2.0:
             n_high_p += 1
+            nhighmom[0] += 1
             #print(particle)
 
 
@@ -571,10 +585,13 @@ for i in range(nentries):
         #particle = [e,px,py,pz,0,22]
         particle = [new_energy,px,py,pz,0,22]
         myparticles.append(particle)
+        scalarmomsum[0] += vec_mag(particle[1:4])
 
+        '''
         if p3>2.0:
             n_high_p += 1
             #print(particle)
+        '''
 
         if ngamma[0]<128:
             gammae[ngamma[0]] = new_energy
@@ -591,9 +608,11 @@ for i in range(nentries):
         #print(totp4,p[0:4])
         totp4 -= p[0:4]
     #print(totp4)
-    missingmass[0] = invmass([totp4],return_squared=True)
+    missingmass[0] = invmass([totp4],return_squared=False)
+    missingmom[0] = vec_mag(totp4[1:])
+    missingE[0] = totp4[0]
     #print(missingmass[0])
-    print(n_high_p)
+    #print(n_high_p)
 
     #print(len(leptons),len(protons),nproton[0])
     # Use this for SP-9445 and SP-9446, p mu/e
