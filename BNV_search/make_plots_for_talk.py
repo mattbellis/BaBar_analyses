@@ -21,7 +21,9 @@ for i in range(nentries):
 
     t.GetEntry(i)
 
-    if t.nproton==1 and t.protone[0]>2.3:
+    #if t.nproton==1 and t.protone[0]>2.3:
+    #if 1:
+    if t.nproton==0 and t.nmu==1 and t.mue[0]>2.0:
         tagmes.append(t.tagmes)
         tagdE.append(t.tagdE)
         tagbcand.append(t.tagbcand)

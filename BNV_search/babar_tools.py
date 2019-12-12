@@ -144,9 +144,9 @@ def calc_B_variables(particles, beam):
     # Get the tag side and don't count the proton or lepton
     for p in particles:
         # Missing neutrino, require high-mom proton
-        if not (vec_mag(p[1:4])>2.0 and p[-1]==2212):
+        #if not (vec_mag(p[1:4])>2.0 and p[-1]==2212):
         # Missing neutron, require high-mom muon
-        #if not (vec_mag(p[1:4])>2.0 and p[-1]==13):
+        if not (vec_mag(p[1:4])>2.0 and p[-1]==13):
             tagbc += p
 
     halfbeam = beam[0]/2.0
