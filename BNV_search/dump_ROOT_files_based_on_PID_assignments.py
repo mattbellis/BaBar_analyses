@@ -8,152 +8,16 @@ import zipfile
 import myPIDselector
 from myPIDselector import *
 
-eps = PIDselector("e")
-pps = PIDselector("p")
-pips = PIDselector("pi")
-Kps = PIDselector("K")
-mups = PIDselector("mu")
+from babar_tools import vec_mag,angle,selectPID,invmass,recalc_energy,sph2cart
+from babar_tools import particle_masses,particle_lunds
+from babar_tools import eps,pps,pips,Kps,mups # The PID selectors for each particle
+from babar_tools import calc_B_variables
+
 
 totx = []
 toty = []
 totz = []
 
-
-#particles = ["mu","e","pi","K","p"]
-particle_masses = [0.000511, 0.105, 0.139, 0.494, 0.938, 0]
-particle_lunds = [11, 13, 211, 321, 2212, 22]
-
-allparts = [{}, {}, {}]
-
-for pl in particle_lunds:
-    allparts[0][pl] = []
-    allparts[1][pl] = []
-    allparts[2][pl] = []
-
-################################################################################
-'''
-def selectPID(eps,mups,pips,Kps,pps,verbose=False):
-    #verbose = True
-    max_pid = -1
-    max_particle = -1
-    for i,ps in enumerate([eps,mups,pips,Kps,pps]):
-        if verbose:
-            ps.PrintSelectors()
-        pid = ps.HighestBitFraction()
-        #print pid
-        if pid>max_pid:
-            max_pid = pid
-            max_particle = i
-    #print max_particle,particles[max_particle]
-    return max_particle,max_pid
-'''
-
-################################################################################
-def vec_mag(vec):
-    mag = np.sqrt(vec[0]*vec[0] + vec[1]*vec[1] + vec[2]*vec[2])
-    return mag
-################################################################################
-def angle(vec0, vec1, returncos=False):
-    mag0 = vec_mag(vec0)
-    mag1 = vec_mag(vec1)
-
-    costheta = (vec0[0]*vec1[0] + vec0[1]*vec1[1] + vec0[2]*vec1[2])/(mag0*mag1)
-
-    if returncos:
-        return costheta
-
-    return np.arccos(costheta)
-    
-################################################################################
-################################################################################
-
-################################################################################
-def selectPID(eps,mups,pips,Kps,pps,verbose=False):
-    #verbose = True
-    max_pid = 2 # Pion
-    max_particle = -1
-
-    s = mups.selectors
-    #print(s)
-    for i in s:
-        #print(i)
-        if i.find("BDT")>=0 and (i.find("TightMuon")>=0 or i.find("LooseMuon")>=0):
-            if mups.IsSelectorSet(i):
-                return 1,1.0 # Muon
-    
-    s = eps.selectors
-    #print(s)
-    for i in s:
-        #print(i)
-        if i.find("TightKM")>=0:
-            if eps.IsSelectorSet(i):
-                return 0,1.0 # Electron
-    
-    s = pps.selectors
-    #print(s)
-    for i in s:
-        #print(i)
-        #if i.find("SuperTightKM")>=0 or i.find("SuperTightKM")>=0:
-        #if i.find("LooseKM")>=0 or i.find("TightKM")>=0:
-        if i.find("LooseKM")==0 or i.find("TightKM")>=0:
-            if pps.IsSelectorSet(i):
-                return 4,1.0 # proton
-
-    s = Kps.selectors
-    #print(s)
-    for i in s:
-        #print(i)
-        if i.find("Tight")>=0:
-            if Kps.IsSelectorSet(i):
-                return 3,1.0 # Kaon
-    
-    # Otherwise it is a pion
-    
-    return max_pid,max_particle
-################################################################################
-
-################################################################################
-# Invariant Mass Function
-################################################################################
-def invmass(p4,return_squared=False):
-    if type(p4[0]) != float:
-        p4 = list(p4)
-
-    totp4 = np.array([0., 0., 0., 0.])
-    for p in p4:
-        totp4[0] += p[0]
-        totp4[1] += p[1]
-        totp4[2] += p[2]
-        totp4[3] += p[3]
-
-    m2 = totp4[0]**2 - totp4[1]**2 - totp4[2]**2 - totp4[3]**2
-
-    if return_squared:
-        return m2
-
-    m = -999
-    if m2 >= 0:
-        m = np.sqrt(m2)
-    else:
-        m = -np.sqrt(np.abs(m2))
-    return m
-################################################################################
-
-
-################################################################################
-def recalc_energy(mass,p3):
-    energy = np.sqrt(mass*mass + vec_mag(p3)**2)
-    return energy
-################################################################################
-
-################################################################################
-def sph2cart(pmag,costh,phi):
-    theta = np.arccos(costh)
-    x = pmag*np.sin(theta)*np.cos(phi)
-    y = pmag*np.sin(theta)*np.sin(phi)
-    z = pmag*costh
-    return x,y,z
-################################################################################
 
 #f = ROOT.TFile(sys.argv[1])
 #f.ls()
@@ -236,6 +100,19 @@ outtree.Branch('scalarmomsum', scalarmomsum, 'scalarmomsum/F')
 nhighmom = array('i', [-1])
 outtree.Branch('nhighmom', nhighmom, 'nhighmom/I')
 
+#bcand,dE,mes, tagbcand,tagdE,tagmes
+bcand = array('f', [-1.0])
+outtree.Branch('bcand', bcand, 'bcand/F')
+dE = array('f', [-1.0])
+outtree.Branch('dE', dE, 'dE/F')
+mes = array('f', [-1.0])
+outtree.Branch('mes', mes, 'mes/F')
+tagbcand = array('f', [-1.0])
+outtree.Branch('tagbcand', tagbcand, 'tagbcand/F')
+tagdE = array('f', [-1.0])
+outtree.Branch('tagdE', tagdE, 'tagdE/F')
+tagmes = array('f', [-1.0])
+outtree.Branch('tagmes', tagmes, 'tagmes/F')
 
 r2 = array('f', [-1.])
 outtree.Branch('r2', r2, 'r2/F')
@@ -404,6 +281,7 @@ for i in range(nentries):
     beamp4 = np.array([tree.eeE, tree.eePx, tree.eePy, tree.eePz])
     beammass = invmass([beamp4])
     beam = np.array([beammass, 0.0, 0.0, 0.0, 0, 0])
+    #print("BEAM: ",beam)
 
     beame[0] = tree.eeE
     beampx[0] = tree.eePx
@@ -450,6 +328,7 @@ for i in range(nentries):
     ne[0] = 0
     nmu[0] = 0
 
+    highmomE = 0
     n_high_p = 0
     for j in range(ntrks):
         idx = tree.TRKMCIdx[j]
@@ -491,6 +370,7 @@ for i in range(nentries):
         if p3>2.0:
             n_high_p += 1
             nhighmom[0] += 1
+            highmomE += new_energy
             #print(particle)
 
 
@@ -602,17 +482,24 @@ for i in range(nentries):
 
     # Missing mass?
     myparticles = np.array(myparticles)
-    totp4 = beam[0:4]
+    totp4 = beam[0:4].copy()
     #print(totp4)
     for p in myparticles:
         #print(totp4,p[0:4])
         totp4 -= p[0:4]
     #print(totp4)
-    missingmass[0] = invmass([totp4],return_squared=False)
     missingmom[0] = vec_mag(totp4[1:])
     missingE[0] = totp4[0]
+
+    # Recalculate the missing mass assuming B on one side 
+    totp4[0] = beam[0]/2 - highmomE
+    missingmass[0] = invmass([totp4],return_squared=True)
+
     #print(missingmass[0])
     #print(n_high_p)
+
+    bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0] = calc_B_variables(myparticles,beam)
+    #print(bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0])
 
     #print(len(leptons),len(protons),nproton[0])
     # Use this for SP-9445 and SP-9446, p mu/e

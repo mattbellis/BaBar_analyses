@@ -94,7 +94,7 @@ def selectPID(eps,mups,pips,Kps,pps,verbose=False):
 ################################################################################
 # Invariant Mass Function
 ################################################################################
-def invmass(p4):
+def invmass(p4,return_squared=False):
     if type(p4[0]) != float:
         p4 = list(p4)
 
@@ -106,6 +106,9 @@ def invmass(p4):
         totp4[3] += p[3]
 
     m2 = totp4[0]**2 - totp4[1]**2 - totp4[2]**2 - totp4[3]**2
+
+    if return_squared:
+        return m2
 
     m = -999
     if m2 >= 0:
@@ -130,4 +133,36 @@ def sph2cart(pmag,costh,phi):
     z = pmag*costh
     return x,y,z
 ################################################################################
+
+################################################################################
+def calc_B_variables(particles, beam):
+
+    # B candidates
+    bc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    tagbc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+    # Get the tag side and don't count the proton or lepton
+    for p in particles:
+        # Missing neutrino, require high-mom proton
+        if not (vec_mag(p[1:4])>2.0 and p[-1]==2212):
+        # Missing neutron, require high-mom muon
+        #if not (vec_mag(p[1:4])>2.0 and p[-1]==13):
+            tagbc += p
+
+    halfbeam = beam[0]/2.0
+    #print(beam)
+    #print(halfbeam)
+
+    bcand = invmass([bc])
+    dE = bc[0] - halfbeam
+    bc[0] = halfbeam
+    mes = invmass([bc])
+
+    tagbcand = invmass([tagbc])
+    tagdE = tagbc[0] - halfbeam
+    tagbc[0] = halfbeam
+    tagmes = invmass([tagbc])
+
+    return bcand,dE,mes, tagbcand,tagdE,tagmes
+
 
