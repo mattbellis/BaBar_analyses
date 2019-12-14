@@ -31,8 +31,9 @@ for infile in sys.argv[1:]:
 
 #tree.Print()
 #exit()
-#nentries = tree.GetEntries()
-nentries = 10000
+nentries = tree.GetEntries()
+#nentries = 10000
+#nentries = 1
 
 
 #outfilename = "%s.dat" % (sys.argv[1].split('/')[-1].split('.root')[0])
@@ -434,6 +435,8 @@ for i in range(nentries):
             muebit[nmu[0]] = ebit
             mumubit[nmu[0]] = mubit
             nmu[0] += 1
+        else:
+            print(mylund)
 
 
 
@@ -481,6 +484,7 @@ for i in range(nentries):
         ngamma[0] += 1
 
     # Missing mass?
+    #'''
     myparticles = np.array(myparticles)
     totp4 = beam[0:4].copy()
     #print(totp4)
@@ -498,8 +502,10 @@ for i in range(nentries):
     #print(missingmass[0])
     #print(n_high_p)
 
-    bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0] = calc_B_variables(myparticles,beam)
-    #print(bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0])
+    bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0],a,b,c,d = calc_B_variables(myparticles,beam)
+    #print(bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0],missingmom[0],missingE[0],missingmass[0])
+    #exit()
+    #'''
 
     #print(len(leptons),len(protons),nproton[0])
     # Use this for SP-9445 and SP-9446, p mu/e

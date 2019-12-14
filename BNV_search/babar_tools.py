@@ -135,21 +135,52 @@ def sph2cart(pmag,costh,phi):
 ################################################################################
 
 ################################################################################
-def calc_B_variables(particles, beam):
+def calc_B_variables(particles, beam, decay='pnu'):
 
     # B candidates
     bc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
     tagbc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    highmomE = 0
+    totp4 = beam[0:4].copy()
+    #print(totp4)
+
+
+    tagq = 0
 
     # Get the tag side and don't count the proton or lepton
+    #print("---------")
+    #print(totp4)
     for p in particles:
-        # Missing neutrino, require high-mom proton
-        #if not (vec_mag(p[1:4])>2.0 and p[-1]==2212):
-        # Missing neutron, require high-mom muon
-        if not (vec_mag(p[1:4])>2.0 and p[-1]==13):
+        totp4 -= p[0:4]
+        #print(p[-1],totp4)
+
+        flag = 1
+        if decay=='pnu': # Missing neutrino, require high-mom proton
+            flag = not (vec_mag(p[1:4])>2.0 and p[-1]==2212)
+        elif decay=='nmu': # Missing neutron, require high-mom muon
+            flag =  not (vec_mag(p[1:4])>2.0 and p[-1]==13)
+        if decay=='ne': # Missing neutron, require high-mom electron
+            flag =  not (vec_mag(p[1:4])>2.0 and p[-1]==11)
+
+        if flag:
+            #print(p)
             tagbc += p
+            tagq += p[-2]
+        else:
+            highmomE += p[0]
+            #print(p[-1],vec_mag(p[1:]))
 
     halfbeam = beam[0]/2.0
+    #print(halfbeam)
+
+    #print(totp4)
+    missingmom = vec_mag(totp4[1:])
+    missingE = totp4[0]
+
+    # Recalculate the missing mass assuming B on one side
+    totp4[0] = halfbeam - highmomE
+    missingmass = invmass([totp4],return_squared=True)
+
     #print(beam)
     #print(halfbeam)
 
@@ -163,6 +194,6 @@ def calc_B_variables(particles, beam):
     tagbc[0] = halfbeam
     tagmes = invmass([tagbc])
 
-    return bcand,dE,mes, tagbcand,tagdE,tagmes
+    return bcand,dE,mes, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass
 
 

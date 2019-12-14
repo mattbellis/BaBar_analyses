@@ -4,8 +4,11 @@ import ROOT
 import matplotlib.pylab as plt
 
 f = ROOT.TFile(sys.argv[1])
+#f.ls()
 
-t = f.Get("Tskim")
+#t = f.Get("Tskim")
+t = f.Get("analysis")
+#t.Print()
 
 nentries = t.GetEntries()
 
@@ -21,9 +24,9 @@ for i in range(nentries):
 
     t.GetEntry(i)
 
-    #if t.nproton==1 and t.protone[0]>2.3:
+    if t.nproton==1 and t.protone[0]>2.3 and t.nhighmom==1 and t.nmu==0 and t.ne==0:# and t.tagq==0:
     #if 1:
-    if t.nproton==0 and t.nmu==1 and t.mue[0]>2.0:
+    #if t.nproton==0 and t.nmu==1 and t.mue[0]>2.0:
         tagmes.append(t.tagmes)
         tagdE.append(t.tagdE)
         tagbcand.append(t.tagbcand)
@@ -34,6 +37,7 @@ for i in range(nentries):
 
 
 
+print(len(tagbcand))
 
 plt.figure(figsize=(12,4))
 plt.subplot(1,3,1)
