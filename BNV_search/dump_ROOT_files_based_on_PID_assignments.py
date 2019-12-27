@@ -484,7 +484,7 @@ for i in range(nentries):
         ngamma[0] += 1
 
     # Missing mass?
-    #'''
+    '''
     myparticles = np.array(myparticles)
     totp4 = beam[0:4].copy()
     #print(totp4)
@@ -505,7 +505,7 @@ for i in range(nentries):
     bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0],a,b,c,d = calc_B_variables(myparticles,beam)
     #print(bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0],missingmom[0],missingE[0],missingmass[0])
     #exit()
-    #'''
+    '''
 
     #print(len(leptons),len(protons),nproton[0])
     # Use this for SP-9445 and SP-9446, p mu/e

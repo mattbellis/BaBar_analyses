@@ -22,11 +22,12 @@ parser.add_argument('--decay', dest='decay', default="pnu", help='Decay to assum
 parser.add_argument('infiles', action='append', nargs='*', help='Input file name(s)')
 args = parser.parse_args()
 
+#print(args)
 decay = args.decay
 
 
 tree = ROOT.TChain("Tskim")
-for infile in sys.argv[1:]:
+for infile in args.infiles[0]:
     print(infile)
     tree.AddFile(infile)
 
