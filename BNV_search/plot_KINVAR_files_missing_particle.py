@@ -185,9 +185,19 @@ for i in range(nentries):
 
 
     # Should the low cut be 2.2 or 2.3? 
-    cut1 = np==1 and pp[0]>2.3# and pp<2.8 and lp>2.3 and lp<2.8
-    cut2 = nmu==0
-    cut3 = ne==0
+    cut1 = 1
+    if decay=='pnu':
+        cut1 = np==1 and pp[0]>2.3# and pp<2.8 and lp>2.3 and lp<2.8
+        cut2 = nmu==0
+        cut3 = ne==0
+    elif decay=='nmu':
+        cut1 = nmu==1 and mup[0]>2.3# and pp<2.8 and lp>2.3 and lp<2.8
+        cut2 = np==0
+        cut3 = ne==0
+    elif decay=='ne':
+        cut1 = ne==1 and ep[0]>2.3# and pp<2.8 and lp>2.3 and lp<2.8
+        cut2 = np==0
+        cut3 = nmu==0
     cut4 = ncharged>5
     cut5 = 1
     cut6 = 1
@@ -249,7 +259,8 @@ print('Processed {0} files for {1}'.format(len(args.infiles),"1"))#,sptag))
 for icut,cut in enumerate(cuts):
     for j,key in enumerate(plotvars.keys()):
         var = plotvars[key]
-        print(len(var["values"][icut])/nentries)
+        if j==0:
+            print("cut {0}   # remaining {1}".format(icut,len(var["values"][icut])/nentries))
 #exit()
 
 
@@ -264,7 +275,8 @@ for icut,cut in enumerate(cuts):
             lch.hist(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5)
         plt.xlabel(var["xlabel"],fontsize=12)
         plt.ylabel(var["ylabel"],fontsize=12)
-        print(len(var["values"][icut]))
+        if j==0:
+            print("cut {0}   # remaining {1}".format(icut,len(var["values"][icut])))
 
     '''
     if icut==len(cuts)-1:
