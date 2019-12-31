@@ -28,6 +28,13 @@ decay = args.decay
 
 
 plotvars = {}
+plotvars["nbnvbcand"] = {"values":[], "xlabel":r"# of BNV B-candidates", "ylabel":r"# E","range":(0,10)} 
+plotvars["bnvbcandmass"] = {"values":[], "xlabel":r"Mass BNV B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
+plotvars["bnvbcandMES"] = {"values":[], "xlabel":r"BNV M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
+plotvars["bnvbcandDeltaE"] = {"values":[], "xlabel":r"BNV $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
+plotvars["bnvprotp3"] = {"values":[], "xlabel":r"BNV proton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
+plotvars["bnvlepp3"] = {"values":[], "xlabel":r"BNV lepton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
+
 plotvars["tagbcandmass"] = {"values":[], "xlabel":r"Mass tag B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
 plotvars["tagbcandMES"] = {"values":[], "xlabel":r"tag M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
 plotvars["tagbcandDeltaE"] = {"values":[], "xlabel":r"tag $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
@@ -53,9 +60,18 @@ plotvars["sphericityall"] = {"values":[], "xlabel":r"Sphericity all", "ylabel":r
 plotvars["ncharged"] = {"values":[], "xlabel":r"# charged particles", "ylabel":r"# E","range":(0,20)} 
 plotvars["nphot"] = {"values":[], "xlabel":r"# photons","ylabel":r"# E","range":(0,20)} 
 
+# Use this to write out only select cuts
+plotvars_to_write_out = {}
+for key in plotvars.keys():
+    plotvars_to_write_out[key] = plotvars[key].copy()
+    plotvars_to_write_out[key]['values'] = []
+
+icuts_to_dump = [1,4]
+
 cuts = []
 ncuts = 7
 for n in range(ncuts):
+    #print(n)
     for key in plotvars.keys():
         plotvars[key]["values"].append([])
 
@@ -167,6 +183,13 @@ for i in range(nentries):
     nphot = tree.ngamma
     ncharged = tree.npi + tree.nk + tree.nproton + tree.ne + tree.nmu
 
+    nbnvbcand = tree.nbnvbcand
+    bnvbcandmass = tree.bcand
+    bnvbcandMES = tree.mes
+    bnvbcandDeltaE = tree.dE
+    bnvprotp3 = tree.bnvprotp3
+    bnvlepp3 = tree.bnvlepp3
+
     tagbcandmass = tree.tagbcand
     tagbcandMES = tree.tagmes
     tagbcandDeltaE = tree.tagdE
@@ -179,6 +202,9 @@ for i in range(nentries):
     np = tree.nproton
     nmu = tree.nmu
     ne = tree.ne
+    pq = tree.protonq
+    muq = tree.muq
+    eq = tree.eq
     pp = tree.protonp3
     mup = tree.mup3
     ep = tree.ep3
@@ -198,14 +224,32 @@ for i in range(nentries):
         cut1 = ne==1 and ep[0]>2.3# and pp<2.8 and lp>2.3 and lp<2.8
         cut2 = np==0
         cut3 = nmu==0
+    elif decay=='pmu' or decay=='pe':
+        cut1 = nbnvbcand==1 and bnvprotp3[0]>2.3 and bnvlepp3[0]>2.3
+        cut2 = 1
+        cut3 = 1
+
     cut4 = ncharged>5
-    cut5 = nhighmom==1
-    cut6 = missingmom>1 and missingE>1 # These cuts seem to be correlated with tagmass and tagdeltaE
+
+    if decay=='pnu' or decay=='nmu' or decay=='ne':
+        cut5 = nhighmom==1
+        cut6 = missingmom>1 and missingE>1 # These cuts seem to be correlated with tagmass and tagdeltaE
+    elif decay=='pmu' or decay=='pe':
+        cut5 = 1
+        cut6 = missingmom<2.6 and missingE<5 # These cuts seem to be correlated with tagmass and tagdeltaE
 
     cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3), (cut1*cut2*cut3*cut4), (cut1*cut2*cut3*cut4*cut5), (cut1*cut2*cut3*cut4*cut5*cut6)]
     for icut,cut in enumerate(cuts):
         if cut:
             #print(icut)
+            plotvars["nbnvbcand"]["values"][icut].append(nbnvbcand)
+            for k in range(nbnvbcand):
+                plotvars["bnvbcandmass"]["values"][icut].append(bnvbcandmass[k])
+                plotvars["bnvbcandMES"]["values"][icut].append(bnvbcandMES[k])
+                plotvars["bnvbcandDeltaE"]["values"][icut].append(bnvbcandDeltaE[k])
+                plotvars["bnvprotp3"]["values"][icut].append(bnvprotp3[k])
+                plotvars["bnvlepp3"]["values"][icut].append(bnvlepp3[k])
+
             plotvars["tagbcandmass"]["values"][icut].append(tagbcandmass)
             plotvars["tagbcandMES"]["values"][icut].append(tagbcandMES)
             plotvars["tagbcandDeltaE"]["values"][icut].append(tagbcandDeltaE)
@@ -247,8 +291,24 @@ for i in range(nentries):
 
 #exit()
 
+################################################
+# Write only specific cuts out to a file
+################################################
+for key in plotvars.keys():
+    #print(key)
+    a = plotvars[key]
+    #print(a.keys())
+    #print(len(a['values']))
+    # Need to clear the values
+    #plotvars_to_write_out[key]['values'] = []
+    for i in range(len(a['values'])):
+        #print(i)
+        if i in icuts_to_dump:
+            #print(i)
+            plotvars_to_write_out[key]['values'].append(a['values'][i])
+
 outfile = open(outfilename,'wb')
-pickle.dump(plotvars,outfile)
+pickle.dump(plotvars_to_write_out,outfile)
 outfile.close()
 
 print('Processed {0} files for {1}'.format(len(args.infiles),"1"))#,sptag))
@@ -268,28 +328,15 @@ for icut,cut in enumerate(cuts):
     plt.figure(figsize=(10,6))
     for j,key in enumerate(plotvars.keys()):
         var = plotvars[key]
-        plt.subplot(5,5,1+j)
+        plt.subplot(5,6,1+j)
         if key=="nphot" or key=="ncharged":
             lch.hist(var["values"][icut],range=var["range"],bins=20,alpha=0.2,markersize=0.5)
         else:
             lch.hist(var["values"][icut],range=var["range"],bins=50,alpha=0.2,markersize=0.5)
-        plt.xlabel(var["xlabel"],fontsize=12)
-        plt.ylabel(var["ylabel"],fontsize=12)
+        plt.xlabel(var["xlabel"],fontsize=8)
+        plt.ylabel(var["ylabel"],fontsize=8)
         if j==0:
             print("cut {0}   # remaining {1}".format(icut,len(var["values"][icut])))
-
-    '''
-    if icut==len(cuts)-1:
-        plt.figure(figsize=(10,6))
-        plt.subplot(1,1,1)
-        plt.plot(plotvars["bcandMES"]["values"][icut],plotvars["bcandDeltaE"]["values"][icut],'.',alpha=0.8,markersize=2.0)
-        plt.xlabel(plotvars["bcandMES"]["xlabel"],fontsize=12)
-        plt.ylabel(plotvars["bcandMES"]["ylabel"],fontsize=12)
-        plt.xlim(5.2,5.3)
-        plt.ylim(-0.4,0.1)
-        plt.tight_layout()
-    '''
-
 
     plt.tight_layout()
 

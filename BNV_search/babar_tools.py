@@ -147,6 +147,12 @@ def calc_B_variables(particles, beam, decay='pnu'):
 
     tagq = 0
 
+    # Grab the relevant protons and leptons
+    prots = []
+    leps = []
+    # Pmag for particles in B candidate
+    protp3 = []
+    lepp3 = []
     # Get the tag side and don't count the proton or lepton
     #print("---------")
     #print(totp4)
@@ -154,13 +160,30 @@ def calc_B_variables(particles, beam, decay='pnu'):
         totp4 -= p[0:4]
         #print(p[-1],totp4)
 
-        flag = 1
+        if decay=='pmu' or decay=='pe':
+            if p[-1]==2212 and vec_mag(p[1:4])>2.0:
+                prots.append(p)
+
+            if decay=='pmu':
+                if p[-1]==13 and vec_mag(p[1:4])>2.0:
+                    leps.append(p)
+            elif decay=='pe':
+                if p[-1]==11 and vec_mag(p[1:4])>2.0:
+                    leps.append(p)
+
+
+        ##### Don't include relevant particles in the calculation of the "tag" B
+        flag = True
         if decay=='pnu': # Missing neutrino, require high-mom proton
             flag = not (vec_mag(p[1:4])>2.0 and p[-1]==2212)
         elif decay=='nmu': # Missing neutron, require high-mom muon
             flag =  not (vec_mag(p[1:4])>2.0 and p[-1]==13)
-        if decay=='ne': # Missing neutron, require high-mom electron
+        elif decay=='ne': # Missing neutron, require high-mom electron
             flag =  not (vec_mag(p[1:4])>2.0 and p[-1]==11)
+        elif decay=='pmu': # proton+muon
+            flag =  not ((vec_mag(p[1:4])>2.0 and p[-1]==13) or (vec_mag(p[1:4])>2.0 and p[-1]==2212))
+        elif decay=='pe': # proton+electron
+            flag =  not ((vec_mag(p[1:4])>2.0 and p[-1]==11) or (vec_mag(p[1:4])>2.0 and p[-1]==2212))
 
         if flag:
             #print(p)
@@ -170,6 +193,25 @@ def calc_B_variables(particles, beam, decay='pnu'):
             highmomE += p[0]
             #print(p[-1],vec_mag(p[1:]))
 
+    ######################################################
+    # See if we have any BNV B candidates
+    ######################################################
+    bcands_temp = []
+    if decay=='pmu' or decay=='pe':
+        for p0 in prots:
+            for l0 in leps:
+                if p0[-2]*l0[-2]<0:
+                    bcands_temp.append(p0+l0)
+                    protp3.append(vec_mag(p0[1:4]))
+                    #print(l0)
+                    lepp3.append(vec_mag(l0[1:4]))
+
+    #print(lepp3)
+    nbnvbcand = len(bcands_temp)
+    #if len(bcands_temp)==1:
+        #bc = bcands_temp[0]
+
+    ########################################################
     halfbeam = beam[0]/2.0
     #print(halfbeam)
 
@@ -184,16 +226,20 @@ def calc_B_variables(particles, beam, decay='pnu'):
     #print(beam)
     #print(halfbeam)
 
-    bcand = invmass([bc])
-    dE = bc[0] - halfbeam
-    bc[0] = halfbeam
-    mes = invmass([bc])
+    bcand = []
+    dE = []
+    mes = []
+    for bc in bcands_temp:
+        bcand.append(invmass([bc]))
+        dE.append(bc[0] - halfbeam)
+        bc[0] = halfbeam
+        mes.append(invmass([bc]))
 
     tagbcand = invmass([tagbc])
     tagdE = tagbc[0] - halfbeam
     tagbc[0] = halfbeam
     tagmes = invmass([tagbc])
 
-    return bcand,dE,mes, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass
+    return nbnvbcand,bcand,dE,mes,protp3,lepp3, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass
 
 

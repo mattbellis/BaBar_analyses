@@ -101,12 +101,19 @@ ntrks = array('i', [-1])
 outtree.Branch('ntrks', ntrks, 'ntrks/I')
 
 #bcand,dE,mes, tagbcand,tagdE,tagmes
-bcand = array('f', [-1.0])
-outtree.Branch('bcand', bcand, 'bcand/F')
-dE = array('f', [-1.0])
-outtree.Branch('dE', dE, 'dE/F')
-mes = array('f', [-1.0])
-outtree.Branch('mes', mes, 'mes/F')
+nbnvbcand = array('i', [-1])
+outtree.Branch('nbnvbcand', nbnvbcand, 'nbnvbcand/I')
+bcand = array('f', 64*[-1.0])
+outtree.Branch('bcand', bcand, 'bcand[nbnvbcand]/F')
+dE = array('f', 64*[-1.0])
+outtree.Branch('dE', dE, 'dE[nbnvbcand]/F')
+mes = array('f', 64*[-1.0])
+outtree.Branch('mes', mes, 'mes[nbnvbcand]/F')
+bnvprotp3 = array('f', 64*[-1.0])
+outtree.Branch('bnvprotp3', bnvprotp3, 'bnvprotp3[nbnvbcand]/F')
+bnvlepp3 = array('f', 64*[-1.0])
+outtree.Branch('bnvlepp3', bnvlepp3, 'bnvlepp3[nbnvbcand]/F')
+
 tagbcand = array('f', [-1.0])
 outtree.Branch('tagbcand', tagbcand, 'tagbcand/F')
 tagdE = array('f', [-1.0])
@@ -352,7 +359,15 @@ for i in range(nentries):
     #print(n_high_p)
     '''
 
-    bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0],tagq[0],missingmom[0],missingE[0],missingmass[0] = calc_B_variables(myparticles,beam,decay)
+    # Fill the bcandidates
+    nbnvbcand[0],temp_bcand,temp_dE,temp_mes,temp_bnvprotp3,temp_bnvlepp3, tagbcand[0],tagdE[0],tagmes[0],tagq[0],missingmom[0],missingE[0],missingmass[0] = calc_B_variables(myparticles,beam,decay)
+    for n in range(nbnvbcand[0]):
+        bcand[n] = temp_bcand[n]
+        dE[n] = temp_dE[n]
+        mes[n] = temp_mes[n]
+        bnvprotp3[n] = temp_bnvprotp3[n]
+        bnvlepp3[n] = temp_bnvlepp3[n]
+
     #print(missingmass[0])
     #print(bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0],missingmom[0],missingE[0],missingmass[0])
     #exit()
