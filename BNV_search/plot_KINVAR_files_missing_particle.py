@@ -199,8 +199,8 @@ for i in range(nentries):
         cut2 = np==0
         cut3 = nmu==0
     cut4 = ncharged>5
-    cut5 = 1
-    cut6 = 1
+    cut5 = nhighmom==1
+    cut6 = missingmom>1 and missingE>1 # These cuts seem to be correlated with tagmass and tagdeltaE
 
     cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3), (cut1*cut2*cut3*cut4), (cut1*cut2*cut3*cut4*cut5), (cut1*cut2*cut3*cut4*cut5*cut6)]
     for icut,cut in enumerate(cuts):
