@@ -83,7 +83,7 @@ def main():
 
         tag = "{0}_{1}".format(mastertag,infile_tag)
 
-        batchfilename = "batch_%s.sh" % (tag)
+        batchfilename = "hpc_scripts/batch_%s.sh" % (tag)
 
         write_output_file(infile,tag,batchfilename)
         
