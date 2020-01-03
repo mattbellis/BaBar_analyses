@@ -3,6 +3,7 @@ import ROOT
 
 import sys
 import argparse
+import os
 
 
 import zipfile
@@ -62,8 +63,22 @@ prot_p = []
 #filenames = sys.argv[1:]
 outfilename = args.outfile
 if outfilename is None:
+    #outfilename = sys.argv[1].split('.root')[0] + "_KINVARS_" + decay + ".root"
+    dirName = 'kinematic_distributions_' + decay
+    fulldirName = '/'.join(sys.argv[1].split('/')[:-1]) + "/" + dirName
+    try:
+        # Create target Directory
+        os.mkdir(fulldirName)
+        print("Directory " , fulldirName ,  " Created ")
+    except FileExistsError:
+        print("Directory " , fulldirName ,  " already exists")
     #outfilename = filenames[0].split('/')[-1].split('.root')[0] + "_OUTPUT.root"
-    outfilename = sys.argv[1].split('.root')[0] + "_KINVARS_" + decay + ".root"
+    #outfilename = sys.argv[1].split('.root')[0] + "_PID_skim.root"
+    #outfilename = '/'.join(sys.argv[1].split('/')[:-1]) + "/" + dirName + "/" + sys.argv[1].split('/')[-1].split('.root')[0] + "_KINVARS_" + decay + ".root"
+    outfilename = '/'.join(sys.argv[1].split('/')[:-1]) + "/" + dirName + "/" + sys.argv[1].split('/')[-1].split('.root')[0] + "_KINVARS.root"
+    print(outfilename)
+    #exit()
+
 outfile = ROOT.TFile(outfilename, "RECREATE")
 outfile.cd()
 
