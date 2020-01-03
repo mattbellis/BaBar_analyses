@@ -13,7 +13,7 @@ def write_output_file(infile, tag, batchfilename):
     output += "#$ -V\n"
     output += "#$ -N bellis_%s\n" % (tag)
     output += "#$ -j y\n"
-    output += "#$ -o bellis_$JOB_ID_%s.log\n"% (tag)
+    output += "#$ -o hpc_script_logs/bellis_$JOB_ID_%s.log\n"% (tag)
     output += "#$ -q sos.q\n"
     #output += "#$ -q allsmp.q\n"
     output += "\n"
@@ -25,8 +25,8 @@ def write_output_file(infile, tag, batchfilename):
     output += "module load modules GNUStack/cmake\n"
     output += "module load GNUCompiler\n"
     output += "module load Python3\n"
-    output += "export PYTHONPATH=/usr/local/gcc-6.3.0/lib64:/home/mbellis/lib/root:$PYTHONPATH\n"
-    output += "export LD_LIBRARY_PATH=/home/mbellis/lib/root:/usr/local/gcc-6.3.0/lib64/:$LD_LIBRARY_PATH\n"
+    output += "export PYTHONPATH=/usr/local/anaconda3/lib:$PYTHONPATH\n"
+    output += "export LD_LIBRARY_PATH=/usr/local/anaconda3/lib:/usr/local/gcc-6.3.0/lib64/:$LD_LIBRARY_PATH\n"
     output += "\n"
     output += "# REMINDER! This is all in bash\n"
     output += "\n"
@@ -83,7 +83,7 @@ def main():
 
         tag = "{0}_{1}".format(mastertag,infile_tag)
 
-        batchfilename = "batch_%s.sh" % (tag)
+        batchfilename = "hpc_scripts/batch_%s.sh" % (tag)
 
         write_output_file(infile,tag,batchfilename)
         
