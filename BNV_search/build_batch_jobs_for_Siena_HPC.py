@@ -5,7 +5,7 @@ import os
 import sys
 
 ###############################################################################
-def write_output_file(infile, tag, batchfilename):
+def write_output_file(infile, tag, batchfilename, kinvars=False, decay='default'):
 
     output = ""
     output += "#!/bin/bash -l\n"
@@ -13,7 +13,7 @@ def write_output_file(infile, tag, batchfilename):
     output += "#$ -V\n"
     output += "#$ -N bellis_%s\n" % (tag)
     output += "#$ -j y\n"
-    output += "#$ -o hpc_script_logs/bellis_$JOB_ID_%s.log\n"% (tag)
+    output += "#$ -o hpc_script_logs/bellis_$JOB_ID_{0}_{1}.log\n".format(tag,decay)
     output += "#$ -q sos.q\n"
     #output += "#$ -q allsmp.q\n"
     output += "\n"
@@ -41,9 +41,14 @@ def write_output_file(infile, tag, batchfilename):
     output += "\n"
     #output += "echo \"outputfile: \" $outputfilename\n"
     output += "\n"
-    output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
-    output += "python dump_ROOT_files_based_on_PID_assignments.py \\\n"
-    output += "\t{0}\n".format(infile)
+    if kinvars is False:
+        output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
+        output += "python dump_ROOT_files_based_on_PID_assignments.py \\\n"
+        output += "\t{0}\n".format(infile)
+    else:
+        output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
+        output += "python look_at_kinematic_distributions.py \\\n"
+        output += "\t{0} --decay {1}\n".format(infile,decay)
     output += "\n"
     output += "date \n"
     output += " \n"
@@ -66,7 +71,8 @@ def main():
     infiles = []
     infilestemp = os.listdir(topdir)
     for file in infilestemp:
-        if file.find('SKIMMED.root')>=0:
+        #if file.find('SKIMMED.root')>=0:
+        if file.find('SKIMMED')>=0:
             file = "{0}/{1}".format(topdir,file)
             infiles.append(file)
             #print("REMOVING: ",file)
@@ -85,14 +91,23 @@ def main():
 
         batchfilename = "hpc_scripts/batch_%s.sh" % (tag)
 
-        write_output_file(infile,tag,batchfilename)
-        
-        print(batchfilename)
+        # No kinvars
+        #write_output_file(infile,tag,batchfilename)
+        #print(batchfilename)
+        #cmd = ['qsub', batchfilename]
+        #print(cmd)
+        #sp.Popen(cmd,0).wait()
 
-        cmd = ['qsub', batchfilename]
-        print(cmd)
-
-        sp.Popen(cmd,0).wait()
+        # Yes kinvars
+        for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
+            print(d)
+            tag = "{0}_{1}_{2}".format(mastertag,infile_tag,d)
+            batchfilename = "hpc_scripts/batch_{0}.sh".format(tag)
+            write_output_file(infile,tag,batchfilename,kinvars=True,decay=d)
+            print(batchfilename)
+            cmd = ['qsub', batchfilename]
+            print(cmd)
+            sp.Popen(cmd,0).wait()
 
 ################################################################################
 ################################################################################
