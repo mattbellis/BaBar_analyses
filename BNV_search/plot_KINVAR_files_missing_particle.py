@@ -297,19 +297,19 @@ for i in range(nentries):
 for key in plotvars.keys():
     #print(key)
     a = plotvars[key]
-    #print(a.keys())
-    #print(len(a['values']))
     # Need to clear the values
     #plotvars_to_write_out[key]['values'] = []
     for i in range(len(a['values'])):
-        #print(i)
         if i in icuts_to_dump:
-            #print(i)
             plotvars_to_write_out[key]['values'].append(a['values'][i])
 
+######################
+# Write out to a file
+######################
 outfile = open(outfilename,'wb')
 pickle.dump(plotvars_to_write_out,outfile)
 outfile.close()
+################################################
 
 print('Processed {0} files for {1}'.format(len(args.infiles),"1"))#,sptag))
 
@@ -324,6 +324,7 @@ for icut,cut in enumerate(cuts):
 #exit()
 
 
+'''
 for icut,cut in enumerate(cuts):
     plt.figure(figsize=(10,6))
     for j,key in enumerate(plotvars.keys()):
@@ -341,3 +342,4 @@ for icut,cut in enumerate(cuts):
     plt.tight_layout()
 
 plt.show()
+'''

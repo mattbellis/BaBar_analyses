@@ -16,12 +16,14 @@ allplotvars = {}
 for infile in infilenames:
     print("Loading " + infile)
     x = pickle.load(open(infile,'rb'))
-    sptag = infile.split('OUTPUT_')[1].split('.pkl')[0]
+    sptag = 'moretmp'
+    #sptag = infile.split('OUTPUT_')[1].split('.pkl')[0]
     #sptag = infile.split('_')[2].split('.pkl')[0]
     allplotvars[sptag] = x
 
 print()
-ncuts = 7
+#ncuts = 7
+ncuts = 2
 for apvkey in allplotvars.keys():
     plotvars = allplotvars[apvkey]
     #for icut,cut in enumerate(cuts):
