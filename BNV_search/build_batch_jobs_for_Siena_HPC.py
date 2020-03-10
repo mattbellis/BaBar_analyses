@@ -98,16 +98,16 @@ def main():
         ########################################
         # No kinvars
         ########################################
-        write_output_file(infile,tag,batchfilename)
-        print(batchfilename)
-        cmd = ['qsub', batchfilename]
-        #print(cmd)
-        sp.Popen(cmd,0).wait()
+        #write_output_file(infile,tag,batchfilename)
+        #print(batchfilename)
+        #cmd = ['qsub', batchfilename]
+        ##print(cmd)
+        #sp.Popen(cmd,0).wait()
 
         ########################################
         # Yes build the kinvars
         ########################################
-        '''
+        #'''
         for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
             print(d)
             tag = "{0}_{1}_{2}".format(mastertag,infile_tag,d)
@@ -117,15 +117,16 @@ def main():
             cmd = ['qsub', batchfilename]
             print(cmd)
             sp.Popen(cmd,0).wait()
-
+        #'''
         ########################################
         # Yes plot the kinvars, or at least build the pickle files
         ########################################
+        '''
         for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
             print(d)
             tag = "{0}_{1}_{2}".format(mastertag,infile_tag,d)
             batchfilename = "hpc_scripts/batch_{0}.sh".format(tag)
-            write_output_file(infile,tag,batchfilename,kinvars='build',decay=d)
+            write_output_file(infile,tag,batchfilename,kinvars='plot',decay=d)
             print(batchfilename)
             cmd = ['qsub', batchfilename]
             print(cmd)
