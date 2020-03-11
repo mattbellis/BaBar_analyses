@@ -145,19 +145,21 @@ def get_sptag(name):
         tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
     else:
         # MC
-        tag = name.split('basicPID_R24-SP-')[1].split('-R24-')[0]
+        tag = 'SP-{0}'.format(name.split('SP-')[1].split('-R24')[0])
     return tag
 ################################################################################
 
 outfilename = None
 sptag = None
 if outfilename is None:
-    #sptag = get_sptag(args.infiles[0]) 
-    #outfilename = 'OUTPUT_' + lepton_to_study + '_' + sptag + ".pkl"
-    outfilename = 'tmp.pkl'
+    sptag = get_sptag(args.infiles[0][0]) 
+    outfilename = 'OUTPUT_{0}_{1}_nfiles{2}.pkl'.format(decay,sptag,len(args.infiles[0]))
+    #outfilename = 'tmp.pkl'
     #outfilename = 'OUTPUT_MUON_' + sptag + ".pkl"
     #outfilename = 'OUTPUT_ELECTRON_' + sptag + ".pkl"
     #outfilename = "output_testing_the_PID_assignment_skim.pkl"
+    print(outfilename)
+    #exit()
 
 
 for i in range(nentries):
