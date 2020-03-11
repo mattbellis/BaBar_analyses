@@ -108,7 +108,7 @@ class PIDselector:
       self.selectors[13] =  "TightKMPionSelection"
       self.selectors[14] =  "VeryTightKMPionSelection"
       self.selectors[15] =  "SuperTightKMPionSelection"
-      print(self.selectors)
+      #print(self.selectors)
     elif  self.particle == "e" or self.particle == "electron":
       self.max_bits = 12 
       self.selectors[0] =  "NoCalElectronMicroSelection"
