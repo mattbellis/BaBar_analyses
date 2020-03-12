@@ -66,7 +66,7 @@ for key in plotvars.keys():
     plotvars_to_write_out[key] = plotvars[key].copy()
     plotvars_to_write_out[key]['values'] = []
 
-icuts_to_dump = [1,4]
+icuts_to_dump = [0,1,2,3,4,5,6]
 
 cuts = []
 ncuts = 7

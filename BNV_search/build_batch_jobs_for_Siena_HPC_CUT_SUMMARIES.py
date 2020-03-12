@@ -82,9 +82,13 @@ def main():
 
     nfiles_at_a_time = 10
 
+    tot_files = 0
+
     for i in range(0,len(infiles),nfiles_at_a_time):
         
         subset = infiles[i:i+nfiles_at_a_time]
+        tot_files += len(subset) # Maybe bail at some point
+        print(subset)
 
         infile_tag = subset[0].split('/')[-1].split(',root')[0]
 
@@ -96,8 +100,8 @@ def main():
         # Yes plot the kinvars, or at least build the pickle files
         ########################################
         #'''
-        for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
-        #for d in ['pe']:
+        #for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
+        for d in ['ne']:
             if subset[0].find(d)<0:
                 continue
             print(d)
@@ -109,6 +113,9 @@ def main():
             print(cmd)
             print(subset)
             sp.Popen(cmd,0).wait()
+
+        if tot_files>=100:
+            break
         #'''
 
 ################################################################################
