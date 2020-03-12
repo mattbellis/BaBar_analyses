@@ -8,7 +8,7 @@ import zipfile
 import myPIDselector
 from myPIDselector import *
 
-import matplotlib.pylab as plt
+#import matplotlib.pylab as plt
 
 eps = PIDselector("e")
 pps = PIDselector("p")
@@ -32,6 +32,7 @@ for pl in particle_lunds:
 ################################################################################
 # Plotting utility
 ################################################################################
+'''
 def display_histogram(h,xlabel='xlabel',ylabel='ylabel',ax=None,xfontsize=12,yfontsize=12):
 
     if ax is not None:
@@ -42,6 +43,7 @@ def display_histogram(h,xlabel='xlabel',ylabel='ylabel',ax=None,xfontsize=12,yfo
     plt.gca().set_xlabel(xlabel,fontsize=xfontsize)
     plt.gca().set_ylabel(ylabel,fontsize=yfontsize)
 
+'''
 
 ################################################################################
 def vec_mag(vec):
