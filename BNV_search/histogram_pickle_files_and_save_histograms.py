@@ -44,18 +44,24 @@ for key in allvars.keys():
         r = (-0.5,0.5)
 
     values = var['values']
-    for vals in values:
-        h = np.histogram(vals,bins=bins,range=r)
-        histos[key]['h'].append(h)
+    norg = len(values[0])
+    if norg==0:
+        norg = -1
+    for i,vals in enumerate(values):
+        if i>0:
+            h = np.histogram(vals,bins=bins,range=r)
+            histos[key]['h'].append(h)
+            n = len(vals)
+            print('{0:2d} {1:6d} {2:.5f}'.format(i,n,n/norg))
 
-print(histos)
+#print(histos)
 
 ################################################################################
 # Display the histograms
 ################################################################################
 plt.figure(figsize=(15,8))
 icount = 0
-print(list(histos.keys()))
+#print(list(histos.keys()))
 #exit()
 for key in histos.keys():
     plt.subplot(5,6,icount+1)
@@ -82,7 +88,7 @@ print("Done caculating...")
 kinvars_to_display = ['bnvbcandMES', 'bnvbcandDeltaE', 'tagbcandMES', 'tagbcandDeltaE', 'missingmass', 'missingmom', 'missingE', 'scalarmomsum']
 plt.figure(figsize=(12,4))
 icount = 0
-print(list(histos.keys()))
+#print(list(histos.keys()))
 #exit()
 for key in kinvars_to_display:
     plt.subplot(2,4,icount+1)
@@ -92,10 +98,11 @@ for key in kinvars_to_display:
     #ylabel = hist['ylabel']
     ylabel = r'# of entries'
     histograms = hist['h']
-    for h in histograms:
-        bt.display_histogram(h, xlabel, ylabel)
+    for i,h in enumerate(histograms):
+        bt.display_histogram(h, xlabel, ylabel,label=str(i))
 
     icount += 1
+    plt.legend()
 plt.tight_layout()
 
 n = infilenames[0]
