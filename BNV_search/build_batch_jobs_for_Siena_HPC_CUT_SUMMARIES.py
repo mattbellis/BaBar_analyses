@@ -5,7 +5,7 @@ import os
 import sys
 
 ###############################################################################
-def write_output_file(infile, tag, batchfilename, kinvars=None, decay='default'):
+def write_output_file(inputfiles, tag, batchfilename, kinvars=None, decay='plot'):
 
     output = ""
     output += "#!/bin/bash -l\n"
@@ -41,18 +41,11 @@ def write_output_file(infile, tag, batchfilename, kinvars=None, decay='default')
     output += "\n"
     #output += "echo \"outputfile: \" $outputfilename\n"
     output += "\n"
-    if kinvars is None:
-        output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
-        output += "python dump_ROOT_files_based_on_PID_assignments.py \\\n"
-        output += "\t{0}\n".format(infile)
-    elif kinvars=='build':
-        output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
-        output += "python look_at_kinematic_distributions.py \\\n"
-        output += "\t{0} --decay {1}\n".format(infile,decay)
-    elif kinvars=='plot':
+    if kinvars=='plot':
+        files_string = " ".join(inputfiles)
         output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
         output += "python plot_KINVAR_files_missing_particle.py \\\n"
-        output += "\t{0} --decay {1}\n".format(infile,decay)
+        output += "\t{0} --decay {1}\n".format(files_string,decay)
     output += "\n"
     output += "date \n"
     output += " \n"
@@ -81,56 +74,48 @@ def main():
             infiles.append(file)
             #print("REMOVING: ",file)
             #infiles.remove(file)
-    print(infiles)
+    #print(infiles)
     #exit()
     #infiles = sys.argv[1:]
 
     mastertag = "babar"
 
-    for infile in infiles:
+    nfiles_at_a_time = 10
 
-        infile_tag = infile.split('/')[-1].split(',root')[0]
+    tot_files = 0
+
+    for i in range(0,len(infiles),nfiles_at_a_time):
+        
+        subset = infiles[i:i+nfiles_at_a_time]
+        tot_files += len(subset) # Maybe bail at some point
+        print(subset)
+
+        infile_tag = subset[0].split('/')[-1].split(',root')[0]
 
         tag = "{0}_{1}".format(mastertag,infile_tag)
 
         batchfilename = "hpc_scripts/batch_%s.sh" % (tag)
 
         ########################################
-        # No kinvars
-        ########################################
-        #write_output_file(infile,tag,batchfilename)
-        #print(batchfilename)
-        #cmd = ['qsub', batchfilename]
-        ##print(cmd)
-        #sp.Popen(cmd,0).wait()
-
-        ########################################
-        # Yes build the kinvars
-        ########################################
-        #'''
-        for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
-            print(d)
-            tag = "{0}_{1}_{2}".format(mastertag,infile_tag,d)
-            batchfilename = "hpc_scripts/batch_{0}.sh".format(tag)
-            write_output_file(infile,tag,batchfilename,kinvars='build',decay=d)
-            print(batchfilename)
-            cmd = ['qsub', batchfilename]
-            print(cmd)
-            sp.Popen(cmd,0).wait()
-        #'''
-        ########################################
         # Yes plot the kinvars, or at least build the pickle files
         ########################################
         #'''
-        for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
+        #for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
+        for d in ['ne']:
+            if subset[0].find(d)<0:
+                continue
             print(d)
             tag = "{0}_{1}_{2}".format(mastertag,infile_tag,d)
             batchfilename = "hpc_scripts/batch_{0}.sh".format(tag)
-            write_output_file(infile,tag,batchfilename,kinvars='plot',decay=d)
+            write_output_file(subset,tag,batchfilename,kinvars='plot',decay=d)
             print(batchfilename)
             cmd = ['qsub', batchfilename]
             print(cmd)
+            print(subset)
             sp.Popen(cmd,0).wait()
+
+        if tot_files>=100:
+            break
         #'''
 
 ################################################################################

@@ -1,12 +1,12 @@
 import numpy as np
-import matplotlib.pylab as plt
+#import matplotlib.pylab as plt
 
 import ROOT
 
 import sys
 import os
 
-import lichen.lichen as lch
+#import lichen.lichen as lch
 
 from myPIDselector import *
 
@@ -66,7 +66,7 @@ for key in plotvars.keys():
     plotvars_to_write_out[key] = plotvars[key].copy()
     plotvars_to_write_out[key]['values'] = []
 
-icuts_to_dump = [1,4]
+icuts_to_dump = [0,1,2,3,4,5,6]
 
 cuts = []
 ncuts = 7
@@ -153,13 +153,30 @@ outfilename = None
 sptag = None
 if outfilename is None:
     sptag = get_sptag(args.infiles[0][0]) 
-    outfilename = 'OUTPUT_{0}_{1}_nfiles{2}.pkl'.format(decay,sptag,len(args.infiles[0]))
-    #outfilename = 'tmp.pkl'
-    #outfilename = 'OUTPUT_MUON_' + sptag + ".pkl"
-    #outfilename = 'OUTPUT_ELECTRON_' + sptag + ".pkl"
-    #outfilename = "output_testing_the_PID_assignment_skim.pkl"
+    #outfilename = 'OUTPUT_{0}_{1}_nfiles{2}.pkl'.format(decay,sptag,len(args.infiles[0]))
+    #print(outfilename)
+    #exit()
+
+    # Better names?
+    fulldirName = '/data/physics/bellis/BaBar/rootfiles/cut_summary_files/{0}/{1}'.format(sptag,decay)
+    try:
+        # Create target Directory
+        os.makedirs(fulldirName,exist_ok=True)
+        print("Directory " , fulldirName ,  " Created ")
+    except FileExistsError:
+        print("Directory " , fulldirName ,  " already exists")
+    #outfilename = filenames[0].split('/')[-1].split('.root')[0] + "_OUTPUT.root"
+    #outfilename = sys.argv[1].split('.root')[0] + "_PID_skim.root"
+    #outfilename = '/'.join(sys.argv[1].split('/')[:-1]) + "/" + dirName + "/" + sys.argv[1].split('/')[-1].split('.root')[0] + "_KINVARS_" + decay + ".root"
+    filenumbers = []
+    for f in args.infiles[0]:
+        n = f.split('_SKIMMED_PID')[0].split('R24-')[-1]
+        filenumbers.append(n)
+    ntag = '-'.join(filenumbers)
+    outfilename = '{0}/OUTPUT_{1}_nfiles{2}.pkl'.format(fulldirName,ntag,len(args.infiles[0]))
     print(outfilename)
     #exit()
+
 
 
 for i in range(nentries):
@@ -215,19 +232,19 @@ for i in range(nentries):
     # Should the low cut be 2.2 or 2.3? 
     cut1 = 1
     if decay=='pnu':
-        cut1 = np==1 and pp[0]>2.3# and pp<2.8 and lp>2.3 and lp<2.8
+        cut1 = np==1 and pp[0]>2.3 and pp[0]<2.8 
         cut2 = nmu==0
         cut3 = ne==0
     elif decay=='nmu':
-        cut1 = nmu==1 and mup[0]>2.3# and pp<2.8 and lp>2.3 and lp<2.8
+        cut1 = nmu==1 and mup[0]>2.3 and mup[0]<2.8 
         cut2 = np==0
-        cut3 = ne==0
+        cut3 = 1# ne==0
     elif decay=='ne':
-        cut1 = ne==1 and ep[0]>2.3# and pp<2.8 and lp>2.3 and lp<2.8
+        cut1 = ne==1 and ep[0]>2.3 and ep[0]<2.8
         cut2 = np==0
-        cut3 = nmu==0
+        cut3 = 1#nmu==0
     elif decay=='pmu' or decay=='pe':
-        cut1 = nbnvbcand==1 and bnvprotp3[0]>2.3 and bnvlepp3[0]>2.3
+        cut1 = nbnvbcand==1 and bnvprotp3[0]>2.3 and bnvlepp3[0]>2.3 and bnvprotp3[0]<2.8 and bnvlepp3[0]<2.8
         cut2 = 1
         cut3 = 1
 
