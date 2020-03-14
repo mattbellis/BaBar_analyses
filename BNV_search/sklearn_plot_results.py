@@ -6,7 +6,7 @@ from sklearn import datasets
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.metrics import classification_report, roc_auc_score
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 from sklearn.metrics import roc_curve, auc, accuracy_score
 
 import sys
@@ -40,8 +40,18 @@ def plot_corr_matrix(ccmat,labels,title="Correlation matrix"):
 def compare_train_test(clf, X_train, y_train, X_test, y_test, bins=30):
     decisions = []
     for X,y in ((X_train, y_train), (X_test, y_test)):
-        d1 = clf.decision_function(X[y>0.5]).ravel()
-        d2 = clf.decision_function(X[y<0.5]).ravel()
+
+        if hasattr(clf, "decision_function"):
+            d1 = clf.decision_function(X[y>0.5]).ravel()
+            d2 = clf.decision_function(X[y<0.5]).ravel()
+        else:
+            print("NO DECISION FUNCTION")
+            #decisions = bdt.predict_proba(X_test)
+            d1 = clf.predict_proba(X[y>0.5]).ravel()
+            d2 = clf.predict_proba(X[y<0.5]).ravel()
+        #d1 = clf.decision_function(X[y>0.5]).ravel()
+        #d2 = clf.decision_function(X[y<0.5]).ravel()
+
         decisions += [d1, d2]
      
     low = min(np.min(d) for d in decisions)
@@ -117,7 +127,8 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
             title = title="Correlation matrix ({0})".format(dataset0name)
         else:
             title = title="Correlation matrix ({0})".format(dataset1name)
-        fig,ax = plot_corr_matrix(corrcoefs,param_labels,title=title)
+        #fig,ax = plot_corr_matrix(corrcoefs,param_labels,title=title)
+        fig,ax = plot_corr_matrix(corrcoefs,param_labels,title='tmp')
 
     ################################################################################
     # Plot data
@@ -125,7 +136,7 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
 
     plt.figure(figsize=(14,11))
     for i in range(len(param_labels)):
-        plt.subplot(3,3,1+i)
+        plt.subplot(5,5,1+i)
         x0 = data0[i]
         x1 = data1[i]
         lo0,hi0 = min(x0),max(x0)
@@ -241,18 +252,32 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
 
     y_predicted = bdt.predict(X_test)
     print(classification_report(y_test, y_predicted, target_names=["background", "signal"]))
-    print("Area under ROC curve: %.4f"%(roc_auc_score(y_test, bdt.decision_function(X_test))))
+    #print("Area under ROC curve: %.4f"%(roc_auc_score(y_test, bdt.decision_function(X_test))))
 
     y_predicted = bdt.predict(X_train)
     print(classification_report(y_train, y_predicted, target_names=["background", "signal"]))
-    print("Area under ROC curve: %.4f"%(roc_auc_score(y_train, bdt.decision_function(X_train))))
+    #print("Area under ROC curve: %.4f"%(roc_auc_score(y_train, bdt.decision_function(X_train))))
 
     ################################################################################
     # ROC curve
     ################################################################################
-    decisions = bdt.decision_function(X_test)
+    if hasattr(bdt, "decision_function"):
+        #decisions = bdt.decision_function(X_test)
+        decisionsTest = bdt.decision_function(X_test)
+        decisionsTrain = bdt.decision_function(X_train)
+    else:
+        print("NO DECISION FUNCTION")
+        #decisions = bdt.predict_proba(X_test)
+        decisionsTest = bdt.predict_proba(X_test)
+        decisionsTrain = bdt.predict_proba(X_train)
+    #decisions = bdt.decision_function(X_test)
     # Compute ROC curve and area under the curve
-    fpr, tpr, thresholds = roc_curve(y_test, decisions)
+    #fpr, tpr, thresholds = roc_curve(y_test, decisions)
+    print(y_test.shape)
+    print(decisionsTest.shape)
+    print(decisionsTest[0:4])
+    #fpr, tpr, thresholds = roc_curve(y_test, decisionsTest)
+    fpr, tpr, thresholds = roc_curve(y_test, decisionsTest.transpose()[1])
     roc_auc = auc(fpr, tpr)
     
     plt.figure()
