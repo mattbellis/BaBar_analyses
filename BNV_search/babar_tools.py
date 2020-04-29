@@ -8,7 +8,8 @@ import zipfile
 import myPIDselector
 from myPIDselector import *
 
-#import matplotlib.pylab as plt
+import matplotlib.pylab as plt
+import pickle
 
 eps = PIDselector("e")
 pps = PIDselector("p")
@@ -28,22 +29,59 @@ for pl in particle_lunds:
     allparts[1][pl] = []
     allparts[2][pl] = []
 
+################################################################################
+# Read in the files and combine all the data dictionaries
+################################################################################
+def read_in_files_and_combine_all_the_dictionaries(infilenames,picklefile=True):
+    allvars = {} # This will hold all the collected data
+    histos = {}  # This initializes the necessary histogram files
+
+    for i,infile in enumerate(infilenames):
+        print("Loading " + infile)
+
+        if picklefile:
+            x = pickle.load(open(infile,'rb'))
+
+        if i==0:
+            key = list(x.keys())[0]
+            ncuts = len(x[key]['values'])
+
+            for key in x.keys():
+                allvars[key] = {}
+                allvars[key]['values'] = list(x[key]['values'])
+                allvars[key]['xlabel'] = x[key]['xlabel']
+                allvars[key]['ylabel'] = x[key]['ylabel']
+                allvars[key]['range'] = x[key]['range']
+
+                histos[key] = {}
+                histos[key]['h'] = []
+                histos[key]['xlabel'] = x[key]['xlabel']
+                histos[key]['ylabel'] = x[key]['ylabel']
+                histos[key]['range'] = x[key]['range']
+        else:
+            for key in x.keys():
+                vals_for_all_cuts = x[key]['values']
+                for i,v in enumerate(vals_for_all_cuts):
+                    allvars[key]['values'][i] += v
+
+    return allvars,histos
+
 
 ################################################################################
 # Plotting utility
 ################################################################################
-'''
-def display_histogram(h,xlabel='xlabel',ylabel='ylabel',ax=None,xfontsize=12,yfontsize=12):
+#'''
+def display_histogram(h,xlabel='xlabel',ylabel='ylabel',ax=None,xfontsize=12,yfontsize=12,label=None):
 
     if ax is not None:
         plt.sca(ax)
     
-    print(len(h[1][:-1]), len(h[0]), h[1][1]-h[1][0])
-    plt.bar(h[1][:-1], h[0], width=h[1][1]-h[1][0])
+    #print(len(h[1][:-1]), len(h[0]), h[1][1]-h[1][0])
+    plt.bar(h[1][:-1], h[0], width=h[1][1]-h[1][0],label=label)
     plt.gca().set_xlabel(xlabel,fontsize=xfontsize)
     plt.gca().set_ylabel(ylabel,fontsize=yfontsize)
 
-'''
+#'''
 
 ################################################################################
 def vec_mag(vec):

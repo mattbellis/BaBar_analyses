@@ -16,6 +16,17 @@ import pickle
 # https://betatim.github.io/posts/sklearn-for-TMVA-users/
 
 ################################################################################
+def read_in_pickle_files(infiles):
+    dict0 = pickle.load(open(infile[0],'rb'))
+
+    
+
+
+
+################################################################################
+
+
+################################################################################
 def plot_corr_matrix(ccmat,labels,title="Correlation matrix"):
     fig1 = plt.figure()
     ax1 = plt.subplot(1,1,1)
