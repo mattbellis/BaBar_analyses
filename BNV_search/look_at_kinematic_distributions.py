@@ -167,6 +167,12 @@ protonp3 = array('f', 64*[-1.])
 outtree.Branch('protonp3', protonp3, 'protonp3[nproton]/F')
 protonq = array('f', 64*[-1.])
 outtree.Branch('protonq', protonq, 'protonq[nproton]/F')
+protonIsTightKM = array('i', 64*[-1])
+outtree.Branch('protonIsTightKM', protonIsTightKM, 'protonIsTightKM[nproton]/I')
+protonIsVeryTightKM = array('i', 64*[-1])
+outtree.Branch('protonIsVeryTightKM', protonIsVeryTightKM, 'protonIsVeryTightKM[nproton]/I')
+protonIsSuperTightKM = array('i', 64*[-1])
+outtree.Branch('protonIsSuperTightKM', protonIsSuperTightKM, 'protonIsSuperTightKM[nproton]/I')
 
 
 ne = array('i', [-1])
@@ -284,6 +290,12 @@ for i in range(nentries):
         e = tree.protone[j]
         px,py,pz = tree.protonpx[j], tree.protonpy[j], tree.protonpz[j]
         q = tree.protonq[j]
+        pbit = tree.protonpbit[j]
+        #eps.SetBits(ebit); mups.SetBits(mubit); pips.SetBits(pibit); Kps.SetBits(Kbit); pps.SetBits(pbit);
+        pps.SetBits(pbit);
+        protonIsTightKM[j] = int(pps.IsBitSet(15))
+        protonIsVeryTightKM[j] = int(pps.IsBitSet(16))
+        protonIsSuperTightKM[j] = int(pps.IsBitSet(17))
 
         particle = [e,px,py,pz,q,2212]
         myparticles.append(particle)

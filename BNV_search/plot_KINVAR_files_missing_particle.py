@@ -66,10 +66,10 @@ for key in plotvars.keys():
     plotvars_to_write_out[key] = plotvars[key].copy()
     plotvars_to_write_out[key]['values'] = []
 
-icuts_to_dump = [0,1,2,3,4,5,6]
+icuts_to_dump = [0,1,2,3,4]
 
 cuts = []
-ncuts = 7
+ncuts = 5
 for n in range(ncuts):
     #print(n)
     for key in plotvars.keys():
@@ -233,31 +233,26 @@ for i in range(nentries):
     cut1 = 1
     if decay=='pnu':
         cut1 = np==1 and pp[0]>2.3 and pp[0]<2.8 
-        cut2 = nmu==0
-        cut3 = ne==0
+        cut2 = ncharged>3
     elif decay=='nmu':
         cut1 = nmu==1 and mup[0]>2.3 and mup[0]<2.8 
-        cut2 = np==0
-        cut3 = 1# ne==0
+        cut2 = ncharged>3
     elif decay=='ne':
         cut1 = ne==1 and ep[0]>2.3 and ep[0]<2.8
-        cut2 = np==0
-        cut3 = 1#nmu==0
+        cut2 = ncharged>3
     elif decay=='pmu' or decay=='pe':
         cut1 = nbnvbcand==1 and bnvprotp3[0]>2.3 and bnvlepp3[0]>2.3 and bnvprotp3[0]<2.8 and bnvlepp3[0]<2.8
-        cut2 = 1
-        cut3 = 1
+        cut2 = ncharged>5
 
-    cut4 = ncharged>5
 
     if decay=='pnu' or decay=='nmu' or decay=='ne':
-        cut5 = nhighmom==1
-        cut6 = missingmom>1 and missingE>1 # These cuts seem to be correlated with tagmass and tagdeltaE
+        cut3 = nhighmom==1
+        cut4 = missingmom>1 and missingE>1 # These cuts seem to be correlated with tagmass and tagdeltaE
     elif decay=='pmu' or decay=='pe':
-        cut5 = 1
-        cut6 = missingmom<2.6 and missingE<5 # These cuts seem to be correlated with tagmass and tagdeltaE
+        cut3 = nhighmom==2
+        cut4 = missingmom<2.6 and missingE<5 # These cuts seem to be correlated with tagmass and tagdeltaE
 
-    cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3), (cut1*cut2*cut3*cut4), (cut1*cut2*cut3*cut4*cut5), (cut1*cut2*cut3*cut4*cut5*cut6)]
+    cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3), (cut1*cut2*cut3*cut4)]#, (cut1*cut2*cut3*cut4*cut5), (cut1*cut2*cut3*cut4*cut5*cut6)]
     for icut,cut in enumerate(cuts):
         if cut:
             #print(icut)

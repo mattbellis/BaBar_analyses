@@ -121,7 +121,7 @@ def main():
         ########################################
         # Yes plot the kinvars, or at least build the pickle files
         ########################################
-        #'''
+        '''
         for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
             print(d)
             tag = "{0}_{1}_{2}".format(mastertag,infile_tag,d)
@@ -131,7 +131,7 @@ def main():
             cmd = ['qsub', batchfilename]
             print(cmd)
             sp.Popen(cmd,0).wait()
-        #'''
+        '''
 
 ################################################################################
 ################################################################################
