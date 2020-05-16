@@ -64,6 +64,11 @@ def read_in_files_and_combine_all_the_dictionaries(infilenames,picklefile=True):
                 for i,v in enumerate(vals_for_all_cuts):
                     allvars[key]['values'][i] += v
 
+    for key in allvars.keys():
+        ncuts = len(allvars[key]['values'])
+        for i in range(ncuts):
+            allvars[key]['values'][i] = np.array(allvars[key]['values'][i])
+
     return allvars,histos
 
 
