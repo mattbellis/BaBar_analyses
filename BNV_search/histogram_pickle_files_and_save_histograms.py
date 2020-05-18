@@ -7,6 +7,8 @@ import sys
 
 import pickle
 
+import pandas as pd
+
 ################################################################################
 
 #OUTPUT_1235.pkl
@@ -21,6 +23,7 @@ infilenames = sys.argv[1:]
 # Read in the files and combine all the data dictionaries
 ################################################################################
 allvars,histos = bt.read_in_files_and_combine_all_the_dictionaries(infilenames)
+df = pd.DataFrame.from_dict(allvars)
 
 #print(allvars)
 ################################################################################

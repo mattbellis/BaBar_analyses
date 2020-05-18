@@ -6,8 +6,8 @@ from raw_event_numbers_and_cross_section import *
 ren = raw_event_numbers
 
 tot = 0
-for key in ren["data"].keys():
-    tot += ren["data"][key]["raw"]
+for key in ren["DATA"].keys():
+    tot += ren["DATA"][key]["raw"]
 
 print(tot,tot/1e9)
 

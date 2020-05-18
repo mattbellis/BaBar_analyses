@@ -47,7 +47,7 @@ fig,ax = skt.plot_corr_matrix(corrcoefs,param_labels_used,title='tmp')
 # Plot data
 plt.figure(figsize=(12,8))
 for i,pl in enumerate(param_labels_used):
-    plt.subplot(5,5,i+1)
+    plt.subplot(6,6,i+1)
     x = data[i]
     plt.hist(x, color='r', alpha=0.5, bins=50, histtype='stepfilled', density=True)
     plt.xlabel(pl)
