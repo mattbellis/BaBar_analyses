@@ -469,7 +469,7 @@ for i in range(nentries):
         ebit = tree.muebit[j]
         mubit = tree.mumubit[j]
         eps.SetBits(ebit); mups.SetBits(mubit); pips.SetBits(pibit); Kps.SetBits(Kbit); pps.SetBits(pbit);
-        eIsTightKMProton[j] = int(pps.IsBitSet(15))
+        muIsTightKMProton[j] = int(pps.IsBitSet(15))
         muIsVeryTightKMProton[j] = int(pps.IsBitSet(16))
         muIsSuperTightKMProton[j] = int(pps.IsBitSet(17))
 

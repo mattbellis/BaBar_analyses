@@ -8,9 +8,9 @@ for i in range(1,7):
         key = "Run{0}".format(i)
         raw_event_numbers["DATA"][key] = {"raw":1, "xsec":0}
 
-for i in [1235, 1237, 1005, 998, 3429, 3981, 2400, 11975, 11976, 11977, 9456, 9457]:
+for i in [1235, 1237, 1005, 998, 3429, 3981, 2400, 11975, 11976, 11977, 9456, 9457, 980]:
         key = "{0}".format(i)
-        raw_event_numbers["MC"][key] = {"raw":1, "xsec":0}
+        raw_event_numbers["MC"][key] = {"raw":1, "xsec":1}
 
 #raw_event_numbers["DATA"]["Run1"]["raw"] *= 2929
 #raw_event_numbers["DATA"]["Run2"]["raw"] *= 9590
@@ -32,6 +32,8 @@ raw_event_numbers["MC"]["998"]["raw"] = 3595740000
 raw_event_numbers["MC"]["3429"]["raw"] = 1620027000
 raw_event_numbers["MC"]["3981"]["raw"] = 622255000
 raw_event_numbers["MC"]["2400"]["raw"] = 472763000
+
+raw_event_numbers["MC"]["980"]["raw"] = 2149000
 
 raw_event_numbers["MC"]["9456"]["raw"] = 4298000
 raw_event_numbers["MC"]["9457"]["raw"] = 4298000

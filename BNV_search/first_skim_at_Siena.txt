@@ -1,17 +1,18 @@
-file_total_counts_data.txt:Total: 116830108
-file_total_counts_data.txt:Total: 381470233
-file_total_counts_data.txt:Total: 201752757
-file_total_counts_data.txt:Total: 662993550
-file_total_counts_data.txt:Total: 499945723
-file_total_counts_data.txt:Total: 855886010   AllEvents-Run5-OnPeak
-file_total_counts_MC-SP-998.txt:Total: 444420132   SP-998
-file_total_counts_MC.txt:Total: 709676   SP-980
-file_total_counts_MC.txt:Total: 1959850   SP-11975
-file_total_counts_MC.txt:Total: 1864139   SP-11976
-file_total_counts_MC.txt:Total: 1750334   SP-11977
-file_total_counts_MC.txt:Total: 2028701   SP-9456
-file_total_counts_MC.txt:Total: 2010973   SP-9457
-file_total_counts_MC.txt:Total: 25718483   SP-1235
-file_total_counts_MC.txt:Total: 21780258   SP-1237
-file_total_counts_MC.txt:Total: 89213627   SP-1005
-file_total_counts_MC.txt:Total: 435212096   SP-3429
+116830108
+381470233
+201752757
+662993550
+855886010   AllEvents-Run5-OnPeak
+499945723
+
+709676   SP-980
+1959850   SP-11975
+1864139   SP-11976
+1750334   SP-11977
+2028701   SP-9456
+2010973   SP-9457
+25718483   SP-1235
+21780258   SP-1237
+89213627   SP-1005
+444420132   SP-998
+435212096   SP-3429

@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pylab as plt
 
 import babar_tools as bt
+import babar_tools_plotting as btp
 
 import sys
 
@@ -45,6 +46,8 @@ for key in allvars.keys():
         r = (5.1,5.3)
     elif key.find('bnvbcandDeltaE')>=0:
         r = (-0.5,0.5)
+    elif key.find('Is')>=0:
+        bins=4
 
     values = var['values']
     norg = len(values[0])
@@ -67,7 +70,12 @@ icount = 0
 #print(list(histos.keys()))
 #exit()
 for key in histos.keys():
+    # Don't plot the flags here
+    if key.find('Is')>=0:
+        continue
+
     plt.subplot(5,6,icount+1)
+    #plt.subplot(10,10,icount+1)
     print(key)
     hist = histos[key]
     xlabel = hist['xlabel']
@@ -75,7 +83,32 @@ for key in histos.keys():
     ylabel = r'# of entries'
     histograms = hist['h']
     for h in histograms:
-        bt.display_histogram(h, xlabel, ylabel,xfontsize=8,yfontsize=8)
+        btp.display_histogram(h, xlabel, ylabel,xfontsize=8,yfontsize=8)
+
+    icount += 1
+plt.tight_layout()
+
+print("Done caculating...")
+
+################################################################################
+
+plt.figure(figsize=(15,8))
+icount = 0
+for key in histos.keys():
+    # Plot the flags here
+    if key.find('Is')<0:
+        continue
+
+    plt.subplot(9,6,icount+1)
+    #plt.subplot(10,10,icount+1)
+    print(key)
+    hist = histos[key]
+    xlabel = hist['xlabel']
+    #ylabel = hist['ylabel']
+    ylabel = r'# of entries'
+    histograms = hist['h']
+    for h in histograms:
+        btp.display_histogram(h, xlabel, ylabel,xfontsize=8,yfontsize=8)
 
     icount += 1
 plt.tight_layout()
@@ -102,7 +135,7 @@ for key in kinvars_to_display:
     ylabel = r'# of entries'
     histograms = hist['h']
     for i,h in enumerate(histograms):
-        bt.display_histogram(h, xlabel, ylabel,label=str(i))
+        btp.display_histogram(h, xlabel, ylabel,label=str(i))
 
     icount += 1
     plt.legend()
