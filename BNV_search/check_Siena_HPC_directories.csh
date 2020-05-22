@@ -18,5 +18,9 @@ foreach sp ( SP-11975-R24 SP-11976-R24 SP-11977-R24 SP-9456-R24 SP-9457-R24 SP-1
    du -smch BaBar_data/rootfiles/"$sp"/basicPID_pi0_R24/ | grep total
    du -smch BaBar_data/rootfiles/"$sp"/basicPID_pi0_R24/PID_assignment/ | grep total
    du -smch BaBar_data/rootfiles/"$sp"/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pmu | grep total
+   du -smch BaBar_data/rootfiles/"$sp"/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pe | grep total
+   du -smch BaBar_data/rootfiles/"$sp"/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pnu | grep total
+   du -smch BaBar_data/rootfiles/"$sp"/basicPID_pi0_R24/PID_assignment/kinematic_distributions_nmu | grep total
+   du -smch BaBar_data/rootfiles/"$sp"/basicPID_pi0_R24/PID_assignment/kinematic_distributions_ne | grep total
 end
 

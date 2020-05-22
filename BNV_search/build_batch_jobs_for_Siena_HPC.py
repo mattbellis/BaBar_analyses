@@ -117,6 +117,7 @@ def main():
             cmd = ['qsub', batchfilename]
             print(cmd)
             sp.Popen(cmd,0).wait()
+            #exit()
         #'''
         ########################################
         # Yes plot the kinvars, or at least build the pickle files

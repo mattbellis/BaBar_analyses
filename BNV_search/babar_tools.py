@@ -8,7 +8,7 @@ import zipfile
 import myPIDselector
 from myPIDselector import *
 
-import matplotlib.pylab as plt
+#import matplotlib.pylab as plt
 import pickle
 
 eps = PIDselector("e")
@@ -75,7 +75,7 @@ def read_in_files_and_combine_all_the_dictionaries(infilenames,picklefile=True):
 ################################################################################
 # Plotting utility
 ################################################################################
-#'''
+'''
 def display_histogram(h,xlabel='xlabel',ylabel='ylabel',ax=None,xfontsize=12,yfontsize=12,label=None):
 
     if ax is not None:
@@ -86,7 +86,7 @@ def display_histogram(h,xlabel='xlabel',ylabel='ylabel',ax=None,xfontsize=12,yfo
     plt.gca().set_xlabel(xlabel,fontsize=xfontsize)
     plt.gca().set_ylabel(ylabel,fontsize=yfontsize)
 
-#'''
+'''
 
 ################################################################################
 def vec_mag(vec):
