@@ -100,8 +100,8 @@ def main():
         # Yes plot the kinvars, or at least build the pickle files
         ########################################
         #'''
-        #for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
-        for d in ['ne']:
+        for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
+        #for d in ['ne']:
             if subset[0].find(d)<0:
                 continue
             print(d)
@@ -114,8 +114,8 @@ def main():
             print(subset)
             sp.Popen(cmd,0).wait()
 
-        #if tot_files>=100:
-            #break
+        if tot_files>=100:
+            break
         #'''
 
 ################################################################################
