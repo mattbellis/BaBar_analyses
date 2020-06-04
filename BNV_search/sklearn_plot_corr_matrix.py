@@ -7,22 +7,40 @@ import babar_tools as bt
 import sys
 import pickle
 
+import pandas as pd
+
 infilenames = sys.argv[1:]
 
-allvars,histos = bt.read_in_files_and_combine_all_the_dictionaries(infilenames)
-
-param_labels = list(allvars.keys())
-
-print(param_labels)
+IS_PICKLE_FILES = False
 
 toberemoved = ['mup','ep','pp']
 
-cuts_to_use = 1
+##########################################################
+if IS_PICKLE_FILES:
+    allvars,histos = bt.read_in_files_and_combine_all_the_dictionaries(infilenames)
+
+    param_labels = list(allvars.keys())
+
+    print(param_labels)
+
+    cuts_to_use = 1
+###
+else:
+    df = pd.read_csv(infilenames[0])
+
+    param_labels = df.columns.values
+
+    allvars = df.values
 
 data = []
 param_labels_used = []
+
 for i,pl in enumerate(param_labels):
-    x = allvars[pl]['values'][cuts_to_use]
+    if IS_PICKLE_FILES:
+        x = allvars[pl]['values'][cuts_to_use]
+    else:
+        x = allvars[i]
+
     print(pl,len(x))
     print(type(x))
     print(len(x[x!=x]))
@@ -35,6 +53,7 @@ for i,pl in enumerate(param_labels):
         data.append(x)
         param_labels_used.append(pl)
 
+################################################################################
 
 corrcoefs = []
 for i in range(len(param_labels_used)):

@@ -15,6 +15,8 @@ import pickle
 
 from sklearn_plot_results import plot_results
 
+import pandas as pd
+
 # Getting some of this from here
 # https://betatim.github.io/posts/sklearn-for-TMVA-users/
 
@@ -29,8 +31,12 @@ if len(infilenames) != 2:
 outfilename = "test_sklearn.pkl"
 outfile = open(outfilename,'wb')
 
-dict0 = pickle.load(open(infilenames[0],'rb'))
-dict1 = pickle.load(open(infilenames[1],'rb'))
+#dict0 = pickle.load(open(infilenames[0],'rb'))
+#dict1 = pickle.load(open(infilenames[1],'rb'))
+
+# FOR THE BABAR PID CUTS
+dict0 = pd.read_csv(infilenames[0]).to_dict()
+dict1 = pd.read_csv(infilenames[1]).to_dict()
 
 param_labels = list(dict0.keys())
 
@@ -45,7 +51,9 @@ tokeep = ['tagbcandMES', 'tagbcandDeltaE', 'missingmass', 'missingmom', 'missing
     #if a in param_labels:
         #param_labels.remove(a)
 
-param_labels = tokeep
+# DO THIS WHEN WE WANT TO REMOVE/KEEP STUFF
+#param_labels = tokeep
+
 
 print(param_labels)
 nparams = len(param_labels)
@@ -55,14 +63,23 @@ cuts_to_use = 1
 
 data0 = []
 for pl in param_labels:
-    data0.append(dict0[pl]['values'][cuts_to_use])
-    print(pl,len(dict0[pl]['values'][cuts_to_use]))
+    #data0.append(dict0[pl]['values'][cuts_to_use])
+    #print(pl,len(dict0[pl]['values'][cuts_to_use]))
+    # FOR BABAR PID CUTS
+    data0.append(list(dict0[pl].values()))
+    print(pl,len(dict0[pl]))
 
 data1 = []
 for pl in param_labels:
-    data1.append(dict1[pl]['values'][cuts_to_use])
-    print(pl,len(dict1[pl]['values'][cuts_to_use]))
+    #data1.append(dict1[pl]['values'][cuts_to_use])
+    #print(pl,len(dict1[pl]['values'][cuts_to_use]))
+    # FOR BABAR PID CUTS
+    data1.append(list(dict1[pl].values()))
+    print(pl,len(dict1[pl]))
 #exit()
+
+#print(data0[0][0])
+#print(type(data0[0][0]))
 
 classifier_results = {}
 
@@ -104,6 +121,7 @@ bdt =  MLPClassifier(alpha=1, max_iter=1000)
 
 print(X_train.shape)
 print(y_train.shape)
+#print(X_train)
 bdt.fit(X_train, y_train)
 
 classifier_results["classifier"] = bdt

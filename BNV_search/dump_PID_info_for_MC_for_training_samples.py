@@ -49,17 +49,22 @@ nentries = tree.GetEntries()
 #outfilename = "%s.dat" % (sys.argv[1].split('.root')[0])
 #outfile = open(outfilename,'w')
 
-#filenames = sys.argv[1:]
-outfilename = "proton_PID_sample.csv"
-outfilename_NOT = "NOT_proton_PID_sample.csv"
-
-PIDtomatch = 2212
+#outfilename = "proton_PID_sample.csv"
+#outfilename_NOT = "NOT_proton_PID_sample.csv"
+#PIDtomatch = 2212
+#outfilename = "mu_PID_sample.csv"
+#outfilename_NOT = "NOT_mu_PID_sample.csv"
+#PIDtomatch = 13
+outfilename = "electron_PID_sample.csv"
+outfilename_NOT = "NOT_electron_PID_sample.csv"
+PIDtomatch = 11
 
 outfile = open(outfilename,'w')
 outfile_NOT = open(outfilename_NOT,'w')
 
 
-output = "TightKMProton" + "," + "VeryTightKMProton" + "," + "SuperTightKMProton" + "," + \
+output = "cos(theta),"
+output += "TightKMProton" + "," + "VeryTightKMProton" + "," + "SuperTightKMProton" + "," + \
       "TightBDTKaon" + "," + "VeryTightBDTKaon" + "," + "TightKMKaon" + "," + "VeryTightKMKaon" + "," + "SuperTightKMKaon" + "," + \
       "TightKMPion" + "," + "VeryTightKMPion" + "," + "SuperTightKMPion" + "," + \
       "TightKMElectron" + "," + "VeryTightKMElectron" + "," + "SuperTightKMElectron" + "," + \
@@ -94,6 +99,7 @@ for i in range(nentries):
     for j in range(ntrks):
         mcidx = tree.TRKMCIdx[j]
         p3 = tree.TRKp3[j]
+        costh = tree.TRKcosth[j]
         lund = tree.TRKLund[j]
         #print("idx,len: ",idx,tree.mcLen, ntrks)
         #print("track", j)
@@ -129,7 +135,7 @@ for i in range(nentries):
         if p3>2.0 and p3<2.6:
             '''
             print("---------------------------------")
-            print(p3,lund,mcidx,mcpid[mcidx])
+            print(p3,costh,lund,mcidx,mcpid[mcidx])
             print("TightKMProton", "VeryTightKMProton", "SuperTightKMProton")
             print(isTightKMProton, isVeryTightKMProton, isSuperTightKMProton)
             print("TightBDTKaon", "VeryTightBDTKaon", "TightKMKaon", "VeryTightKMKaon", "SuperTightKMKaon")
@@ -143,6 +149,7 @@ for i in range(nentries):
             '''
 
             if mcpid[mcidx]==PIDtomatch:
+                output += "{0},".format(costh)
                 output += "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17}\n".format(isTightKMProton, isVeryTightKMProton, isSuperTightKMProton,
                   isTightBDTKaon, isVeryTightBDTKaon, isTightKMKaon, isVeryTightKMKaon, isSuperTightKMKaon,
                   isTightKMPion, isVeryTightKMPion, isSuperTightKMPion,
@@ -151,6 +158,7 @@ for i in range(nentries):
                 break;
 
             else:
+                output_NOT += "{0},".format(costh)
                 output_NOT += "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17}\n".format(isTightKMProton, isVeryTightKMProton, isSuperTightKMProton,
                   isTightBDTKaon, isVeryTightBDTKaon, isTightKMKaon, isVeryTightKMKaon, isSuperTightKMKaon,
                   isTightKMPion, isVeryTightKMPion, isSuperTightKMPion,
