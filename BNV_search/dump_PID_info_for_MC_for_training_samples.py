@@ -49,15 +49,17 @@ nentries = tree.GetEntries()
 #outfilename = "%s.dat" % (sys.argv[1].split('.root')[0])
 #outfile = open(outfilename,'w')
 
-#outfilename = "proton_PID_sample.csv"
-#outfilename_NOT = "NOT_proton_PID_sample.csv"
-#PIDtomatch = 2212
+#outfilename = "proton_PID_sample_SP998.csv"
+#outfilename_NOT = "NOT_proton_PID_sample_SP998.csv"
+outfilename = "proton_PID_sample_SP9456.csv"
+outfilename_NOT = "NOT_proton_PID_sample_SP9456.csv"
+PIDtomatch = 2212
 #outfilename = "mu_PID_sample.csv"
 #outfilename_NOT = "NOT_mu_PID_sample.csv"
 #PIDtomatch = 13
-outfilename = "electron_PID_sample.csv"
-outfilename_NOT = "NOT_electron_PID_sample.csv"
-PIDtomatch = 11
+#outfilename = "electron_PID_sample.csv"
+#outfilename_NOT = "NOT_electron_PID_sample.csv"
+#PIDtomatch = 11
 
 outfile = open(outfilename,'w')
 outfile_NOT = open(outfilename_NOT,'w')

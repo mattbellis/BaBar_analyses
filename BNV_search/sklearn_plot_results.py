@@ -293,7 +293,7 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
     plt.grid()
     plt.savefig("plots/roc_curve.png")
     
-    figctt = compare_train_test(bdt, X_train, y_train, X_test, y_test)
+    figctt = compare_train_test(bdt, X_train, y_train, X_test, y_test,bins=5000)
     
     if show:
         plt.show()

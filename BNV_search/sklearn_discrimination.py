@@ -54,8 +54,9 @@ tokeep = ['tagbcandMES', 'tagbcandDeltaE', 'missingmass', 'missingmom', 'missing
 # DO THIS WHEN WE WANT TO REMOVE/KEEP STUFF
 #param_labels = tokeep
 
-
 print(param_labels)
+param_labels.remove('cos(theta)')
+
 nparams = len(param_labels)
 print("nparams: ",nparams)
 
