@@ -276,7 +276,11 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
     print(y_test.shape)
     print(decisionsTest.shape)
     print(decisionsTest[0:4])
+
+    # For Ada boost
     #fpr, tpr, thresholds = roc_curve(y_test, decisionsTest)
+    
+    # FOR MLP
     fpr, tpr, thresholds = roc_curve(y_test, decisionsTest.transpose()[1])
     roc_auc = auc(fpr, tpr)
     

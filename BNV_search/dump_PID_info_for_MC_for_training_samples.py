@@ -41,24 +41,32 @@ for infile in sys.argv[1:]:
     print(infile)
     tree.AddFile(infile)
 
+tree.Print()
+#exit()
 
 nentries = tree.GetEntries()
-#nentries = 1000
+nentries = 10000
 
 #outfilename = "%s.dat" % (sys.argv[1].split('/')[-1].split('.root')[0])
 #outfilename = "%s.dat" % (sys.argv[1].split('.root')[0])
 #outfile = open(outfilename,'w')
 
-#outfilename = "proton_PID_sample_SP998.csv"
-#outfilename_NOT = "NOT_proton_PID_sample_SP998.csv"
-outfilename = "proton_PID_sample_SP9456.csv"
-outfilename_NOT = "NOT_proton_PID_sample_SP9456.csv"
+outfilename = "proton_PID_sample_SP998.csv"
+outfilename_NOT = "NOT_proton_PID_sample_SP998.csv"
+#outfilename = "proton_PID_sample_SP9456.csv"
+#outfilename_NOT = "NOT_proton_PID_sample_SP9456.csv"
 PIDtomatch = 2212
-#outfilename = "mu_PID_sample.csv"
-#outfilename_NOT = "NOT_mu_PID_sample.csv"
+
+#outfilename = "mu_PID_sample_SP9456.csv"
+#outfilename_NOT = "NOT_mu_PID_sample_SP9456.csv"
+#outfilename = "mu_PID_sample_SP998.csv"
+#outfilename_NOT = "NOT_mu_PID_sample_SP998.csv"
 #PIDtomatch = 13
-#outfilename = "electron_PID_sample.csv"
-#outfilename_NOT = "NOT_electron_PID_sample.csv"
+
+#outfilename = "electron_PID_sample_SP9457.csv"
+#outfilename_NOT = "NOT_electron_PID_sample_SP9457.csv"
+#outfilename = "electron_PID_sample_SP998.csv"
+#outfilename_NOT = "NOT_electron_PID_sample_SP998.csv"
 #PIDtomatch = 11
 
 outfile = open(outfilename,'w')
@@ -89,12 +97,39 @@ for i in range(nentries):
     nvals = 0
 
     mcpid = []
+    mcpidfromB = []
+    mcmoth = []
+    
+    B0dau = []
+    B0bardau = []
 
     nmc = tree.mcLen
-    #print("MC ----{0}----".format(nmc))
+    #print("MC -----------------{0}-----------------".format(nmc))
     for j in range(nmc):
         pid = abs(tree.mcLund[j])
         mcpid.append(pid)
+
+        mothIdx = tree.mothIdx[j]
+        #print(pid,mothIdx,tree.dauLen[j])
+        #for k in range(tree.dauLen[j]):
+            #print("\t",tree.dauIdx[j],tree.mcLund[tree.dauIdx[j]])
+        #print(j,mothIdx)
+        # Did this particle come from a B meson?
+        if mothIdx>=0:
+            if tree.mcLund[mothIdx]==511:
+                B0dau.append([pid,j])
+            elif tree.mcLund[mothIdx]==-511:
+                B0bardau.append([pid,j])
+
+    # See what we're looking for
+    mcidxOfInterest = -1
+    for Bcand in [B0dau,B0bardau]:
+        #print(Bcand)
+        if len(Bcand)==2:
+            for b in Bcand:
+                if b[0]==PIDtomatch:
+                    mcidxOfInterest = b[1]
+    #print(mcidxOfInterest) 
 
     ntrks = tree.nTRK
     #print("----{0}----".format(ntrks))
@@ -150,7 +185,7 @@ for i in range(nentries):
             print(isBDTTightMuon, isBDTVeryTightMuon, isBDTTightMuonFakeRate, isBDTVeryTightMuonFakeRate)
             '''
 
-            if mcpid[mcidx]==PIDtomatch:
+            if mcpid[mcidx]==PIDtomatch and (mcidx == mcidxOfInterest):
                 output += "{0},".format(costh)
                 output += "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17}\n".format(isTightKMProton, isVeryTightKMProton, isSuperTightKMProton,
                   isTightBDTKaon, isVeryTightBDTKaon, isTightKMKaon, isVeryTightKMKaon, isSuperTightKMKaon,
@@ -159,7 +194,7 @@ for i in range(nentries):
                   isBDTTightMuon, isBDTVeryTightMuon, isBDTTightMuonFakeRate, isBDTVeryTightMuonFakeRate)
                 break;
 
-            else:
+            elif mcpid[mcidx]!=PIDtomatch:
                 output_NOT += "{0},".format(costh)
                 output_NOT += "{0},{1},{2},{3},{4},{5},{6},{7},{8},{9},{10},{11},{12},{13},{14},{15},{16},{17}\n".format(isTightKMProton, isVeryTightKMProton, isSuperTightKMProton,
                   isTightBDTKaon, isVeryTightBDTKaon, isTightKMKaon, isVeryTightKMKaon, isSuperTightKMKaon,

@@ -107,8 +107,8 @@ print(type(y),y.shape)
 
 skdataset = {"data":X,"target":y,"target_names":param_labels}
 
-X_dev,X_eval, y_dev,y_eval = train_test_split(X, y, test_size=0.33, random_state=42)
-X_train,X_test, y_train,y_test = train_test_split(X_dev, y_dev, test_size=0.33, random_state=492)
+X_dev,X_eval, y_dev,y_eval = train_test_split(X, y, test_size=0.20, random_state=42)
+X_train,X_test, y_train,y_test = train_test_split(X_dev, y_dev, test_size=0.20, random_state=492)
 
 ################################################################################
 # Fit/Classify
@@ -118,7 +118,8 @@ X_train,X_test, y_train,y_test = train_test_split(X_dev, y_dev, test_size=0.33, 
 dt = DecisionTreeClassifier(max_depth=3)
 
 #bdt = AdaBoostClassifier(dt, algorithm='SAMME', n_estimators=800, learning_rate=0.5)
-bdt =  MLPClassifier(alpha=1, max_iter=1000)
+#bdt =  MLPClassifier(alpha=1, max_iter=1000)
+bdt =  MLPClassifier(hidden_layer_sizes=(5), max_iter=1000)
 
 print(X_train.shape)
 print(y_train.shape)

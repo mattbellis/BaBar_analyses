@@ -330,7 +330,6 @@ for i in range(nentries):
             if pid==LUNDTOMATCH:
                 matchIdx = j
 
-        
     leptons = []
     protons = []
     ntrks = tree.nTRK
