@@ -128,6 +128,10 @@ bnvprotp3 = array('f', 64*[-1.0])
 outtree.Branch('bnvprotp3', bnvprotp3, 'bnvprotp3[nbnvbcand]/F')
 bnvlepp3 = array('f', 64*[-1.0])
 outtree.Branch('bnvlepp3', bnvlepp3, 'bnvlepp3[nbnvbcand]/F')
+bnvprotidx = array('i', 64*[-1])
+outtree.Branch('bnvprotidx', bnvprotidx, 'bnvprotidx[nbnvbcand]/I')
+bnvlepidx = array('i', 64*[-1])
+outtree.Branch('bnvlepidx', bnvlepidx, 'bnvlepidx[nbnvbcand]/I')
 
 tagbcand = array('f', [-1.0])
 outtree.Branch('tagbcand', tagbcand, 'tagbcand/F')
@@ -377,7 +381,7 @@ for i in range(nentries):
         px,py,pz = tree.pipx[j], tree.pipy[j], tree.pipz[j]
         q = tree.piq[j]
 
-        particle = [e,px,py,pz,q,211]
+        particle = [e,px,py,pz,q,j,211]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
         scalarmomsum[0] += p3
@@ -396,7 +400,7 @@ for i in range(nentries):
         px,py,pz = tree.kpx[j], tree.kpy[j], tree.kpz[j]
         q = tree.kq[j]
 
-        particle = [e,px,py,pz,q,321]
+        particle = [e,px,py,pz,q,j,321]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
         scalarmomsum[0] += p3
@@ -444,7 +448,7 @@ for i in range(nentries):
         protonIsBDTTightMuonFakeRate[j] = int(mups.IsBitSet(22))
         protonIsBDTVeryTightMuonFakeRate[j] = int(mups.IsBitSet(23))
 
-        particle = [e,px,py,pz,q,2212]
+        particle = [e,px,py,pz,q,j,2212]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
         scalarmomsum[0] += p3
@@ -494,7 +498,7 @@ for i in range(nentries):
         muIsBDTVeryTightMuonFakeRate[j] = int(mups.IsBitSet(23))
 
 
-        particle = [e,px,py,pz,q,13]
+        particle = [e,px,py,pz,q,j,13]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
         scalarmomsum[0] += p3
@@ -545,7 +549,7 @@ for i in range(nentries):
 
 
 
-        particle = [e,px,py,pz,q,11]
+        particle = [e,px,py,pz,q,j,11]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
         scalarmomsum[0] += p3
@@ -563,7 +567,7 @@ for i in range(nentries):
         e = tree.gammae[j]
         px,py,pz = tree.gammapx[j], tree.gammapy[j], tree.gammapz[j]
 
-        particle = [e,px,py,pz,0,0]
+        particle = [e,px,py,pz,0,j,0]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
         scalarmomsum[0] += p3
@@ -595,13 +599,15 @@ for i in range(nentries):
     '''
 
     # Fill the bcandidates
-    nbnvbcand[0],temp_bcand,temp_dE,temp_mes,temp_bnvprotp3,temp_bnvlepp3, tagbcand[0],tagdE[0],tagmes[0],tagq[0],missingmom[0],missingE[0],missingmass[0] = calc_B_variables(myparticles,beam,decay)
+    nbnvbcand[0],temp_bcand,temp_dE,temp_mes,temp_bnvprotp3,temp_bnvlepp3,temp_bnvprotidx,temp_bnvlepidx, tagbcand[0],tagdE[0],tagmes[0],tagq[0],missingmom[0],missingE[0],missingmass[0] = calc_B_variables(myparticles,beam,decay)
     for n in range(nbnvbcand[0]):
         bcand[n] = temp_bcand[n]
         dE[n] = temp_dE[n]
         mes[n] = temp_mes[n]
         bnvprotp3[n] = temp_bnvprotp3[n]
         bnvlepp3[n] = temp_bnvlepp3[n]
+        bnvprotidx[n] = temp_bnvprotidx[n]
+        bnvlepidx[n] = temp_bnvlepidx[n]
 
     #print(missingmass[0])
     #print(bcand[0],dE[0],mes[0], tagbcand[0],tagdE[0],tagmes[0],missingmom[0],missingE[0],missingmass[0])

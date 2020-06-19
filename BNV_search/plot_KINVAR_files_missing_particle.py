@@ -11,6 +11,7 @@ import os
 from myPIDselector import *
 
 import pickle
+import pandas as pd
 
 from babar_tools import vec_mag,angle,selectPID,invmass,recalc_energy,sph2cart
 from babar_tools import particle_masses,particle_lunds
@@ -95,7 +96,8 @@ for key in plotvars.keys():
 icuts_to_dump = [0,1,2,3,4]
 
 cuts = []
-ncuts = 5
+#ncuts = 5
+ncuts = 4 # Trying to dump to dataframe
 for n in range(ncuts):
     #print(n)
     for key in plotvars.keys():
@@ -326,17 +328,23 @@ for i in range(nentries):
         cut2 = ncharged>3
     elif decay=='pmu' or decay=='pe':
         cut1 = nbnvbcand==1 and bnvprotp3[0]>2.3 and bnvlepp3[0]>2.3 and bnvprotp3[0]<2.8 and bnvlepp3[0]<2.8
+        #'''
+        if decay=='pmu':
+            cut1 *= np==1 and nmu==1
+        elif decay=='pe':
+            cut1 *= np==1 and ne==1
+        #'''
         cut2 = ncharged>5
 
 
     if decay=='pnu' or decay=='nmu' or decay=='ne':
         cut3 = nhighmom==1
-        cut4 = missingmom>1 and missingE>1 # These cuts seem to be correlated with tagmass and tagdeltaE
+        #cut4 = missingmom>1 and missingE>1 # These cuts seem to be correlated with tagmass and tagdeltaE
     elif decay=='pmu' or decay=='pe':
-        cut3 = nhighmom==2
-        cut4 = missingmom<2.6 and missingE<5 # These cuts seem to be correlated with tagmass and tagdeltaE
+        cut3 = nhighmom==2 
+        #cut4 = missingmom<2.6 and missingE<5 # These cuts seem to be correlated with tagmass and tagdeltaE
 
-    cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3), (cut1*cut2*cut3*cut4)]#, (cut1*cut2*cut3*cut4*cut5), (cut1*cut2*cut3*cut4*cut5*cut6)]
+    cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3)]#, (cut1*cut2*cut3*cut4)]#, (cut1*cut2*cut3*cut4*cut5), (cut1*cut2*cut3*cut4*cut5*cut6)]
     for icut,cut in enumerate(cuts):
         if cut:
             #print(icut)
@@ -467,6 +475,37 @@ for key in plotvars.keys():
 outfile = open(outfilename,'wb')
 pickle.dump(plotvars_to_write_out,outfile)
 outfile.close()
+################################################
+# Write to dataframe and write out the last cut
+df_dict = {}
+for key in plotvars.keys():
+    # These may be of different length so we don't include them
+    if decay=='pmu':
+        if key.find('eIs')>=0 or key=='ep':
+            continue
+    elif decay=='pe':
+        if key.find('muIs')>=0 or key=='mup':
+            continue
+    elif decay=='pnu':
+        if key.find('eIs')>=0 or key.find('muIs')>=0 or key=='ep' or key=='mup':
+            continue
+    elif decay=='nmu':
+        if key.find('protonIs')>=0 or key.find('eIs')>=0 or key=='ep' or key=='pp':
+            continue
+    elif decay=='ne':
+        if key.find('protonIs')>=0 or key.find('muIs')>=0 or key=='pp' or key=='mup':
+            continue
+
+    df_dict[key] = plotvars[key]['values'][ncuts-1].copy()
+    print(key,len(df_dict[key]))
+
+print(df_dict.keys())
+df = pd.DataFrame.from_dict(df_dict)
+print(df.columns)
+
+df.to_hdf('test_out.h5','df',mode='w')
+
+
 ################################################
 
 print('Processed {0} files for {1}'.format(len(args.infiles),"1"))#,sptag))
