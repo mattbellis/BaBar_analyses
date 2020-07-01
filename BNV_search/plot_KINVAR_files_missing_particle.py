@@ -191,9 +191,12 @@ if outfilename is None:
     #fulldirName = '/data/physics/bellis/BaBar/rootfiles/cut_summary_files/{0}/{1}'.format(sptag,decay)
     #fulldirName = '{0}/{1}'.format(sptag,decay)
 
+    fulldir_prepend = ''
+    fulldir_prepend = '/data/physics/bellis/BaBar/rootfiles/'
+
     fulldirNames = {}
-    fulldirNames['pkl'] = 'cut_summary_files_pickle/{0}/{1}'.format(sptag,decay)
-    fulldirNames['df'] =  'cut_summary_files_df/{0}/{1}'.format(sptag,decay)
+    fulldirNames['pkl'] = '{2}/cut_summary_files_pickle/{0}/{1}'.format(sptag,decay,fulldir_prepend)
+    fulldirNames['df'] =  '{2}/cut_summary_files_df/{0}/{1}'.format(sptag,decay,fulldir_prepend)
 
     for key in fulldirNames.keys():
         fulldirName = fulldirNames[key]
@@ -484,9 +487,9 @@ for key in plotvars.keys():
 ######################
 # Write out to a file
 ######################
-#outfile = open(outfilename,'wb')
-#pickle.dump(plotvars_to_write_out,outfile)
-#outfile.close()
+outfile = open(outfilename,'wb')
+pickle.dump(plotvars_to_write_out,outfile)
+outfile.close()
 
 ################################################
 # Write to dataframe and write out the last cut
