@@ -55,7 +55,9 @@ tokeep = ['tagbcandMES', 'tagbcandDeltaE', 'missingmass', 'missingmom', 'missing
 #param_labels = tokeep
 
 print(param_labels)
-#param_labels.remove('cos(theta)')
+param_labels.remove('cos(theta)')
+param_labels.remove('p3')
+print(param_labels)
 
 nparams = len(param_labels)
 print("nparams: ",nparams)
@@ -107,8 +109,9 @@ print(type(y),y.shape)
 
 skdataset = {"data":X,"target":y,"target_names":param_labels}
 
-X_dev,X_eval, y_dev,y_eval = train_test_split(X, y, test_size=0.20, random_state=42)
-X_train,X_test, y_train,y_test = train_test_split(X_dev, y_dev, test_size=0.20, random_state=492)
+#X_dev,X_eval, y_dev,y_eval = train_test_split(X, y, test_size=0.20, random_state=42)
+#X_train,X_test, y_train,y_test = train_test_split(X_dev, y_dev, test_size=0.20, random_state=492)
+X_train,X_test, y_train,y_test = train_test_split(X, y, test_size=0.20, random_state=492)
 
 ################################################################################
 # Fit/Classify
@@ -124,6 +127,7 @@ bdt =  MLPClassifier(hidden_layer_sizes=(5), max_iter=1000)
 print(X_train.shape)
 print(y_train.shape)
 #print(X_train)
+#bdt.fit(X_train, y_train)
 bdt.fit(X_train, y_train)
 
 classifier_results["classifier"] = bdt

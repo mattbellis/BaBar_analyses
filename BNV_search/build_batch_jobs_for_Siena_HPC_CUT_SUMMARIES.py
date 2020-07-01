@@ -80,7 +80,9 @@ def main():
 
     mastertag = "babar"
 
-    nfiles_at_a_time = 10
+    #nfiles_at_a_time = 10
+    # Do this for signal MC
+    nfiles_at_a_time = 1
 
     tot_files = 0
 
@@ -102,7 +104,7 @@ def main():
         #'''
         for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
         #for d in ['ne']:
-            if subset[0].find(d)<0:
+            if subset[0].find('_'+d)<0:
                 continue
             print(d)
             tag = "{0}_{1}_{2}".format(mastertag,infile_tag,d)
@@ -114,8 +116,9 @@ def main():
             print(subset)
             sp.Popen(cmd,0).wait()
 
-        if tot_files>=100:
-            break
+        #if tot_files>=100:
+        #if tot_files>=3:
+            #break
         #'''
 
 ################################################################################

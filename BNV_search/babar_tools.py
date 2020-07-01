@@ -199,8 +199,8 @@ def sph2cart(pmag,costh,phi):
 def calc_B_variables(particles, beam, decay='pnu'):
 
     # B candidates
-    bc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-    tagbc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    bc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+    tagbc = np.array([0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0])
     highmomE = 0
     totp4 = beam[0:4].copy()
     #print(totp4)
@@ -214,6 +214,8 @@ def calc_B_variables(particles, beam, decay='pnu'):
     # Pmag for particles in B candidate
     protp3 = []
     lepp3 = []
+    protidx = []
+    lepidx = []
     # Get the tag side and don't count the proton or lepton
     #print("---------")
     #print(totp4)
@@ -264,8 +266,10 @@ def calc_B_variables(particles, beam, decay='pnu'):
                 if p0[-2]*l0[-2]<0:
                     bcands_temp.append(p0+l0)
                     protp3.append(vec_mag(p0[1:4]))
+                    protidx.append(p0[-2])
                     #print(l0)
                     lepp3.append(vec_mag(l0[1:4]))
+                    lepidx.append(l0[idx])
 
     #print(lepp3)
     nbnvbcand = len(bcands_temp)
@@ -301,6 +305,6 @@ def calc_B_variables(particles, beam, decay='pnu'):
     tagbc[0] = halfbeam
     tagmes = invmass([tagbc])
 
-    return nbnvbcand,bcand,dE,mes,protp3,lepp3, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass
+    return nbnvbcand,bcand,dE,mes,protp3,lepp3,protidx,lepidx, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass
 
 
