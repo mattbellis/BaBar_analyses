@@ -54,13 +54,14 @@ for key in allvars.keys():
     if norg==0:
         norg = -1
     for i,vals in enumerate(values):
-        if i>0:
+        if i>-1: # If we want to only show some number of cuts greater than this. 
             h = np.histogram(vals,bins=bins,range=r)
             histos[key]['h'].append(h)
             n = len(vals)
             print('{0:2d} {1:6d} {2:.5f}'.format(i,n,n/norg))
 
 #print(histos)
+#exit()
 
 ################################################################################
 # Display the histograms
