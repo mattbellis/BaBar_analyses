@@ -178,7 +178,9 @@ def get_sptag(name):
 ################################################################################
 
 outfilename = None
+outfilename_df = None
 sptag = None
+
 if outfilename is None:
     sptag = get_sptag(args.infiles[0][0]) 
     #outfilename = 'OUTPUT_{0}_{1}_nfiles{2}.pkl'.format(decay,sptag,len(args.infiles[0]))
@@ -187,13 +189,21 @@ if outfilename is None:
 
     # Better names?
     #fulldirName = '/data/physics/bellis/BaBar/rootfiles/cut_summary_files/{0}/{1}'.format(sptag,decay)
-    fulldirName = '{0}/{1}'.format(sptag,decay)
-    try:
-        # Create target Directory
-        os.makedirs(fulldirName,exist_ok=True)
-        print("Directory " , fulldirName ,  " Created ")
-    except FileExistsError:
-        print("Directory " , fulldirName ,  " already exists")
+    #fulldirName = '{0}/{1}'.format(sptag,decay)
+
+    fulldirNames = {}
+    fulldirNames['pkl'] = 'cut_summary_files_pickle/{0}/{1}'.format(sptag,decay)
+    fulldirNames['df'] =  'cut_summary_files_df/{0}/{1}'.format(sptag,decay)
+
+    for key in fulldirNames.keys():
+        fulldirName = fulldirNames[key]
+        try:
+            # Create target Directory
+            os.makedirs(fulldirName,exist_ok=True)
+            print("Directory " , fulldirName ,  " Created ")
+        except FileExistsError:
+            print("Directory " , fulldirName ,  " already exists")
+
     #outfilename = filenames[0].split('/')[-1].split('.root')[0] + "_OUTPUT.root"
     #outfilename = sys.argv[1].split('.root')[0] + "_PID_skim.root"
     #outfilename = '/'.join(sys.argv[1].split('/')[:-1]) + "/" + dirName + "/" + sys.argv[1].split('/')[-1].split('.root')[0] + "_KINVARS_" + decay + ".root"
@@ -202,15 +212,17 @@ if outfilename is None:
         n = f.split('_SKIMMED_PID')[0].split('R24-')[-1]
         filenumbers.append(n)
     ntag = '-'.join(filenumbers)
-    outfilename = '{0}/OUTPUT_{1}_nfiles{2}.pkl'.format(fulldirName,ntag,len(args.infiles[0]))
+    outfilename = '{0}/OUTPUT_{1}_nfiles{2}.pkl'.format(fulldirNames['pkl'],ntag,len(args.infiles[0]))
+    outfilename_df = '{0}/OUTPUT_{1}_nfiles{2}.h5'.format(fulldirNames['df'],ntag,len(args.infiles[0]))
     print(outfilename)
+    print(outfilename_df)
     #exit()
 
 
 
 for i in range(nentries):
 
-    if i%1000==0:
+    if i%10000==0:
         print(i,nentries)
 
     if i>100000000:
@@ -472,9 +484,10 @@ for key in plotvars.keys():
 ######################
 # Write out to a file
 ######################
-outfile = open(outfilename,'wb')
-pickle.dump(plotvars_to_write_out,outfile)
-outfile.close()
+#outfile = open(outfilename,'wb')
+#pickle.dump(plotvars_to_write_out,outfile)
+#outfile.close()
+
 ################################################
 # Write to dataframe and write out the last cut
 df_dict = {}
@@ -497,13 +510,13 @@ for key in plotvars.keys():
             continue
 
     df_dict[key] = plotvars[key]['values'][ncuts-1].copy()
-    print(key,len(df_dict[key]))
+    #print(key,len(df_dict[key]))
 
-print(df_dict.keys())
+#print(df_dict.keys())
 df = pd.DataFrame.from_dict(df_dict)
-print(df.columns)
+#print(df.columns)
 
-df.to_hdf('test_out.h5','df',mode='w')
+df.to_hdf(outfilename_df,'df',mode='w')
 
 
 ################################################

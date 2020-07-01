@@ -47,10 +47,15 @@ def compare_train_test(clf, X_train, y_train, X_test, y_test, bins=30):
         else:
             print("NO DECISION FUNCTION")
             #decisions = bdt.predict_proba(X_test)
-            d1 = clf.predict_proba(X[y>0.5]).ravel()
-            d2 = clf.predict_proba(X[y<0.5]).ravel()
-        #d1 = clf.decision_function(X[y>0.5]).ravel()
-        #d2 = clf.decision_function(X[y<0.5]).ravel()
+            v = clf.predict_proba(X[y>0.5])
+            print("v: ")
+            print(v)
+            print(v[:,1])
+            d1 = clf.predict_proba(X[y>0.5])[:,0].ravel()
+            d2 = clf.predict_proba(X[y<0.5])[:,0].ravel()
+            print("d1: ")
+            print(d1)
+            #exit()
 
         decisions += [d1, d2]
      
@@ -173,8 +178,9 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
 
     skdataset = {"data":X,"target":y,"target_names":param_labels}
 
-    X_dev,X_eval, y_dev,y_eval = train_test_split(X, y, test_size=0.33, random_state=42)
-    X_train,X_test, y_train,y_test = train_test_split(X_dev, y_dev, test_size=0.33, random_state=492)
+    #X_dev,X_eval, y_dev,y_eval = train_test_split(X, y, test_size=0.33, random_state=42)
+    #X_train,X_test, y_train,y_test = train_test_split(X_dev, y_dev, test_size=0.33, random_state=492)
+    X_train,X_test, y_train,y_test = train_test_split(X, y, test_size=0.20, random_state=492)
     
     ################################################################################
     # Fit/Classify
@@ -268,8 +274,11 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
     else:
         print("NO DECISION FUNCTION")
         #decisions = bdt.predict_proba(X_test)
+
         decisionsTest = bdt.predict_proba(X_test)
         decisionsTrain = bdt.predict_proba(X_train)
+        #decisionsTest = bdt.predict(X_test)
+        #decisionsTrain = bdt.predict(X_train)
     #decisions = bdt.decision_function(X_test)
     # Compute ROC curve and area under the curve
     #fpr, tpr, thresholds = roc_curve(y_test, decisions)
@@ -297,7 +306,7 @@ def plot_results(data0, data1, dataset0name, dataset1name, param_labels, bdt, sh
     plt.grid()
     plt.savefig("plots/roc_curve.png")
     
-    figctt = compare_train_test(bdt, X_train, y_train, X_test, y_test,bins=5000)
+    figctt = compare_train_test(bdt, X_train, y_train, X_test, y_test,bins=300)
     
     if show:
         plt.show()
