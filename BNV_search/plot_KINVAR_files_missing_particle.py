@@ -472,9 +472,9 @@ for key in plotvars.keys():
 ######################
 # Write out to a file
 ######################
-outfile = open(outfilename,'wb')
-pickle.dump(plotvars_to_write_out,outfile)
-outfile.close()
+#outfile = open(outfilename,'wb')
+#pickle.dump(plotvars_to_write_out,outfile)
+#outfile.close()
 ################################################
 # Write to dataframe and write out the last cut
 df_dict = {}
