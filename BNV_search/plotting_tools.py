@@ -72,12 +72,22 @@ def get_variable_parameters_for_plotting():
 
 
 ################################################################################
-def make_all_plots(df,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None):
+def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,infilenames=None,xlabelfontsize=12,ignorePID=False):
+
+    if type(dfs) != list:
+        dfs = [dfs]
 
     if plot_params is None:
         plot_params = get_variable_parameters_for_plotting()
 
-    names = df.columns.values
+    tempnames = dfs[0].columns.values
+    names = []
+    if ignorePID:
+        for name in tempnames:
+            if name.find('Is')>=0 or name.find('BDT')>=0 or name.find('KM')>=0:
+                1
+            else:
+                names.append(name)
 
     nplots = len(names)
 
@@ -90,7 +100,7 @@ def make_all_plots(df,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),kd
             continue
 
         if i%nplots_per_figure==0:
-            plt.figure(figsize=(9,7))
+            plt.figure(figsize=figsize)
             grid_count = 0
 
         plt.subplot(grid_of_plots[0],grid_of_plots[1],grid_count+1)
@@ -108,14 +118,25 @@ def make_all_plots(df,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),kd
         
         if backend=='seaborn':
             if plotrange is not None:
-                sns.distplot(df[name],bins=bins,hist_kws={"range": plotrange},kde=kde)
+                for j,df in enumerate(dfs):
+                    label = None
+                    if infilenames is not None:
+                        label = infilenames[j]
+                    sns.distplot(df[name],bins=bins,hist_kws={"range": plotrange},kde=kde,norm_hist=norm_hist,label=label)
             else:
-                sns.distplot(df[name],bins=bins,kde=kde)
+                for j,df in enumerate(dfs):
+                    label = None
+                    if infilenames is not None:
+                        label = infilenames[j]
+                    sns.distplot(df[name],bins=bins,kde=kde,norm_hist=norm_hist,label=label)
 
             if xlabel is not None:
-                plt.xlabel(xlabel,fontsize=18)
+                plt.xlabel(xlabel,fontsize=xlabelfontsize)
             else:
-                plt.xlabel(name,fontsize=18)
+                plt.xlabel(name,fontsize=xlabelfontsize)
+
+            if infilenames is not None:
+                plt.legend()
 
 
         if i%nplots_per_figure==nplots_per_figure-1 or i==nplots-1:
