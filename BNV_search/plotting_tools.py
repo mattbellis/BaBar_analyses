@@ -123,6 +123,7 @@ def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),k
                     if infilenames is not None:
                         label = infilenames[j]
                     sns.distplot(df[name],bins=bins,hist_kws={"range": plotrange},kde=kde,norm_hist=norm_hist,label=label)
+                    plt.xlim(plotrange[0],plotrange[1])
             else:
                 for j,df in enumerate(dfs):
                     label = None
@@ -136,7 +137,7 @@ def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),k
                 plt.xlabel(name,fontsize=xlabelfontsize)
 
             if infilenames is not None:
-                plt.legend()
+                plt.legend(fontsize=8)
 
 
         if i%nplots_per_figure==nplots_per_figure-1 or i==nplots-1:

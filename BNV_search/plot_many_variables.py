@@ -5,6 +5,7 @@ import pandas as pd
 import seaborn as sns
 
 import plotting_tools as pt
+import babar_dataframe_tools as bd
 
 infilenames = sys.argv[1:]
 
@@ -12,12 +13,29 @@ dfs = []
 for infilename in infilenames:
 
     if infilename.find('.csv')>=0:
-        dfs.append(pd.read_csv(infilename))
+        df = pd.read_csv(infilename)
     elif infilename.find('.h5')>=0:
-        dfs.append(pd.read_hdf(infilename))
+        df = pd.read_hdf(infilename)
+
+    muon_mask = bd.pid_mask(df,particle='muon')
+    proton_mask = bd.pid_mask(df,particle='proton')
+
+    dfs.append(df)
+
+    df_mu = df[muon_mask]
+    dfs.append(df_mu)
+    df_proton = df[proton_mask]
+    dfs.append(df_proton)
+    df_both = df[muon_mask & proton_mask]
+    dfs.append(df_both)
 
 
-pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,norm_hist=True)
+
+plot_params = pt.get_variable_parameters_for_plotting()
+plot_params['bnvbcandDeltaE']['range'] = (-1.0,1.0)
+plot_params['bnvbcandMES']['range'] = (5.2,5.3)
+#pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,norm_hist=True,infilenames=infilenames,plot_params=plot_params)
+pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params)
 
 #plot_params = pt.get_variable_parameters_for_plotting()
 #plot_params['p3']['range'] = (2.0,3.0)
