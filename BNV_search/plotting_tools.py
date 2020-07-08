@@ -72,7 +72,7 @@ def get_variable_parameters_for_plotting():
 
 
 ################################################################################
-def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,infilenames=None,xlabelfontsize=12,ignorePID=False):
+def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,labels=None,xlabelfontsize=12,ignorePID=False,weights=1.0):
 
     if type(dfs) != list:
         dfs = [dfs]
@@ -120,15 +120,19 @@ def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),k
             if plotrange is not None:
                 for j,df in enumerate(dfs):
                     label = None
-                    if infilenames is not None:
-                        label = infilenames[j]
-                    sns.distplot(df[name],bins=bins,hist_kws={"range": plotrange},kde=kde,norm_hist=norm_hist,label=label)
+                    if labels is not None:
+                        label = labels[j]
+                    weight=np.ones(len(df[name]))
+                    if type(weights) == list:
+                        weight *= weights[j]
+
+                    sns.distplot(df[name],bins=bins,hist_kws={"range": plotrange, "weights":weight},kde=kde,norm_hist=norm_hist,label=label)
                     plt.xlim(plotrange[0],plotrange[1])
             else:
                 for j,df in enumerate(dfs):
                     label = None
-                    if infilenames is not None:
-                        label = infilenames[j]
+                    if labels is not None:
+                        label = labels[j]
                     sns.distplot(df[name],bins=bins,kde=kde,norm_hist=norm_hist,label=label)
 
             if xlabel is not None:
@@ -136,7 +140,7 @@ def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),k
             else:
                 plt.xlabel(name,fontsize=xlabelfontsize)
 
-            if infilenames is not None:
+            if labels is not None:
                 plt.legend(fontsize=8)
 
 
