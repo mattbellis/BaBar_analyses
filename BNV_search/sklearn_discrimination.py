@@ -14,6 +14,7 @@ import sys
 import pickle
 
 from sklearn_plot_results import plot_results
+import sklearn_tools as sktools
 
 import pandas as pd
 
@@ -22,29 +23,65 @@ import pandas as pd
 
 ################################################################################
 infilenames = sys.argv[1:]
-if len(infilenames) != 2:
-    print("Wrong number of input files!")
-    print("Should be 2!")
-    exit()
 
-#outfilename = "CLASSIFICATION_{0}_{1}.pkl".format(infilenames[0].split('.pkl')[0],infilenames[1].split('.pkl')[0])
-outfilename = "test_sklearn.pkl"
+outfilename = "CLASSIFICATION_{0}_{1}.pkl".format(infilenames[0].split('.')[0],infilenames[1].split('.')[0])
+#outfilename = "test_sklearn.pkl"
 outfile = open(outfilename,'wb')
 
-#dict0 = pickle.load(open(infilenames[0],'rb'))
-#dict1 = pickle.load(open(infilenames[1],'rb'))
+df0,df1 = sktools.read_in_files_and_return_dataframe(infilenames)
 
-# FOR THE BABAR PID CUTS
-dict0 = pd.read_csv(infilenames[0]).to_dict()
-dict1 = pd.read_csv(infilenames[1]).to_dict()
+print(len(df0),infilenames[0])
+print(len(df1),infilenames[1])
 
-param_labels = list(dict0.keys())
+#toberemoved = ['bcandmass', 'bcandMES', 'bcandDeltaE', 'pmom', 'lepmom']
+# BaBar PID
+#toberemoved = ['cos(theta)', 'p3']
+toberemoved = []
 
-toberemoved = ['bcandmass', 'bcandMES', 'bcandDeltaE', 'pmom', 'lepmom']
+# Manually remove some of the columns that are about PID
+for name in list(df0.keys()):
+    if name.find('Is')>=0 or name.find('BDT')>=0 or name.find('KM')>=0:
+        toberemoved.append(name)
+toberemoved.append('ne')
+toberemoved.append('np')
+toberemoved.append('nmu')
+toberemoved.append('nbnvbcand')
+toberemoved.append('bnvbcandMES')
+toberemoved.append('bnvbcandDeltaE')
+toberemoved.append('bnvbcandmass')
+toberemoved.append('bnvlepp3')
+toberemoved.append('bnvprotp3')
+toberemoved.append('bnvprotp3')
+toberemoved.append('pp')
+#toberemoved.append('ep')
+toberemoved.append('mup')
+
+df0 = sktools.format(df0,'signal',columns_to_drop=toberemoved)
+df1 = sktools.format(df1,'background',columns_to_drop=toberemoved)
+
+data = {'df':sktools.mergeDataframes([df0, df1]),
+        'zeroClass':'signal', 'oneClass':'background', 'twoClass':'both', 'title':'training data'}
+
+sktools.plot_corr_matrix(data['df'])
+#plt.show()
+
+result = sktools.learn(data, hidden_layers=5, iterations=1000)
+
+sktools.tablesReportFromDict(result)
+sktools.graphicReport(result)
+
+plt.show()
+#exit()
+
+
+'''
+#param_labels = list(dict0.keys())
+
+
 # For charged modes
-tokeep = ['bnvbcandMES', 'bnvbcandDeltaE', 'tagbcandMES', 'tagbcandDeltaE', 'missingmass', 'missingmom', 'missingE', 'scalarmomsum', 'r2', 'r2all', 'thrustmag', 'thrustmagall', 'thrustcosth', 'thrustcosthall', 'sphericityall', 'ncharged', 'nphot']
+#tokeep = ['bnvbcandMES', 'bnvbcandDeltaE', 'tagbcandMES', 'tagbcandDeltaE', 'missingmass', 'missingmom', 'missingE', 'scalarmomsum', 'r2', 'r2all', 'thrustmag', 'thrustmagall', 'thrustcosth', 'thrustcosthall', 'sphericityall', 'ncharged', 'nphot']
 # For missing particle modes
-tokeep = ['tagbcandMES', 'tagbcandDeltaE', 'missingmass', 'missingmom', 'missingE', 'scalarmomsum', 'r2', 'r2all', 'thrustmag', 'thrustmagall', 'thrustcosth', 'thrustcosthall', 'sphericityall', 'ncharged', 'nphot']
+#tokeep = ['tagbcandMES', 'tagbcandDeltaE', 'missingmass', 'missingmom', 'missingE', 'scalarmomsum', 'r2', 'r2all', 'thrustmag', 'thrustmagall', 'thrustcosth', 'thrustcosthall', 'sphericityall', 'ncharged', 'nphot']
 
 
 #for a in toberemoved:
@@ -138,3 +175,4 @@ outfile.close()
 plot_results(data0, data1, infilenames[0], infilenames[1], param_labels, bdt)
 
 plt.show()
+'''
