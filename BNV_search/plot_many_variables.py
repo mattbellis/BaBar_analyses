@@ -15,6 +15,7 @@ color_scheme = {'1235':'b',
                 '998':'g', 
                 '1005':'r', 
                 '3429':'m', 
+                '9456':'k', 
                 }
 
 infilenames = sys.argv[1:]
@@ -34,33 +35,60 @@ for infilename in infilenames:
     muon_mask = bd.pid_mask(df,particle='muon')
     proton_mask = bd.pid_mask(df,particle='proton')
 
+    shape_mask = bd.shape_mask(df)
+    #print(df.columns)
+
     #dfs.append(df)
+    print("------------")
+    print(len(df))
+    print(len(df[muon_mask & proton_mask]))
+    print(len(df[muon_mask & proton_mask & shape_mask]))
+    print(len(df[muon_mask & proton_mask])/len(df))
+    print(len(df[shape_mask & muon_mask & proton_mask])/len(df))
+    print("------------")
 
     #df_mu = df[muon_mask]
     #dfs.append(df_mu)
     #df_proton = df[proton_mask]
     #dfs.append(df_proton)
-    df_both = df[muon_mask & proton_mask]
-    dfs.append(df_both)
+    #df_both = df[muon_mask & proton_mask]
+    #dfs.append(df_both)
+
+    dftmp = df[shape_mask & proton_mask & muon_mask]
+    dfs.append(dftmp)
 
     sp,label = bt.get_sptag(infilename)
     print(sp,label)
     sps.append(label)
     labels.append(label)
 
-    wt = raw['MC'][sp]['weight']
+    wt = 1.0
+    if 'weight' in list(raw['MC'][sp].keys()):
+        wt = raw['MC'][sp]['weight']
     print(wt)
     weights.append(wt)
     colors.append(color_scheme[sp])
 
+# Use this for testing cuts
+#labels = ['PID cuts','shape cuts']
+#weights = [1.0, 1.0]
+#colors = ['k','g']
 
+print("Making the plots.......")
 plot_params = pt.get_variable_parameters_for_plotting()
 plot_params['bnvbcandDeltaE']['range'] = (-1.0,1.0)
 plot_params['bnvbcandMES']['range'] = (5.2,5.3)
 #pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,norm_hist=True,labels=labels,plot_params=plot_params)
 #pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=False,weights=weights)
+
+# For overlaying the data - STILL IN TESTING STATE
 #pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,overlay_data=True)
+
+# For stacked histograms
 pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(3,3),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,figsize=(12,7))
+
+# For comparing cuts
+#pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(3,3),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=False,weights=weights,color=colors,figsize=(12,7),norm_hist=True)
 
 #plot_params = pt.get_variable_parameters_for_plotting()
 #plot_params['p3']['range'] = (2.0,3.0)

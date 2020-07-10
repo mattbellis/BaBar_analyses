@@ -174,7 +174,7 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
             tmpcolor=None
             if color is not None:
                 tmpcolor=color[:last_df]
-            plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,label=labels[:last_df],color=tmpcolor)
+            plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,label=labels[:last_df],color=tmpcolor,histtype='stepfilled',density=norm_hist)
 
             if overlay_data:
                 hist_with_errors(dfs[-1][name],bins=bins,range=plotrange,label='Data')
@@ -236,4 +236,37 @@ def hist_with_errors(values,bins=100,range=None,fmt='o',color='black',ecolor='bl
 
     return ret,xpts,ypts,xpts_err,ypts_err
 
+
+################################################################################
+def hist2d(xvals,yvals,xbins=10,ybins=10,xrange=None,yrange=None,origin='lower',cmap=plt.cm.coolwarm,axes=None,aspect='auto',log=False,weights=None,zlim=(None,None),label=None):
+
+    # If no ranges are passed in, use the min and max of the x- and y-vals.
+    if xrange==None:
+        xrange = (min(xvals),max(xvals))
+    if yrange==None:
+        yrange = (min(yvals),max(xvals))
+
+    # Note I am switching the expected order of xvals and yvals, following the 
+    # comment in the SciPy tutorial.
+    # ``Please note that the histogram does not follow the Cartesian convention 
+    # where x values are on the abcissa and y values on the ordinate axis. Rather, 
+    # x is histogrammed along the first dimension of the array (vertical), and y 
+    # along the second dimension of the array (horizontal). 
+    # This ensures compatibility with histogramdd.
+    #
+    # http://docs.scipy.org/doc/numpy/reference/generated/numpy.histogram2d.html
+    H,xedges,yedges = np.histogram2d(yvals,xvals,bins=[ybins,xbins],range=[yrange,xrange],weights=weights)
+    extent = [yedges[0], yedges[-1], xedges[0], xedges[-1]]
+
+    if log is True:
+        H = np.log10(H)
+
+    # If no axes are passed in, use the current axes available to plt.
+    if axes==None:
+        axes=plt.gca()
+
+    ret = axes.imshow(H,extent=extent,interpolation='nearest',origin=origin,cmap=cmap,axes=axes,aspect=aspect,vmin=zlim[0],vmax=zlim[1])
+    #colorbar = plt.colorbar(cax=axes)
+
+    return ret,xedges,yedges,H,extent
 

@@ -404,6 +404,7 @@ def get_sptag(name):
     labels['3429'] = r'$\tau^+\tau^-$'
     labels['3981'] = r'$\mu^+\mu^-$'
     labels['signal'] = r'$B\rightarrow p \ell^-$'
+    labels['9456'] = r'$B\rightarrow p \ell^-$'
 
     tag = None
     label = None
@@ -415,7 +416,7 @@ def get_sptag(name):
     elif name.find('SP')>=0:
         # MC
         index = name.find('SP')+1
-        sps = ['1235', '1237', '1005', '998', '3429', '3981']
+        sps = ['1235', '1237', '1005', '998', '3429', '3981','9456']
         for sp in sps:
             if name.find(sp,index)>=index:
                 break
