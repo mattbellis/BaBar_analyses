@@ -72,7 +72,7 @@ def get_variable_parameters_for_plotting():
 
 
 ################################################################################
-def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,labels=None,xlabelfontsize=12,ignorePID=False,weights=1.0):
+def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,labels=None,xlabelfontsize=12,ignorePID=False,weights=1.0,stacked=False,alpha=0.5,color=None):
 
     if type(dfs) != list:
         dfs = [dfs]
@@ -116,6 +116,7 @@ def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),k
             plotrange=(0,1)
             bins=2
         
+        ########################################################################
         if backend=='seaborn':
             if plotrange is not None:
                 for j,df in enumerate(dfs):
@@ -126,14 +127,60 @@ def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),k
                     if type(weights) == list:
                         weight *= weights[j]
 
-                    sns.distplot(df[name],bins=bins,hist_kws={"range": plotrange, "weights":weight},kde=kde,norm_hist=norm_hist,label=label)
+                    sns.distplot(df[name],bins=bins,hist_kws={"range": plotrange, "weights":weight, "stacked":stacked,'alpha':alpha},kde=kde,norm_hist=norm_hist,label=label)
                     plt.xlim(plotrange[0],plotrange[1])
             else:
                 for j,df in enumerate(dfs):
                     label = None
                     if labels is not None:
                         label = labels[j]
-                    sns.distplot(df[name],bins=bins,kde=kde,norm_hist=norm_hist,label=label)
+                    weight=np.ones(len(df[name]))
+                    if type(weights) == list:
+                        weight *= weights[j]
+
+                    sns.distplot(df[name],bins=bins,kde=kde,norm_hist=norm_hist,label=label,hist_kws={"weights":weight, "stacked":stacked})
+
+            if xlabel is not None:
+                plt.xlabel(xlabel,fontsize=xlabelfontsize)
+            else:
+                plt.xlabel(name,fontsize=xlabelfontsize)
+
+            if labels is not None:
+                plt.legend(fontsize=8)
+
+        ########################################################################
+        elif backend=='matplotlib':
+            #if plotrange is not None:
+            allvals = []
+            allweights=[]
+            last_df = len(dfs)
+            if overlay_data:
+                last_df -= 1
+            for j in range(last_df):
+                df = dfs[j]
+                #label = None
+                #if labels is not None:
+                    #label = labels[j]
+
+                vals = df[name]
+
+                weight=np.ones(len(vals))
+                if type(weights) == list:
+                    weight *= weights[j]
+
+                allvals.append(df[name].values)
+                allweights.append(weight)
+
+            tmpcolor=None
+            if color is not None:
+                tmpcolor=color[:last_df]
+            plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,label=labels[:last_df],color=tmpcolor)
+
+            if overlay_data:
+                hist_with_errors(dfs[-1][name],bins=bins,range=plotrange,label='Data')
+
+            if plotrange is not None:
+                plt.xlim(plotrange[0],plotrange[1])
 
             if xlabel is not None:
                 plt.xlabel(xlabel,fontsize=xlabelfontsize)
@@ -144,6 +191,7 @@ def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),k
                 plt.legend(fontsize=8)
 
 
+        ########################################################################
         if i%nplots_per_figure==nplots_per_figure-1 or i==nplots-1:
             print("Here!")
             plt.tight_layout()
@@ -151,5 +199,41 @@ def make_all_plots(dfs,specific_plots=[],backend='seaborn',grid_of_plots=(2,2),k
         grid_count += 1
 
 
+
+################################################################################
+def hist_with_errors(values,bins=100,range=None,fmt='o',color='black',ecolor='black',markersize=2,axes=None,barsabove=False,capsize=0,linewidth=1,normed=False,weights=None,label=None,alpha=0.0):
+
+    nentries_per_bin, bin_edges, patches = plt.hist(values,bins=bins,
+            range=range,alpha=alpha,weights=weights) # Make histogram transparent.
+
+    # Create an errorbar plot using the info from the histogram.
+    bin_width = bin_edges[1] - bin_edges[0] # Assumes evenly spaced bins.
+    xpts = bin_edges[0:-1] + bin_width/2.0 # Get the bin centers and leave off
+                                           # the last point which is the high
+                                           # side of a bin.
+
+    ypts = 1.0*nentries_per_bin.copy()
+    xpts_err = bin_width/2.0
+    ypts_err = np.sqrt(nentries_per_bin) # Use np.sqrt to take square root
+                                         # of an array. We'll assume Gaussian
+                                         # errors here.
+    if normed:
+        ntot = float(sum(nentries_per_bin))
+        ypts /= ntot
+        ypts_err /= ntot
+
+
+    # If no axes are passed in, use the current axes available to plt.
+    if axes==None:
+        axes=plt.gca()
+
+    ret = axes.errorbar(xpts, ypts, xerr=xpts_err, yerr=ypts_err,fmt=fmt,
+            color=color,ecolor=ecolor,markersize=markersize,barsabove=barsabove,capsize=capsize,
+            linewidth=linewidth,label=label,alpha=1.0)
+
+    if normed:
+        axes.set_ylim(0,2.0*max(ypts))
+
+    return ret,xpts,ypts,xpts_err,ypts_err
 
 

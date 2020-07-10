@@ -10,12 +10,20 @@ import babar_tools as bt
 
 raw = bt.return_dataset_information(verbose=True)
 
+color_scheme = {'1235':'b', 
+                '1237':'c', 
+                '998':'g', 
+                '1005':'r', 
+                '3429':'m', 
+                }
+
 infilenames = sys.argv[1:]
 
 dfs = []
 sps = []
 labels = []
 weights = []
+colors = []
 for infilename in infilenames:
 
     if infilename.find('.csv')>=0:
@@ -43,13 +51,16 @@ for infilename in infilenames:
     wt = raw['MC'][sp]['weight']
     print(wt)
     weights.append(wt)
+    colors.append(color_scheme[sp])
 
 
 plot_params = pt.get_variable_parameters_for_plotting()
 plot_params['bnvbcandDeltaE']['range'] = (-1.0,1.0)
 plot_params['bnvbcandMES']['range'] = (5.2,5.3)
 #pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,norm_hist=True,labels=labels,plot_params=plot_params)
-pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels)
+#pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=False,weights=weights)
+#pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,overlay_data=True)
+pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(3,3),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,figsize=(12,7))
 
 #plot_params = pt.get_variable_parameters_for_plotting()
 #plot_params['p3']['range'] = (2.0,3.0)
