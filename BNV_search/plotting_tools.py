@@ -270,3 +270,119 @@ def hist2d(xvals,yvals,xbins=10,ybins=10,xrange=None,yrange=None,origin='lower',
 
     return ret,xedges,yedges,H,extent
 
+################################################################################
+def return_dataset_information(verbose=False):
+    # Information about BaBar detector and luminosity
+    # https://www.sciencedirect.com/science/article/pii/S0168900213007183
+    raw_event_numbers = {}
+    raw_event_numbers["DATA"] = {}
+    raw_event_numbers["MC"] = {}
+    
+    for i in range(1,7):
+            key = "Run{0}".format(i)
+            raw_event_numbers["DATA"][key] = {"raw":1, "xsec":0}
+    
+    for i in [1235, 1237, 1005, 998, 3429, 3981, 2400, 11975, 11976, 11977, 9456, 9457, 980]:
+            key = "{0}".format(i)
+            raw_event_numbers["MC"][key] = {"raw":1, "xsec":1}
+    
+    #raw_event_numbers["DATA"]["Run1"]["raw"] *= 2929
+    #raw_event_numbers["DATA"]["Run2"]["raw"] *= 9590
+    #raw_event_numbers["DATA"]["Run3"]["raw"] *= 5014
+    #raw_event_numbers["DATA"]["Run4"]["raw"] *= 15936
+    #raw_event_numbers["DATA"]["Run5"]["raw"] *= 21045
+    #raw_event_numbers["DATA"]["Run6"]["raw"] *= 12629
+    raw_event_numbers["DATA"]["Run1"]["raw"] = 292782011
+    raw_event_numbers["DATA"]["Run2"]["raw"] = 958854016
+    raw_event_numbers["DATA"]["Run3"]["raw"] = 501277316
+    raw_event_numbers["DATA"]["Run4"]["raw"] = 1593488357
+    raw_event_numbers["DATA"]["Run5"]["raw"] = 2104338820
+    raw_event_numbers["DATA"]["Run6"]["raw"] = 1262797446
+    
+    raw_event_numbers["MC"]["1235"]["raw"] = 710352000
+    raw_event_numbers["MC"]["1237"]["raw"] = 719931000
+    raw_event_numbers["MC"]["1005"]["raw"] = 1133638000
+    raw_event_numbers["MC"]["998"]["raw"] = 3595740000
+    raw_event_numbers["MC"]["3429"]["raw"] = 1620027000
+    raw_event_numbers["MC"]["3981"]["raw"] = 622255000
+    raw_event_numbers["MC"]["2400"]["raw"] = 472763000
+    
+    raw_event_numbers["MC"]["980"]["raw"] = 2149000
+    
+    raw_event_numbers["MC"]["9456"]["raw"] = 4298000
+    raw_event_numbers["MC"]["9457"]["raw"] = 4298000
+    raw_event_numbers["MC"]["11975"]["raw"] = 4514000
+    raw_event_numbers["MC"]["11976"]["raw"] = 4494000
+    raw_event_numbers["MC"]["11977"]["raw"] = 4514000
+    
+    raw_event_numbers["MC"]["1235"]["xsec"] = 0.54
+    raw_event_numbers["MC"]["1237"]["xsec"] = 0.54
+    raw_event_numbers["MC"]["1005"]["xsec"] = 1.30
+    raw_event_numbers["MC"]["998"]["xsec"] = 2.09
+    raw_event_numbers["MC"]["3429"]["xsec"] = 0.94
+    raw_event_numbers["MC"]["3981"]["xsec"] = 1.16
+    raw_event_numbers["MC"]["2400"]["xsec"] = 40
+    
+    intlumi = 424.18
+    
+    
+    # Section 6.2 of above paper
+    # The final dataset contains more than nine billion events passing the pre-reconstruction filter described above, primarily taken on the  resonance. 
+    
+    
+    tot = 0
+    for key in raw_event_numbers["DATA"].keys():
+        tot += raw_event_numbers["DATA"][key]["raw"]
+    
+    if verbose:
+        print(tot,tot/1e9)
+    
+    bkg = [1235, 1237, 1005, 998, 3429, 3981, 2400]
+    tot = 0
+    for sp in bkg:
+        key = "{0}".format(sp)
+        xsec = raw_event_numbers["MC"][key]["xsec"]
+        raw = raw_event_numbers["MC"][key]["raw"]
+        weight = (raw/1e6)/(xsec*intlumi)
+        raw_event_numbers["MC"][key]["scale_factor"] = weight
+        raw_event_numbers["MC"][key]["weight"] = 1.0/weight
+
+        if verbose:
+            print("{0:4s} {1:4.2f} {2:-9.2f} {3:6.2f} {4:6.2f}".format(key, xsec, xsec*intlumi, raw/1e6, (raw/1e6)/(xsec*intlumi)))
+        tot += xsec
+    if verbose:
+        print(tot)
+
+    return raw_event_numbers
+    
+################################################################################
+def get_sptag(name):
+
+    labels = {}
+    labels['1235'] = r'$B^+B^-$'
+    labels['1237'] = r'$B^0\bar{B}^0$'
+    labels['1005'] = r'$c\bar{c}$'
+    labels['998'] = r'$u\bar{u},d\bar{d},s\bar{s}$'
+    labels['3429'] = r'$\tau^+\tau^-$'
+    labels['3981'] = r'$\mu^+\mu^-$'
+    labels['signal'] = r'$B\rightarrow p \ell^-$'
+    labels['9456'] = r'$B\rightarrow p \ell^-$'
+
+    tag = None
+    label = None
+    if name.find('AllEvents')>=0:
+        # Data
+        # basicPID_R24-AllEvents-Run1-OnPeak-R24-9_SKIMMED.root
+        tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
+        label = 'Data'
+    elif name.find('SP')>=0:
+        # MC
+        index = name.find('SP')+1
+        sps = ['1235', '1237', '1005', '998', '3429', '3981','9456']
+        for sp in sps:
+            if name.find(sp,index)>=index:
+                break
+        tag = sp
+        label = labels[sp]
+    return tag,label
+################################################################################

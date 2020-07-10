@@ -6,9 +6,9 @@ import seaborn as sns
 
 import plotting_tools as pt
 import babar_dataframe_tools as bd
-import babar_tools as bt
+#import babar_tools as bt
 
-raw = bt.return_dataset_information(verbose=True)
+raw = pt.return_dataset_information(verbose=True)
 
 color_scheme = {'1235':'b', 
                 '1237':'c', 
@@ -57,7 +57,7 @@ for infilename in infilenames:
     dftmp = df[shape_mask & proton_mask & muon_mask]
     dfs.append(dftmp)
 
-    sp,label = bt.get_sptag(infilename)
+    sp,label = pt.get_sptag(infilename)
     print(sp,label)
     sps.append(label)
     labels.append(label)
