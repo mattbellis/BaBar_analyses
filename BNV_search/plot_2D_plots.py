@@ -8,7 +8,7 @@ import plotting_tools as pt
 import babar_dataframe_tools as bd
 import babar_tools as bt
 
-raw = bt.return_dataset_information(verbose=True)
+raw = pt.return_dataset_information(verbose=True)
 
 color_scheme = {'1235':'b', 
                 '1237':'c', 
@@ -35,6 +35,7 @@ for infilename in infilenames:
 
     muon_mask = bd.pid_mask(df,particle='muon')
     proton_mask = bd.pid_mask(df,particle='proton')
+    shape_mask = bd.shape_mask(df)
 
     #dfs.append(df)
 
@@ -42,10 +43,10 @@ for infilename in infilenames:
     #dfs.append(df_mu)
     #df_proton = df[proton_mask]
     #dfs.append(df_proton)
-    df_both = df[muon_mask & proton_mask]
+    df_both = df[muon_mask & proton_mask & shape_mask]
     dfs.append(df_both)
 
-    sp,label = bt.get_sptag(infilename)
+    sp,label = pt.get_sptag(infilename)
     print(sp,label)
     sps.append(label)
     labels.append(label)
