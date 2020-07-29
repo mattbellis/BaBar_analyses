@@ -80,9 +80,9 @@ def main():
 
     mastertag = "babar"
 
-    #nfiles_at_a_time = 10
+    nfiles_at_a_time = 10
     # Do this for signal MC
-    nfiles_at_a_time = 1
+    #nfiles_at_a_time = 1
 
     tot_files = 0
 

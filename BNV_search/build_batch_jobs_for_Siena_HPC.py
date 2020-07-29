@@ -43,7 +43,8 @@ def write_output_file(infile, tag, batchfilename, kinvars=None, decay='default')
     output += "\n"
     if kinvars is None:
         output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
-        output += "python dump_ROOT_files_based_on_PID_assignments.py \\\n"
+        #output += "python dump_ROOT_files_based_on_PID_assignments.py \\\n"
+        output += "python STEP_1_dump_ROOT_files_and_assign_PID.py\\\n"
         output += "\t{0}\n".format(infile)
     elif kinvars=='build':
         output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
@@ -97,17 +98,20 @@ def main():
 
         ########################################
         # No kinvars
+        # Just dump the files with new PID
         ########################################
-        #write_output_file(infile,tag,batchfilename)
-        #print(batchfilename)
-        #cmd = ['qsub', batchfilename]
-        ##print(cmd)
-        #sp.Popen(cmd,0).wait()
+        write_output_file(infile,tag,batchfilename)
+        print(batchfilename)
+        cmd = ['qsub', batchfilename]
+        #print(cmd)
+        sp.Popen(cmd,0).wait()
+
+        exit()
 
         ########################################
         # Yes build the kinvars
         ########################################
-        #'''
+        '''
         for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
             print(d)
             tag = "{0}_{1}_{2}".format(mastertag,infile_tag,d)
@@ -118,7 +122,7 @@ def main():
             print(cmd)
             sp.Popen(cmd,0).wait()
             #exit()
-        #'''
+        '''
         ########################################
         # Yes plot the kinvars, or at least build the pickle files
         ########################################

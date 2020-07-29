@@ -380,7 +380,7 @@ for i in range(nentries):
         myparticles.append(particle)
         scalarmomsum[0] += vec_mag(particle[1:4])
 
-        if p3>2.0:
+        if p3>1.7:
             n_high_p += 1
             nhighmom[0] += 1
             highmomE += new_energy
@@ -453,9 +453,9 @@ for i in range(nentries):
 
 
         pmag = vec_mag(particle[1:4])
-        if (particle[-1]==11 or particle[-1]==13) and pmag>2.0 and pmag<3.0:
+        if (particle[-1]==11 or particle[-1]==13) and pmag>1.7 and pmag<3.4:
             leptons.append(np.array(particle + [j]))
-        elif particle[-1]==2212 and pmag>2.0 and pmag<3.0:
+        elif particle[-1]==2212 and pmag>1.7 and pmag<3.4:
             protons.append(np.array(particle + [j]))
     #exit()
 
