@@ -333,6 +333,7 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
                 # Check the charge
                 if p0[-3]*l0[-3]<=0:
                     bcp4 = p0+l0
+                    #print("here!!!!!!!!!")
                     #print(bcp4)
                     #bcands_temp.append(p0+l0)
                     bcands_temp.append(bcp4)
