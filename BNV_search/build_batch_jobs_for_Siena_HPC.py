@@ -48,12 +48,12 @@ def write_output_file(infile, tag, batchfilename, kinvars=None, decay='default')
         output += "\t{0}\n".format(infile)
     elif kinvars=='build':
         output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
-        output += "python look_at_kinematic_distributions.py \\\n"
+        output += "python STEP_2_calculate_kinematic_variables.py \\\n"
         output += "\t{0} --decay {1}\n".format(infile,decay)
-    elif kinvars=='plot':
-        output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
-        output += "python plot_KINVAR_files_missing_particle.py \\\n"
-        output += "\t{0} --decay {1}\n".format(infile,decay)
+    #elif kinvars=='plot':
+        #output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
+        #output += "python plot_KINVAR_files_missing_particle.py \\\n"
+        #output += "\t{0} --decay {1}\n".format(infile,decay)
     output += "\n"
     output += "date \n"
     output += " \n"
@@ -100,18 +100,20 @@ def main():
         # No kinvars
         # Just dump the files with new PID
         ########################################
+        '''
         write_output_file(infile,tag,batchfilename)
         print(batchfilename)
         cmd = ['qsub', batchfilename]
         #print(cmd)
         sp.Popen(cmd,0).wait()
 
-        exit()
+        #exit()
+        '''
 
         ########################################
         # Yes build the kinvars
         ########################################
-        '''
+        #'''
         for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
             print(d)
             tag = "{0}_{1}_{2}".format(mastertag,infile_tag,d)
@@ -122,7 +124,7 @@ def main():
             print(cmd)
             sp.Popen(cmd,0).wait()
             #exit()
-        '''
+        #'''
         ########################################
         # Yes plot the kinvars, or at least build the pickle files
         ########################################
