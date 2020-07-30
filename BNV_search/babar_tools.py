@@ -206,7 +206,7 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     #print(totp4)
 
 
-    tagq = 0
+    tagq_temp = 0
 
     # Grab the relevant protons and leptons
     prots = []
@@ -216,6 +216,8 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     lepp3 = []
     protidx = []
     lepidx = []
+
+    tagq = []
     # Get the tag side and don't count the proton or lepton
     #print("---------")
     #print(totp4)
@@ -223,7 +225,7 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
         totp4 -= p[0:4]
         #print(p[-1],totp4)
 
-        if decay=='pmu' or decay=='pe' or decay='pnu':
+        if decay=='pmu' or decay=='pe' or decay=='pnu':
             if p[-1]==2212 and vec_mag(p[1:4])>momentum_cut:
                 prots.append(p)
 
@@ -287,7 +289,7 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
         
         # Add everything into the tag and we'll subtract it out later
         tagbc += p
-        tagq += p[-2]
+        tagq_temp += int(p[-3])
         # If it's not
         if flag:
             highmomE += p[0]
@@ -309,24 +311,35 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     bcand = []
     dE = []
     mes = []
+    tagbcand = []
+    tagdE = []
+    tagmes = []
+    missingmass = []
     if decay=='pmu' or decay=='pe':
         for p0 in prots:
             for l0 in leps:
+                #print(p0)
+                #print(l0)
                 # Check the charge
-                if p0[-2]*l0[-2]<0:
+                if p0[-3]*l0[-3]<0:
                     bcp4 = p0+l0
+                    #print(bcp4)
                     #bcands_temp.append(p0+l0)
                     bcands_temp.append(bcp4)
                     protp3.append(vec_mag(p0[1:4]))
                     protidx.append(p0[-2])
                     #print(l0)
                     lepp3.append(vec_mag(l0[1:4]))
-                    lepidx.append(l0[idx])
+                    lepidx.append(l0[-2])
 
                     # Recalculate the missing mass assuming B on one side
                     #totp4[0] = halfbeam - highmomE
-                    totp4[0] = halfbeam - bcp4
-                    missingmass = invmass([totp4],return_squared=True)
+                    #missingmass = invmass([totp4],return_squared=True)
+                    totp4_temp = totp4
+                    # Try to improve the resolution by replacing some of the 
+                    # B beam energy with 1/2 the beam
+                    totp4_temp[0] = halfbeam - bcp4[0]
+                    missingmass.append(invmass([totp4_temp],return_squared=True))
 
                     #for bc in bcands_temp:
                     bcand.append(invmass([bcp4]))
@@ -334,12 +347,19 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
                     bcp4[0] = halfbeam
                     mes.append(invmass([bcp4]))
 
-                    tagbcand = invmass([totp4-bcp4])
-                    tagdE = tagbc[0] - halfbeam
+                    #print("----------------")
+                    #print(tagbc)
+                    #print(bcp4)
+                    #print(tagbc-bcp4)
+                    #print(invmass([tagbc-bcp4]))
+                    tagbcand.append(invmass([tagbc-bcp4]))
+                    tagdE.append(tagbc[0] - halfbeam)
 
                     tagbc_temp = tagbc - bcp4
                     tagbc_temp[0] = halfbeam
-                    tagmes = invmass([tagbc_temp])
+                    tagmes.append(invmass([tagbc_temp]))
+
+                    tagq.append(tagq_temp + int(p0[-3]) + int(l0[-3]))
                     #totp4[0] = halfbeam
                     #tagmes = invmass([tagbc])
 
