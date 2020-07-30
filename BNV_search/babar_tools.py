@@ -315,13 +315,23 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     tagdE = []
     tagmes = []
     missingmass = []
-    if decay=='pmu' or decay=='pe':
+    if decay=='nmu' or decay=='ne':
+        if len(prots)==0:
+            prots = [np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])]
+    if decay=='pnu':
+        if len(leps)==0:
+            leps = [np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])]
+    #if decay=='pmu' or decay=='pe':
+    #print("--------")
+    #print(prots)
+    #print(leps)
+    if 1:
         for p0 in prots:
             for l0 in leps:
                 #print(p0)
                 #print(l0)
                 # Check the charge
-                if p0[-3]*l0[-3]<0:
+                if p0[-3]*l0[-3]<=0:
                     bcp4 = p0+l0
                     #print(bcp4)
                     #bcands_temp.append(p0+l0)
