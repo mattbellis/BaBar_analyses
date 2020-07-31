@@ -350,7 +350,7 @@ for i in range(nentries):
 
     beamp4 = np.array([tree.beame, tree.beampx, tree.beampy, tree.beampz])
     beammass = invmass([beamp4])
-    beam = np.array([beammass, 0.0, 0.0, 0.0, 0, 0])
+    beam = np.array([beammass, 0.0, 0.0, 0.0, 0, 0, 0])
     #print("BEAM: ",beam)
 
     r2[0] = tree.r2

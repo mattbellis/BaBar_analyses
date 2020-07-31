@@ -202,9 +202,9 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     bc = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
     tagbc = np.array([0.0, 0.0, 0.0, 0.0, 0.0,0.0, 0.0])
     highmomE = 0
-    totp4 = beam[0:4].copy()
+    #totp4 = beam[0:4].copy()
+    totp4 = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
     #print(totp4)
-
 
     tagq_temp = 0
 
@@ -222,7 +222,9 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     #print("---------")
     #print(totp4)
     for p in particles:
-        totp4 -= p[0:4]
+        #totp4 -= p[0:4]
+        totp4 += p
+        tagq_temp += int(p[-3])
         #print(p[-1],totp4)
 
         if decay=='pmu' or decay=='pe' or decay=='pnu':
@@ -270,6 +272,7 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
             #print(p[-1],vec_mag(p[1:]))
         '''
 
+        '''
         # New calculation (7/30/2020
         # Include everything in the tag! 
         # We'll subtract out the other stuff later!
@@ -294,14 +297,20 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
         if flag:
             highmomE += p[0]
             #print(p[-1],vec_mag(p[1:]))
+        '''
 
 
     halfbeam = beam[0]/2.0
     #print(halfbeam)
 
     #print(totp4)
-    missingmom = vec_mag(totp4[1:])
-    missingE = totp4[0]
+    missingp4 = beam - totp4
+    missingmom = vec_mag(missingp4[1:4])
+    missingE = missingp4[0]
+
+    # For later calculations we want to set the missingp4 energy
+    # to be 0. 
+    missingp4[0] = 0.0
 
     ######################################################
     # See if we have any BNV B candidates
@@ -316,11 +325,13 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     tagmes = []
     missingmass = []
     if decay=='nmu' or decay=='ne':
-        if len(prots)==0:
-            prots = [np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])]
+        #if len(prots)==0:
+        #prots = [np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])]
+        prots = [missingp4]
     if decay=='pnu':
-        if len(leps)==0:
-            leps = [np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])]
+        #if len(leps)==0:
+            #leps = [np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])]
+        leps = [missingp4]
     #if decay=='pmu' or decay=='pe':
     #print("--------")
     #print(prots)
@@ -346,15 +357,21 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
                     # Recalculate the missing mass assuming B on one side
                     #totp4[0] = halfbeam - highmomE
                     #missingmass = invmass([totp4],return_squared=True)
-                    totp4_temp = totp4
+                    totp4_temp = missingp4
                     # Try to improve the resolution by replacing some of the 
                     # B beam energy with 1/2 the beam
-                    totp4_temp[0] = halfbeam - bcp4[0]
-                    missingmass.append(invmass([totp4_temp],return_squared=True))
+                    #totp4_temp[0] = halfbeam - bcp4[0]
+                    totp4_temp[0] = beam[0] - (halfbeam + bcp4[0])
+                    m = invmass([totp4_temp],return_squared=True)
+                    #print(totp4_temp)
+                    #print(m,halfbeam,bcp4[0])
+                    missingmass.append(m)
 
                     #for bc in bcands_temp:
                     bcand.append(invmass([bcp4]))
                     dE.append(bcp4[0] - halfbeam)
+                    # Save this for use with the tag side
+                    bcp4E_org = bcp4[0]
                     bcp4[0] = halfbeam
                     mes.append(invmass([bcp4]))
 
@@ -363,14 +380,26 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
                     #print(bcp4)
                     #print(tagbc-bcp4)
                     #print(invmass([tagbc-bcp4]))
-                    tagbcand.append(invmass([tagbc-bcp4]))
-                    tagdE.append(tagbc[0] - halfbeam)
 
-                    tagbc_temp = tagbc - bcp4
-                    tagbc_temp[0] = halfbeam
-                    tagmes.append(invmass([tagbc_temp]))
+                    tagbp4 = None
+                    if decay=='pmu' or decay=='pe':
+                        tagbp4 = totp4 - bcp4 
+                    elif decay=='pnu':
+                        tagbp4 = totp4 - p0
+                    elif decay=='nmu' or decay=='ne':
+                        tagbp4 = totp4 - l0 
 
-                    tagq.append(tagq_temp + int(p0[-3]) + int(l0[-3]))
+                    #tagbcand.append(invmass([tagbc-bcp4]))
+                    tagbcand.append(invmass([tagbp4]))
+                    #tagdE.append(tagbc[0] - halfbeam)
+                    # Need to use the original bcp4 because we modified it.
+                    tagdE.append(totp4[0] - bcp4E_org - halfbeam)
+
+                    #tagbc_temp = tagbc - bcp4
+                    tagbp4[0] = halfbeam
+                    tagmes.append(invmass([tagbp4]))
+
+                    tagq.append(tagq_temp - int(p0[-3]) - int(l0[-3]))
                     #totp4[0] = halfbeam
                     #tagmes = invmass([tagbc])
 
