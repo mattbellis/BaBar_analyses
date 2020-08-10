@@ -44,7 +44,7 @@ def write_output_file(inputfiles, tag, batchfilename, kinvars=None, decay='plot'
     if kinvars=='plot':
         files_string = " ".join(inputfiles)
         output += "cd /home/mbellis/BaBar_analyses/BNV_search/ \n"
-        output += "python plot_KINVAR_files_missing_particle.py \\\n"
+        output += "python STEP_3_make_cuts_and_write_output_files_for_later_plotting.py \\\n"
         output += "\t{0} --decay {1}\n".format(files_string,decay)
     output += "\n"
     output += "date \n"
