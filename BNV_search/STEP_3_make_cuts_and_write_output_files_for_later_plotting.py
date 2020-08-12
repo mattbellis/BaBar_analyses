@@ -22,6 +22,7 @@ parser = argparse.ArgumentParser(description='Process some files for B BNV searc
 parser.add_argument('--outfile', dest='outfile', default=None, help='Name of output file.')
 # decay can be pnu, ne, nmu
 parser.add_argument('--decay', dest='decay', default="pnu", help='Decay to assume')
+parser.add_argument('--dump-all-pid-flags', dest='dump_all_pid_flags', default=False, help='Dump all the PID flags to the output dict')
 parser.add_argument('infiles', action='append', nargs='*', help='Input file name(s)')
 args = parser.parse_args()
 
@@ -60,6 +61,13 @@ plotvars["thrustcosthall"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$ all"
 plotvars["sphericityall"] = {"values":[], "xlabel":r"Sphericity all", "ylabel":r"# E","range":(0,1)} 
 plotvars["ncharged"] = {"values":[], "xlabel":r"# charged particles", "ylabel":r"# E","range":(0,20)} 
 plotvars["nphot"] = {"values":[], "xlabel":r"# photons","ylabel":r"# E","range":(0,20)} 
+#plotvars["bnvprotIsTight"] = {"values":[], "xlabel":r"BNV proton IsTight", "ylabel":r"# E", "range":(-0.5, 1.5)}
+#plotvars["bnvprotIsVeryTight"] = {"values":[], "xlabel":r"BNV proton IsVeryTight", "ylabel":r"# E", "range":(-0.5, 1.5)}
+#plotvars["bnvprotIsSuperTight"] = {"values":[], "xlabel":r"BNV proton IsSuperTight", "ylabel":r"# E", "range":(-0.5, 1.5)}
+#plotvars["bnvlepIsTight"] = {"values":[], "xlabel":r"BNV lepton IsTight", "ylabel":r"# E", "range":(-0.5, 1.5)}
+#plotvars["bnvlepIsVeryTight"] = {"values":[], "xlabel":r"BNV lepton IsVeryTight", "ylabel":r"# E", "range":(-0.5, 1.5)}
+#plotvars["bnvlepIsTightFakeRate"] = {"values":[], "xlabel":r"BNV lepton IsTightFakeRate", "ylabel":r"# E", "range":(-0.5, 1.5)}
+#plotvars["bnvlepIsVeryTightFakeRate"] = {"values":[], "xlabel":r"BNV lepton IsVeryTightFakeRate", "ylabel":r"# E", "range":(-0.5, 1.5)}
 
 # Make the plotvars for the PID flags
 particles = ['proton','e','mu']
@@ -181,7 +189,7 @@ outfilename = None
 outfilename_df = None
 sptag = None
 
-if outfilename is None:
+if args.outfile is None:
     sptag = get_sptag(args.infiles[0][0]) 
     #outfilename = 'OUTPUT_{0}_{1}_nfiles{2}.pkl'.format(decay,sptag,len(args.infiles[0]))
     #print(outfilename)
@@ -217,8 +225,11 @@ if outfilename is None:
     ntag = '-'.join(filenumbers)
     outfilename = '{0}/OUTPUT_{1}_nfiles{2}.pkl'.format(fulldirNames['pkl'],ntag,len(args.infiles[0]))
     outfilename_df = '{0}/OUTPUT_{1}_nfiles{2}.h5'.format(fulldirNames['df'],ntag,len(args.infiles[0]))
-    print(outfilename)
-    print(outfilename_df)
+else:
+    outfilename = '{0}.pkl'.format(args.outfile)
+    outfilename_df = '{0}.df'.format(args.outfile)
+print(outfilename)
+print(outfilename_df)
     #exit()
 
 
@@ -333,49 +344,81 @@ for i in range(nentries):
     # Should the low cut be 2.2 or 2.3? 
     cut1 = 1
     if decay=='pnu':
-        cut1 = np==1 and pp[0]>2.3 and pp[0]<2.8 
+        #cut1 = np==1 and pp[0]>2.3 and pp[0]<2.8 
+        cut1 = np>=1 and nhighmom==1 and nbnvbcand>=1 
         cut2 = ncharged>3
     elif decay=='nmu':
-        cut1 = nmu==1 and mup[0]>2.3 and mup[0]<2.8 
-        cut2 = ncharged>3
+        #cut1 = nmu==1 and mup[0]>2.3 and mup[0]<2.8 
+        cut1 = nmu>=1 and nhighmom==1 and nbnvbcand>=1
+        cut2 = ncharged>3 
     elif decay=='ne':
-        cut1 = ne==1 and ep[0]>2.3 and ep[0]<2.8
+        #cut1 = ne==1 and ep[0]>2.3 and ep[0]<2.8
+        cut1 = ne>=1 and nhighmom==1 and nbnvbcand>=1
         cut2 = ncharged>3
     elif decay=='pmu' or decay=='pe':
-        cut1 = nbnvbcand==1 and bnvprotp3[0]>2.3 and bnvlepp3[0]>2.3 and bnvprotp3[0]<2.8 and bnvlepp3[0]<2.8
+        #cut1 = nbnvbcand==1 and bnvprotp3[0]>2.3 and bnvlepp3[0]>2.3 and bnvprotp3[0]<2.8 and bnvlepp3[0]<2.8
+        cut1 = nbnvbcand>=1 and nhighmom==2
         #'''
         if decay=='pmu':
-            cut1 *= np==1 and nmu==1
+            #cut1 *= np==1 and nmu==1
+            cut1 *= np>=1 and nmu>=1
         elif decay=='pe':
-            cut1 *= np==1 and ne==1
+            #cut1 *= np==1 and ne==1
+            cut1 *= np>=1 and ne>=1
         #'''
         cut2 = ncharged>5
+        '''
+        for inb in range(nbnvbcand):
+            pidx = tree.bnvprotidx[inb]
+            lepidx = tree.bnvlepidx[inb]
+            print(pidx)
+            print(protonIsTightKMProton[pidx], protonIsVeryTightKMProton[pidx], protonIsSuperTightKMProton[pidx])
+            if decay=='pmu':
+                print(lepidx)
+                print(muIsBDTTightMuon[lepidx], muIsBDTVeryTightMuon[lepidx], muIsBDTTightMuonFakeRate[lepidx], muIsBDTVeryTightMuonFakeRate[lepidx])
+        '''
 
 
+    '''
     if decay=='pnu' or decay=='nmu' or decay=='ne':
-        cut3 = nhighmom==1
+        cut3 = nbnvbcand==1 
         #cut4 = missingmom>1 and missingE>1 # These cuts seem to be correlated with tagmass and tagdeltaE
     elif decay=='pmu' or decay=='pe':
-        cut3 = nhighmom==2 
+        cut3 = nbnvbcand==1
         #cut4 = missingmom<2.6 and missingE<5 # These cuts seem to be correlated with tagmass and tagdeltaE
+    '''
+
+    # Make tighter momentum cuts for the last cut
+    if decay=='pmu':
+        cut3 = nbnvbcand==1 
+        if nbnvbcand>0:
+            cut3 *= bnvprotp3[0]>2.3 and bnvprotp3[0]<2.8
+            cut3 *= bnvlepp3[0]>2.3 and bnvlepp3[0]<2.8
+    elif decay=='pe':
+        cut3 = nbnvbcand==1 
+        if nbnvbcand>0:
+            cut3 *= bnvprotp3[0]>2.3 and bnvprotp3[0]<2.8
+            cut3 *= bnvlepp3[0]>2.3 and bnvlepp3[0]<2.8
+    elif decay=='pnu':
+        cut3 = nbnvbcand==1 
+        if nbnvbcand>0:
+            cut3 *= bnvprotp3[0]>2.3 and bnvprotp3[0]<2.8
+            cut3 *= bnvlepp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
+    elif decay=='nmu':
+        cut3 = nbnvbcand==1 
+        if nbnvbcand>0:
+            cut3 *= bnvprotp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
+            cut3 *= bnvlepp3[0]>2.3 and bnvlepp3[0]<2.8
+    elif decay=='ne':
+        cut3 = nbnvbcand==1 
+        if nbnvbcand>0:
+            cut3 *= bnvprotp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
+            cut3 *= bnvlepp3[0]>2.3 and bnvlepp3[0]<2.8
 
     cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3)]#, (cut1*cut2*cut3*cut4)]#, (cut1*cut2*cut3*cut4*cut5), (cut1*cut2*cut3*cut4*cut5*cut6)]
     for icut,cut in enumerate(cuts):
         if cut:
             #print(icut)
-            plotvars["nbnvbcand"]["values"][icut].append(nbnvbcand)
-            for k in range(nbnvbcand):
-                plotvars["bnvbcandmass"]["values"][icut].append(bnvbcandmass[k])
-                plotvars["bnvbcandMES"]["values"][icut].append(bnvbcandMES[k])
-                plotvars["bnvbcandDeltaE"]["values"][icut].append(bnvbcandDeltaE[k])
-                plotvars["bnvprotp3"]["values"][icut].append(bnvprotp3[k])
-                plotvars["bnvlepp3"]["values"][icut].append(bnvlepp3[k])
-
-            plotvars["tagbcandmass"]["values"][icut].append(tagbcandmass)
-            plotvars["tagbcandMES"]["values"][icut].append(tagbcandMES)
-            plotvars["tagbcandDeltaE"]["values"][icut].append(tagbcandDeltaE)
-            plotvars["tagq"]["values"][icut].append(tagq)
-
             plotvars["r2"]["values"][icut].append(r2)
             plotvars["r2all"]["values"][icut].append(r2all)
             plotvars["thrustmag"]["values"][icut].append(thrustmag)
@@ -387,7 +430,6 @@ for i in range(nentries):
             plotvars["nphot"]["values"][icut].append(nphot)
             plotvars["ncharged"]["values"][icut].append(ncharged)
 
-            plotvars["missingmass"]["values"][icut].append(missingmass)
             plotvars["missingmom"]["values"][icut].append(missingmom)
             plotvars["missingE"]["values"][icut].append(missingE)
             plotvars["scalarmomsum"]["values"][icut].append(scalarmomsum)
@@ -398,72 +440,239 @@ for i in range(nentries):
             plotvars["nmu"]["values"][icut].append(nmu)
             plotvars["ne"]["values"][icut].append(ne)
 
-            for k in range(np):
-                plotvars["pp"]["values"][icut].append(pp[k])
+            plotvars["nbnvbcand"]["values"][icut].append(nbnvbcand)
 
-                plotvars["protonIsTightKMProton"]["values"][icut].append(protonIsTightKMProton[k])
-                plotvars["protonIsVeryTightKMProton"]["values"][icut].append(protonIsVeryTightKMProton[k])
-                plotvars["protonIsSuperTightKMProton"]["values"][icut].append(protonIsSuperTightKMProton[k])
-                plotvars["protonIsTightBDTKaon"]["values"][icut].append(protonIsTightBDTKaon[k])
-                plotvars["protonIsVeryTightBDTKaon"]["values"][icut].append(protonIsVeryTightBDTKaon[k])
-                plotvars["protonIsTightKMKaon"]["values"][icut].append(protonIsTightKMKaon[k])
-                plotvars["protonIsVeryTightKMKaon"]["values"][icut].append(protonIsVeryTightKMKaon[k])
-                plotvars["protonIsSuperTightKMKaon"]["values"][icut].append(protonIsSuperTightKMKaon[k])
-                plotvars["protonIsTightKMPion"]["values"][icut].append(protonIsTightKMPion[k])
-                plotvars["protonIsVeryTightKMPion"]["values"][icut].append(protonIsVeryTightKMPion[k])
-                plotvars["protonIsSuperTightKMPion"]["values"][icut].append(protonIsSuperTightKMPion[k])
-                plotvars["protonIsTightKMElectron"]["values"][icut].append(protonIsTightKMElectron[k])
-                plotvars["protonIsVeryTightKMElectron"]["values"][icut].append(protonIsVeryTightKMElectron[k])
-                plotvars["protonIsSuperTightKMElectron"]["values"][icut].append(protonIsSuperTightKMElectron[k])
-                plotvars["protonIsBDTTightMuon"]["values"][icut].append(protonIsBDTTightMuon[k])
-                plotvars["protonIsBDTVeryTightMuon"]["values"][icut].append(protonIsBDTVeryTightMuon[k])
-                plotvars["protonIsBDTTightMuonFakeRate"]["values"][icut].append(protonIsBDTTightMuonFakeRate[k])
-                plotvars["protonIsBDTVeryTightMuonFakeRate"]["values"][icut].append(protonIsBDTVeryTightMuonFakeRate[k])
+            for k in range(nbnvbcand):
+                plotvars["bnvbcandmass"]["values"][icut].append(bnvbcandmass[k])
+                plotvars["bnvbcandMES"]["values"][icut].append(bnvbcandMES[k])
+                plotvars["bnvbcandDeltaE"]["values"][icut].append(bnvbcandDeltaE[k])
+                plotvars["bnvprotp3"]["values"][icut].append(bnvprotp3[k])
+                plotvars["bnvlepp3"]["values"][icut].append(bnvlepp3[k])
 
-            for k in range(nmu):
-                plotvars["mup"]["values"][icut].append(mup[k])
+                plotvars["tagbcandmass"]["values"][icut].append(tagbcandmass[k])
+                plotvars["tagbcandMES"]["values"][icut].append(tagbcandMES[k])
+                plotvars["tagbcandDeltaE"]["values"][icut].append(tagbcandDeltaE[k])
+                plotvars["tagq"]["values"][icut].append(tagq[k])
+                plotvars["missingmass"]["values"][icut].append(missingmass[k])
 
-                plotvars["muIsTightKMProton"]["values"][icut].append(muIsTightKMProton[k])
-                plotvars["muIsVeryTightKMProton"]["values"][icut].append(muIsVeryTightKMProton[k])
-                plotvars["muIsSuperTightKMProton"]["values"][icut].append(muIsSuperTightKMProton[k])
-                plotvars["muIsTightBDTKaon"]["values"][icut].append(muIsTightBDTKaon[k])
-                plotvars["muIsVeryTightBDTKaon"]["values"][icut].append(muIsVeryTightBDTKaon[k])
-                plotvars["muIsTightKMKaon"]["values"][icut].append(muIsTightKMKaon[k])
-                plotvars["muIsVeryTightKMKaon"]["values"][icut].append(muIsVeryTightKMKaon[k])
-                plotvars["muIsSuperTightKMKaon"]["values"][icut].append(muIsSuperTightKMKaon[k])
-                plotvars["muIsTightKMPion"]["values"][icut].append(muIsTightKMPion[k])
-                plotvars["muIsVeryTightKMPion"]["values"][icut].append(muIsVeryTightKMPion[k])
-                plotvars["muIsSuperTightKMPion"]["values"][icut].append(muIsSuperTightKMPion[k])
-                plotvars["muIsTightKMElectron"]["values"][icut].append(muIsTightKMElectron[k])
-                plotvars["muIsVeryTightKMElectron"]["values"][icut].append(muIsVeryTightKMElectron[k])
-                plotvars["muIsSuperTightKMElectron"]["values"][icut].append(muIsSuperTightKMElectron[k])
-                plotvars["muIsBDTTightMuon"]["values"][icut].append(muIsBDTTightMuon[k])
-                plotvars["muIsBDTVeryTightMuon"]["values"][icut].append(muIsBDTVeryTightMuon[k])
-                plotvars["muIsBDTTightMuonFakeRate"]["values"][icut].append(muIsBDTTightMuonFakeRate[k])
-                plotvars["muIsBDTVeryTightMuonFakeRate"]["values"][icut].append(muIsBDTVeryTightMuonFakeRate[k])
+                # Dump the PID flags for the BNV candidate decay products
+                if not args.dump_all_pid_flags:
+                    if decay=='pnu' or decay=='pmu' or decay=='pe':
+                        pidx = tree.bnvprotidx[k]
 
-            for k in range(ne):
-                plotvars["ep"]["values"][icut].append(ep[k])
+                        plotvars["pp"]["values"][icut].append(pp[pidx])
+                        plotvars["protonIsTightKMProton"]["values"][icut].append(protonIsTightKMProton[pidx])
+                        plotvars["protonIsVeryTightKMProton"]["values"][icut].append(protonIsVeryTightKMProton[pidx])
+                        plotvars["protonIsSuperTightKMProton"]["values"][icut].append(protonIsSuperTightKMProton[pidx])
+                        plotvars["protonIsTightBDTKaon"]["values"][icut].append(protonIsTightBDTKaon[pidx])
+                        plotvars["protonIsVeryTightBDTKaon"]["values"][icut].append(protonIsVeryTightBDTKaon[pidx])
+                        plotvars["protonIsTightKMKaon"]["values"][icut].append(protonIsTightKMKaon[pidx])
+                        plotvars["protonIsVeryTightKMKaon"]["values"][icut].append(protonIsVeryTightKMKaon[pidx])
+                        plotvars["protonIsSuperTightKMKaon"]["values"][icut].append(protonIsSuperTightKMKaon[pidx])
+                        plotvars["protonIsTightKMPion"]["values"][icut].append(protonIsTightKMPion[pidx])
+                        plotvars["protonIsVeryTightKMPion"]["values"][icut].append(protonIsVeryTightKMPion[pidx])
+                        plotvars["protonIsSuperTightKMPion"]["values"][icut].append(protonIsSuperTightKMPion[pidx])
+                        plotvars["protonIsTightKMElectron"]["values"][icut].append(protonIsTightKMElectron[pidx])
+                        plotvars["protonIsVeryTightKMElectron"]["values"][icut].append(protonIsVeryTightKMElectron[pidx])
+                        plotvars["protonIsSuperTightKMElectron"]["values"][icut].append(protonIsSuperTightKMElectron[pidx])
+                        plotvars["protonIsBDTTightMuon"]["values"][icut].append(protonIsBDTTightMuon[pidx])
+                        plotvars["protonIsBDTVeryTightMuon"]["values"][icut].append(protonIsBDTVeryTightMuon[pidx])
+                        plotvars["protonIsBDTTightMuonFakeRate"]["values"][icut].append(protonIsBDTTightMuonFakeRate[pidx])
+                        plotvars["protonIsBDTVeryTightMuonFakeRate"]["values"][icut].append(protonIsBDTVeryTightMuonFakeRate[pidx])
 
-                plotvars["eIsTightKMProton"]["values"][icut].append(eIsTightKMProton[k])
-                plotvars["eIsVeryTightKMProton"]["values"][icut].append(eIsVeryTightKMProton[k])
-                plotvars["eIsSuperTightKMProton"]["values"][icut].append(eIsSuperTightKMProton[k])
-                plotvars["eIsTightBDTKaon"]["values"][icut].append(eIsTightBDTKaon[k])
-                plotvars["eIsVeryTightBDTKaon"]["values"][icut].append(eIsVeryTightBDTKaon[k])
-                plotvars["eIsTightKMKaon"]["values"][icut].append(eIsTightKMKaon[k])
-                plotvars["eIsVeryTightKMKaon"]["values"][icut].append(eIsVeryTightKMKaon[k])
-                plotvars["eIsSuperTightKMKaon"]["values"][icut].append(eIsSuperTightKMKaon[k])
-                plotvars["eIsTightKMPion"]["values"][icut].append(eIsTightKMPion[k])
-                plotvars["eIsVeryTightKMPion"]["values"][icut].append(eIsVeryTightKMPion[k])
-                plotvars["eIsSuperTightKMPion"]["values"][icut].append(eIsSuperTightKMPion[k])
-                plotvars["eIsTightKMElectron"]["values"][icut].append(eIsTightKMElectron[k])
-                plotvars["eIsVeryTightKMElectron"]["values"][icut].append(eIsVeryTightKMElectron[k])
-                plotvars["eIsSuperTightKMElectron"]["values"][icut].append(eIsSuperTightKMElectron[k])
-                plotvars["eIsBDTTightMuon"]["values"][icut].append(eIsBDTTightMuon[k])
-                plotvars["eIsBDTVeryTightMuon"]["values"][icut].append(eIsBDTVeryTightMuon[k])
-                plotvars["eIsBDTTightMuonFakeRate"]["values"][icut].append(eIsBDTTightMuonFakeRate[k])
-                plotvars["eIsBDTVeryTightMuonFakeRate"]["values"][icut].append(eIsBDTVeryTightMuonFakeRate[k])
+                        #plotvars["bnvprotIsTight"]["values"][icut].append(protonIsTightKMProton[pidx])
+                        #plotvars["bnvprotIsVeryTight"]["values"][icut].append(protonIsVeryTightKMProton[pidx])
+                        #plotvars["bnvprotIsSuperTight"]["values"][icut].append(protonIsSuperTightKMProton[pidx])
+                    elif decay=='nmu' or decay=='ne':
+                        plotvars["pp"]["values"][icut].append(-999)
+                        plotvars["protonIsTightKMProton"]["values"][icut].append(-999)
+                        plotvars["protonIsVeryTightKMProton"]["values"][icut].append(-999)
+                        plotvars["protonIsSuperTightKMProton"]["values"][icut].append(-999)
+                        plotvars["protonIsTightBDTKaon"]["values"][icut].append(-999)
+                        plotvars["protonIsVeryTightBDTKaon"]["values"][icut].append(-999)
+                        plotvars["protonIsTightKMKaon"]["values"][icut].append(-999)
+                        plotvars["protonIsVeryTightKMKaon"]["values"][icut].append(-999)
+                        plotvars["protonIsSuperTightKMKaon"]["values"][icut].append(-999)
+                        plotvars["protonIsTightKMPion"]["values"][icut].append(-999)
+                        plotvars["protonIsVeryTightKMPion"]["values"][icut].append(-999)
+                        plotvars["protonIsSuperTightKMPion"]["values"][icut].append(-999)
+                        plotvars["protonIsTightKMElectron"]["values"][icut].append(-999)
+                        plotvars["protonIsVeryTightKMElectron"]["values"][icut].append(-999)
+                        plotvars["protonIsSuperTightKMElectron"]["values"][icut].append(-999)
+                        plotvars["protonIsBDTTightMuon"]["values"][icut].append(-999)
+                        plotvars["protonIsBDTVeryTightMuon"]["values"][icut].append(-999)
+                        plotvars["protonIsBDTTightMuonFakeRate"]["values"][icut].append(-999)
+                        plotvars["protonIsBDTVeryTightMuonFakeRate"]["values"][icut].append(-999)
 
+                    if decay=='pmu' or decay=='nmu':
+                        pidx = tree.bnvlepidx[k]
+
+                        plotvars["mup"]["values"][icut].append(mup[pidx])
+                        plotvars["muIsTightKMProton"]["values"][icut].append(muIsTightKMProton[pidx])
+                        plotvars["muIsVeryTightKMProton"]["values"][icut].append(muIsVeryTightKMProton[pidx])
+                        plotvars["muIsSuperTightKMProton"]["values"][icut].append(muIsSuperTightKMProton[pidx])
+                        plotvars["muIsTightBDTKaon"]["values"][icut].append(muIsTightBDTKaon[pidx])
+                        plotvars["muIsVeryTightBDTKaon"]["values"][icut].append(muIsVeryTightBDTKaon[pidx])
+                        plotvars["muIsTightKMKaon"]["values"][icut].append(muIsTightKMKaon[pidx])
+                        plotvars["muIsVeryTightKMKaon"]["values"][icut].append(muIsVeryTightKMKaon[pidx])
+                        plotvars["muIsSuperTightKMKaon"]["values"][icut].append(muIsSuperTightKMKaon[pidx])
+                        plotvars["muIsTightKMPion"]["values"][icut].append(muIsTightKMPion[pidx])
+                        plotvars["muIsVeryTightKMPion"]["values"][icut].append(muIsVeryTightKMPion[pidx])
+                        plotvars["muIsSuperTightKMPion"]["values"][icut].append(muIsSuperTightKMPion[pidx])
+                        plotvars["muIsTightKMElectron"]["values"][icut].append(muIsTightKMElectron[pidx])
+                        plotvars["muIsVeryTightKMElectron"]["values"][icut].append(muIsVeryTightKMElectron[pidx])
+                        plotvars["muIsSuperTightKMElectron"]["values"][icut].append(muIsSuperTightKMElectron[pidx])
+                        plotvars["muIsBDTTightMuon"]["values"][icut].append(muIsBDTTightMuon[pidx])
+                        plotvars["muIsBDTVeryTightMuon"]["values"][icut].append(muIsBDTVeryTightMuon[pidx])
+                        plotvars["muIsBDTTightMuonFakeRate"]["values"][icut].append(muIsBDTTightMuonFakeRate[pidx])
+                        plotvars["muIsBDTVeryTightMuonFakeRate"]["values"][icut].append(muIsBDTVeryTightMuonFakeRate[pidx])
+
+                    elif decay=='pe' or decay=='nnu' or decay=='ne':
+                        plotvars["mup"]["values"][icut].append(-999)
+                        plotvars["muIsTightKMProton"]["values"][icut].append(-999)
+                        plotvars["muIsVeryTightKMProton"]["values"][icut].append(-999)
+                        plotvars["muIsSuperTightKMProton"]["values"][icut].append(-999)
+                        plotvars["muIsTightBDTKaon"]["values"][icut].append(-999)
+                        plotvars["muIsVeryTightBDTKaon"]["values"][icut].append(-999)
+                        plotvars["muIsTightKMKaon"]["values"][icut].append(-999)
+                        plotvars["muIsVeryTightKMKaon"]["values"][icut].append(-999)
+                        plotvars["muIsSuperTightKMKaon"]["values"][icut].append(-999)
+                        plotvars["muIsTightKMPion"]["values"][icut].append(-999)
+                        plotvars["muIsVeryTightKMPion"]["values"][icut].append(-999)
+                        plotvars["muIsSuperTightKMPion"]["values"][icut].append(-999)
+                        plotvars["muIsTightKMElectron"]["values"][icut].append(-999)
+                        plotvars["muIsVeryTightKMElectron"]["values"][icut].append(-999)
+                        plotvars["muIsSuperTightKMElectron"]["values"][icut].append(-999)
+                        plotvars["muIsBDTTightMuon"]["values"][icut].append(-999)
+                        plotvars["muIsBDTVeryTightMuon"]["values"][icut].append(-999)
+                        plotvars["muIsBDTTightMuonFakeRate"]["values"][icut].append(-999)
+                        plotvars["muIsBDTVeryTightMuonFakeRate"]["values"][icut].append(-999)
+
+                    if decay=='pe' or decay=='ne':
+                        pidx = tree.bnvlepidx[k]
+
+                        plotvars["ep"]["values"][icut].append(ep[pidx])
+                        plotvars["eIsTightKMProton"]["values"][icut].append(eIsTightKMProton[pidx])
+                        plotvars["eIsVeryTightKMProton"]["values"][icut].append(eIsVeryTightKMProton[pidx])
+                        plotvars["eIsSuperTightKMProton"]["values"][icut].append(eIsSuperTightKMProton[pidx])
+                        plotvars["eIsTightBDTKaon"]["values"][icut].append(eIsTightBDTKaon[pidx])
+                        plotvars["eIsVeryTightBDTKaon"]["values"][icut].append(eIsVeryTightBDTKaon[pidx])
+                        plotvars["eIsTightKMKaon"]["values"][icut].append(eIsTightKMKaon[pidx])
+                        plotvars["eIsVeryTightKMKaon"]["values"][icut].append(eIsVeryTightKMKaon[pidx])
+                        plotvars["eIsSuperTightKMKaon"]["values"][icut].append(eIsSuperTightKMKaon[pidx])
+                        plotvars["eIsTightKMPion"]["values"][icut].append(eIsTightKMPion[pidx])
+                        plotvars["eIsVeryTightKMPion"]["values"][icut].append(eIsVeryTightKMPion[pidx])
+                        plotvars["eIsSuperTightKMPion"]["values"][icut].append(eIsSuperTightKMPion[pidx])
+                        plotvars["eIsTightKMElectron"]["values"][icut].append(eIsTightKMElectron[pidx])
+                        plotvars["eIsVeryTightKMElectron"]["values"][icut].append(eIsVeryTightKMElectron[pidx])
+                        plotvars["eIsSuperTightKMElectron"]["values"][icut].append(eIsSuperTightKMElectron[pidx])
+                        plotvars["eIsBDTTightMuon"]["values"][icut].append(eIsBDTTightMuon[pidx])
+                        plotvars["eIsBDTVeryTightMuon"]["values"][icut].append(eIsBDTVeryTightMuon[pidx])
+                        plotvars["eIsBDTTightMuonFakeRate"]["values"][icut].append(eIsBDTTightMuonFakeRate[pidx])
+                        plotvars["eIsBDTVeryTightMuonFakeRate"]["values"][icut].append(eIsBDTVeryTightMuonFakeRate[pidx])
+
+                    elif decay=='pmu' or decay=='nnu' or decay=='nmu':
+                        plotvars["ep"]["values"][icut].append(-999)
+                        plotvars["eIsTightKMProton"]["values"][icut].append(-999)
+                        plotvars["eIsVeryTightKMProton"]["values"][icut].append(-999)
+                        plotvars["eIsSuperTightKMProton"]["values"][icut].append(-999)
+                        plotvars["eIsTightBDTKaon"]["values"][icut].append(-999)
+                        plotvars["eIsVeryTightBDTKaon"]["values"][icut].append(-999)
+                        plotvars["eIsTightKMKaon"]["values"][icut].append(-999)
+                        plotvars["eIsVeryTightKMKaon"]["values"][icut].append(-999)
+                        plotvars["eIsSuperTightKMKaon"]["values"][icut].append(-999)
+                        plotvars["eIsTightKMPion"]["values"][icut].append(-999)
+                        plotvars["eIsVeryTightKMPion"]["values"][icut].append(-999)
+                        plotvars["eIsSuperTightKMPion"]["values"][icut].append(-999)
+                        plotvars["eIsTightKMElectron"]["values"][icut].append(-999)
+                        plotvars["eIsVeryTightKMElectron"]["values"][icut].append(-999)
+                        plotvars["eIsSuperTightKMElectron"]["values"][icut].append(-999)
+                        plotvars["eIsBDTTightMuon"]["values"][icut].append(-999)
+                        plotvars["eIsBDTVeryTightMuon"]["values"][icut].append(-999)
+                        plotvars["eIsBDTTightMuonFakeRate"]["values"][icut].append(-999)
+                        plotvars["eIsBDTVeryTightMuonFakeRate"]["values"][icut].append(-999)
+
+
+                '''
+                if decay=='nmu' or decay=='ne' or decay=='pmu' or decay=='pe':
+                    lepidx = tree.bnvlepidx[k]
+                    plotvars["bnvlepIsTight"]["values"][icut].append(muIsBDTTightMuon[lepidx])
+                    plotvars["bnvlepIsVeryTight"]["values"][icut].append(muIsBDTVeryTightMuon[lepidx])
+                    plotvars["bnvlepIsTightFakeRate"]["values"][icut].append(muIsBDTTightMuonFakeRate[lepidx])
+                    plotvars["bnvlepIsVeryTightFakeRate"]["values"][icut].append(muIsBDTVeryTightMuonFakeRate[lepidx])
+                elif decay=='pnu':
+                    plotvars["bnvlepIsTight"]["values"][icut].append(-1)
+                    plotvars["bnvlepIsVeryTight"]["values"][icut].append(-1)
+                    plotvars["bnvlepIsTightFakeRate"]["values"][icut].append(-1)
+                    plotvars["bnvlepIsVeryTightFakeRate"]["values"][icut].append(-1)
+                '''
+
+            if args.dump_all_pid_flags:
+                for k in range(np):
+                    plotvars["pp"]["values"][icut].append(pp[k])
+
+                    plotvars["protonIsTightKMProton"]["values"][icut].append(protonIsTightKMProton[k])
+                    plotvars["protonIsVeryTightKMProton"]["values"][icut].append(protonIsVeryTightKMProton[k])
+                    plotvars["protonIsSuperTightKMProton"]["values"][icut].append(protonIsSuperTightKMProton[k])
+                    plotvars["protonIsTightBDTKaon"]["values"][icut].append(protonIsTightBDTKaon[k])
+                    plotvars["protonIsVeryTightBDTKaon"]["values"][icut].append(protonIsVeryTightBDTKaon[k])
+                    plotvars["protonIsTightKMKaon"]["values"][icut].append(protonIsTightKMKaon[k])
+                    plotvars["protonIsVeryTightKMKaon"]["values"][icut].append(protonIsVeryTightKMKaon[k])
+                    plotvars["protonIsSuperTightKMKaon"]["values"][icut].append(protonIsSuperTightKMKaon[k])
+                    plotvars["protonIsTightKMPion"]["values"][icut].append(protonIsTightKMPion[k])
+                    plotvars["protonIsVeryTightKMPion"]["values"][icut].append(protonIsVeryTightKMPion[k])
+                    plotvars["protonIsSuperTightKMPion"]["values"][icut].append(protonIsSuperTightKMPion[k])
+                    plotvars["protonIsTightKMElectron"]["values"][icut].append(protonIsTightKMElectron[k])
+                    plotvars["protonIsVeryTightKMElectron"]["values"][icut].append(protonIsVeryTightKMElectron[k])
+                    plotvars["protonIsSuperTightKMElectron"]["values"][icut].append(protonIsSuperTightKMElectron[k])
+                    plotvars["protonIsBDTTightMuon"]["values"][icut].append(protonIsBDTTightMuon[k])
+                    plotvars["protonIsBDTVeryTightMuon"]["values"][icut].append(protonIsBDTVeryTightMuon[k])
+                    plotvars["protonIsBDTTightMuonFakeRate"]["values"][icut].append(protonIsBDTTightMuonFakeRate[k])
+                    plotvars["protonIsBDTVeryTightMuonFakeRate"]["values"][icut].append(protonIsBDTVeryTightMuonFakeRate[k])
+
+                for k in range(nmu):
+                    plotvars["mup"]["values"][icut].append(mup[k])
+
+                    plotvars["muIsTightKMProton"]["values"][icut].append(muIsTightKMProton[k])
+                    plotvars["muIsVeryTightKMProton"]["values"][icut].append(muIsVeryTightKMProton[k])
+                    plotvars["muIsSuperTightKMProton"]["values"][icut].append(muIsSuperTightKMProton[k])
+                    plotvars["muIsTightBDTKaon"]["values"][icut].append(muIsTightBDTKaon[k])
+                    plotvars["muIsVeryTightBDTKaon"]["values"][icut].append(muIsVeryTightBDTKaon[k])
+                    plotvars["muIsTightKMKaon"]["values"][icut].append(muIsTightKMKaon[k])
+                    plotvars["muIsVeryTightKMKaon"]["values"][icut].append(muIsVeryTightKMKaon[k])
+                    plotvars["muIsSuperTightKMKaon"]["values"][icut].append(muIsSuperTightKMKaon[k])
+                    plotvars["muIsTightKMPion"]["values"][icut].append(muIsTightKMPion[k])
+                    plotvars["muIsVeryTightKMPion"]["values"][icut].append(muIsVeryTightKMPion[k])
+                    plotvars["muIsSuperTightKMPion"]["values"][icut].append(muIsSuperTightKMPion[k])
+                    plotvars["muIsTightKMElectron"]["values"][icut].append(muIsTightKMElectron[k])
+                    plotvars["muIsVeryTightKMElectron"]["values"][icut].append(muIsVeryTightKMElectron[k])
+                    plotvars["muIsSuperTightKMElectron"]["values"][icut].append(muIsSuperTightKMElectron[k])
+                    plotvars["muIsBDTTightMuon"]["values"][icut].append(muIsBDTTightMuon[k])
+                    plotvars["muIsBDTVeryTightMuon"]["values"][icut].append(muIsBDTVeryTightMuon[k])
+                    plotvars["muIsBDTTightMuonFakeRate"]["values"][icut].append(muIsBDTTightMuonFakeRate[k])
+                    plotvars["muIsBDTVeryTightMuonFakeRate"]["values"][icut].append(muIsBDTVeryTightMuonFakeRate[k])
+
+                for k in range(ne):
+                    plotvars["ep"]["values"][icut].append(ep[k])
+
+                    plotvars["eIsTightKMProton"]["values"][icut].append(eIsTightKMProton[k])
+                    plotvars["eIsVeryTightKMProton"]["values"][icut].append(eIsVeryTightKMProton[k])
+                    plotvars["eIsSuperTightKMProton"]["values"][icut].append(eIsSuperTightKMProton[k])
+                    plotvars["eIsTightBDTKaon"]["values"][icut].append(eIsTightBDTKaon[k])
+                    plotvars["eIsVeryTightBDTKaon"]["values"][icut].append(eIsVeryTightBDTKaon[k])
+                    plotvars["eIsTightKMKaon"]["values"][icut].append(eIsTightKMKaon[k])
+                    plotvars["eIsVeryTightKMKaon"]["values"][icut].append(eIsVeryTightKMKaon[k])
+                    plotvars["eIsSuperTightKMKaon"]["values"][icut].append(eIsSuperTightKMKaon[k])
+                    plotvars["eIsTightKMPion"]["values"][icut].append(eIsTightKMPion[k])
+                    plotvars["eIsVeryTightKMPion"]["values"][icut].append(eIsVeryTightKMPion[k])
+                    plotvars["eIsSuperTightKMPion"]["values"][icut].append(eIsSuperTightKMPion[k])
+                    plotvars["eIsTightKMElectron"]["values"][icut].append(eIsTightKMElectron[k])
+                    plotvars["eIsVeryTightKMElectron"]["values"][icut].append(eIsVeryTightKMElectron[k])
+                    plotvars["eIsSuperTightKMElectron"]["values"][icut].append(eIsSuperTightKMElectron[k])
+                    plotvars["eIsBDTTightMuon"]["values"][icut].append(eIsBDTTightMuon[k])
+                    plotvars["eIsBDTVeryTightMuon"]["values"][icut].append(eIsBDTVeryTightMuon[k])
+                    plotvars["eIsBDTTightMuonFakeRate"]["values"][icut].append(eIsBDTTightMuonFakeRate[k])
+                    plotvars["eIsBDTVeryTightMuonFakeRate"]["values"][icut].append(eIsBDTVeryTightMuonFakeRate[k])
 
     #nbcand += 1
         
@@ -515,10 +724,10 @@ for key in plotvars.keys():
     df_dict[key] = plotvars[key]['values'][ncuts-1].copy()
     #print(key,len(df_dict[key]))
 
+# Dump out some subset to a pandas dataframe
 #print(df_dict.keys())
 df = pd.DataFrame.from_dict(df_dict)
 #print(df.columns)
-
 df.to_hdf(outfilename_df,'df',mode='w')
 
 

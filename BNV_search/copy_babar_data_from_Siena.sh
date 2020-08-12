@@ -24,5 +24,5 @@
 
 
 # Direct from grawp
-rsync -avh mbellis@localhost:/data/physics/bellis/BaBar/rootfiles/cut_summary_files_df /home/bellis/babar_data/
+rsync -avh mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/cut_summary_files_df /home/bellis/babar_data/
 

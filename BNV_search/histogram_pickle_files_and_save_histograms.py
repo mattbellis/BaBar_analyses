@@ -100,7 +100,7 @@ for key in histos.keys():
     if key.find('Is')<0:
         continue
 
-    plt.subplot(9,6,icount+1)
+    plt.subplot(9,7,icount+1)
     #plt.subplot(10,10,icount+1)
     print(key)
     hist = histos[key]
