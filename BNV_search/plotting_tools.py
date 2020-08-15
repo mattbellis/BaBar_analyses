@@ -367,13 +367,15 @@ def get_sptag(name):
     labels['3981'] = r'$\mu^+\mu^-$'
     labels['signal'] = r'$B\rightarrow p \ell^-$'
     labels['9456'] = r'$B\rightarrow p \ell^-$'
+    labels['Data'] = r'Data'
 
     tag = None
     label = None
     if name.find('AllEvents')>=0:
         # Data
         # basicPID_R24-AllEvents-Run1-OnPeak-R24-9_SKIMMED.root
-        tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
+        #tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
+        tag = 'Run' + name.split('Run')[1][0]
         label = 'Data'
     elif name.find('SP')>=0:
         # MC

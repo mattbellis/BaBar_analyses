@@ -16,6 +16,12 @@ color_scheme = {'1235':'b',
                 '1005':'r', 
                 '3429':'m', 
                 '9456':'k', 
+                'Run1':'k', 
+                'Run2':'k', 
+                'Run3':'k', 
+                'Run4':'k', 
+                'Run5':'k', 
+                'Run6':'k', 
                 }
 
 infilenames = sys.argv[1:]
@@ -32,6 +38,7 @@ for infilename in infilenames:
     elif infilename.find('.h5')>=0:
         df = pd.read_hdf(infilename)
 
+    print(df.columns)
     muon_mask = bd.pid_mask(df,particle='muon')
     proton_mask = bd.pid_mask(df,particle='proton')
 
@@ -57,14 +64,16 @@ for infilename in infilenames:
     dftmp = df[shape_mask & proton_mask & muon_mask]
     dfs.append(dftmp)
 
+    print(infilename)
     sp,label = pt.get_sptag(infilename)
     print(sp,label)
     sps.append(label)
     labels.append(label)
 
     wt = 1.0
-    if 'weight' in list(raw['MC'][sp].keys()):
-        wt = raw['MC'][sp]['weight']
+    if sp.find('Run')<0:
+        if 'weight' in list(raw['MC'][sp].keys()):
+            wt = raw['MC'][sp]['weight']
     print(wt)
     weights.append(wt)
     colors.append(color_scheme[sp])
