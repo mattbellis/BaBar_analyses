@@ -12,6 +12,39 @@ import babar_dataframe_tools as bd
 #df = pd.read_hdf("CUT_SUMMARY_SP-9456_pmu.h5")
 df = pd.read_hdf(sys.argv[1])
 
+all_variables = [#'nbnvbcand', \
+                'bnvbcandmass', \
+                'bnvbcandMES', \
+                'bnvbcandDeltaE', \
+                'bnvprotp3', \
+                'bnvlepp3', \
+                'tagbcandmass', \
+                'tagbcandMES', \
+                'tagbcandDeltaE', \
+                'tagq', \
+                'missingmass', \
+                'missingmom', \
+                'missingE', \
+                'scalarmomsum', \
+                'nhighmom', \
+                'np', \
+                'nmu', \
+                'ne', \
+                #'pp', \
+                #'mup', \
+                #'ep', \
+                'r2',  \
+                'r2all', \
+                'thrustmag', \
+                'thrustmagall', \
+                'thrustcosth', \
+                'thrustcosthall', \
+                'sphericityall', \
+                'ncharged', \
+                'nphot']
+
+# HOW DO WE ONLY WORK WITH THE UNCOMMENTED VARIABLES?
+
 # heatmap
 corr = df.corr()
 
