@@ -1,9 +1,13 @@
 import sys
 import pandas as pd
 
-outfilename = sys.argv[1]
+#outfilename = sys.argv[1]
 
-infilenames = sys.argv[2:]
+infilenames = sys.argv[1:]
+
+sp = infilenames[0].split('SP-')[1].split('/')[0]
+decay = infilenames[0].split('SP-')[1].split('/')[1]
+outfilename = 'CUT_SUMMARY_SP-{0}_{1}.h5'.format(sp,decay)
 
 frames = []
 for infilename in infilenames:

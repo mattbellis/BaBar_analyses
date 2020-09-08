@@ -116,6 +116,9 @@ def main():
             print(subset)
             sp.Popen(cmd,0).wait()
 
+            # For testing
+            #exit()
+
         #if tot_files>=100:
         #if tot_files>=3:
             #break

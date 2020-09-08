@@ -178,7 +178,7 @@ def get_sptag(name):
     if name.find('AllEvents')>=0:
         # Data
         # basicPID_R24-AllEvents-Run1-OnPeak-R24-9_SKIMMED.root
-        tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
+        tag = 'AllEvents-' + name.split('AllEvents-')[1].split('-OnPeak-R24')[0] + '-OnPeak-R24'
     else:
         # MC
         tag = 'SP-{0}'.format(name.split('SP-')[1].split('-R24')[0])
@@ -200,7 +200,8 @@ if args.outfile is None:
     #fulldirName = '{0}/{1}'.format(sptag,decay)
 
     fulldir_prepend = ''
-    fulldir_prepend = '/data/physics/bellis/BaBar/rootfiles/'
+    #fulldir_prepend = '/data/physics/bellis/BaBar/rootfiles/'
+    fulldir_prepend = '/qnap/mbellis/bellis/BaBar/rootfiles/'
 
     fulldirNames = {}
     fulldirNames['pkl'] = '{2}/cut_summary_files_pickle/{0}/{1}'.format(sptag,decay,fulldir_prepend)
@@ -389,31 +390,40 @@ for i in range(nentries):
     '''
 
     # Make tighter momentum cuts for the last cut
+    # For the signal selection
+    lopcut = 2.3
+    hipcut = 2.8
+
+    # Maybe for sidebands in data
+    if sptag.find('AllEvents')>=0:
+        lopcut = 1.7
+        hipcut = 10.0
+
     if decay=='pmu':
         cut3 = nbnvbcand==1 
         if nbnvbcand>0:
-            cut3 *= bnvprotp3[0]>2.3 and bnvprotp3[0]<2.8
-            cut3 *= bnvlepp3[0]>2.3 and bnvlepp3[0]<2.8
+            cut3 *= bnvprotp3[0]>lopcut and bnvprotp3[0]<hipcut
+            cut3 *= bnvlepp3[0]>lopcut and bnvlepp3[0]<hipcut
     elif decay=='pe':
         cut3 = nbnvbcand==1 
         if nbnvbcand>0:
-            cut3 *= bnvprotp3[0]>2.3 and bnvprotp3[0]<2.8
-            cut3 *= bnvlepp3[0]>2.3 and bnvlepp3[0]<2.8
+            cut3 *= bnvprotp3[0]>lopcut and bnvprotp3[0]<hipcut
+            cut3 *= bnvlepp3[0]>lopcut and bnvlepp3[0]<hipcut
     elif decay=='pnu':
         cut3 = nbnvbcand==1 
         if nbnvbcand>0:
-            cut3 *= bnvprotp3[0]>2.3 and bnvprotp3[0]<2.8
+            cut3 *= bnvprotp3[0]>lopcut and bnvprotp3[0]<hipcut
             cut3 *= bnvlepp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
     elif decay=='nmu':
         cut3 = nbnvbcand==1 
         if nbnvbcand>0:
             cut3 *= bnvprotp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
-            cut3 *= bnvlepp3[0]>2.3 and bnvlepp3[0]<2.8
+            cut3 *= bnvlepp3[0]>lopcut and bnvlepp3[0]<hipcut
     elif decay=='ne':
         cut3 = nbnvbcand==1 
         if nbnvbcand>0:
             cut3 *= bnvprotp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
-            cut3 *= bnvlepp3[0]>2.3 and bnvlepp3[0]<2.8
+            cut3 *= bnvlepp3[0]>lopcut and bnvlepp3[0]<hipcut
 
     cuts = [1, cut1, (cut2*cut1), (cut1*cut2*cut3)]#, (cut1*cut2*cut3*cut4)]#, (cut1*cut2*cut3*cut4*cut5), (cut1*cut2*cut3*cut4*cut5*cut6)]
     for icut,cut in enumerate(cuts):
