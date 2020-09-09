@@ -29,4 +29,4 @@ scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-998-R2
 # Direct from grawp
 rsync -avh -e "ssh -p 22000" mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/cut_summary_files_df /home/bellis/babar_data/
 
-
+rsync -avh -e "ssh -p 22000" mbellis@localhost:BaBar_analyses/BNV_search/CUT_SUM*.h5 /home/bellis/BaBar_analyses/BNV_search/.

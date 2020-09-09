@@ -45,10 +45,13 @@ all_variables = [#'nbnvbcand', \
 
 # HOW DO WE ONLY WORK WITH THE UNCOMMENTED VARIABLES?
 
+df = df[all_variables]
+
 # heatmap
 corr = df.corr()
-
-ax = sns.heatmap( corr, vmin=-1, vmax=1, center=0, cmap=sns.diverging_palette(20, 220, n=200), square=True)
+# add the size right here
+plt.subplots(figsize=(10,7))
+ax = sns.heatmap( corr, vmin=-1,xticklabels=True, yticklabels=True, vmax=1, center=0, cmap=sns.diverging_palette(20, 220, n=200), square=True)
 ax.set_xticklabels( ax.get_xticklabels(), rotation=45, horizontalalignment='right');
 
 # corr matrix
@@ -70,5 +73,14 @@ for xx in axes:
         df.hist(column = df.columns[i], density=True, bins = 200, ax=axis)
         i = i+1
 
+
+#plt.show()
+
+# plot corr matrix with values (example)
+plt.figure()
+columns = ['bnvprotp3', 'bnvlepp3', 'tagbcandmass', 'tagbcandMES', 'tagbcandDeltaE']
+col = df[columns]
+corr = col.corr()
+sns.heatmap(corr, annot=True)
 
 plt.show()

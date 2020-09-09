@@ -40,7 +40,8 @@ for infilename in infilenames:
 
     print(df.columns)
     muon_mask = bd.pid_mask(df,particle='muon')
-    proton_mask = bd.pid_mask(df,particle='proton')
+    #proton_mask = bd.pid_mask(df,particle='proton')
+    proton_mask = bd.pid_mask(df,particle='muon')
 
     shape_mask = bd.shape_mask(df)
     #print(df.columns)
