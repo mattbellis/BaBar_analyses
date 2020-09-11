@@ -10,9 +10,12 @@ def pid_mask(df,particle='muon'):
         failing = ['muIsTightKMProton','muIsTightKMKaon','muIsTightKMElectron']
         #passing = ['muIsBDTTightMuon', 'muIsBDTVeryTightMuon', 'muIsBDTTightMuonFakeRate', 'muIsBDTVeryTightMuonFakeRate']
         passing = ['muIsBDTTightMuonFakeRate']
-    if particle=='proton':
+    elif particle=='proton':
         failing = ['protonIsTightKMKaon','protonIsTightKMPion','protonIsTightKMElectron'] #,'TightBDTKaon']
         passing = ['protonIsTightKMProton']
+    elif particle =='electron':
+        failing = []
+        passing = ['TightKMElectron', 'VeryTightKMElectron']
 
 
     tot = len(df)
@@ -41,3 +44,13 @@ def shape_mask(df):
 
     return mask
 
+
+################################################################################
+def blinding_mask(df):
+
+    x = df['bnvbcandMES']
+    y = df['bnvbcandDeltaE']
+
+    mask = (x>5.265) & (y>-0.12) & (y<0.12)
+
+    return mask
