@@ -15,7 +15,7 @@ def pid_mask(df,particle='muon'):
         passing = ['protonIsTightKMProton']
     elif particle =='electron':
         failing = []
-        passing = ['TightKMElectron', 'VeryTightKMElectron']
+        passing = ['eIsTightKMElectron', 'eIsVeryTightKMElectron']
 
 
     tot = len(df)
@@ -52,5 +52,18 @@ def blinding_mask(df):
     y = df['bnvbcandDeltaE']
 
     mask = (x>5.265) & (y>-0.12) & (y<0.12)
+
+    return mask
+
+################################################################################
+def side_bands_mask(df,region='DeltaEmES'):
+
+    x = df['bnvbcandMES']
+    y = df['bnvbcandDeltaE']
+
+    maskA = (x>5.265) & (y>0.12) & (y<0.2)
+    maskB = (x>5.265) & (y<-0.12) & (y>-0.2)
+
+    mask = (maskA) & (maskB)
 
     return mask

@@ -57,11 +57,12 @@ for infilename in infilenames:
     elif infilename.find('.h5')>=0:
         df = pd.read_hdf(infilename)
 
-    print(df.columns)
-    muon_mask = bd.pid_mask(df,particle='muon')
-    #muon_mask = bd.pid_mask(df,particle='proton')
+    #print(df.columns)
+    #lepton_mask = bd.pid_mask(df,particle='muon')
+    lepton_mask = bd.pid_mask(df,particle='electron')
+    #lepton_mask = bd.pid_mask(df,particle='proton')
     #proton_mask = bd.pid_mask(df,particle='proton')
-    proton_mask = bd.pid_mask(df,particle='muon')
+    proton_mask = bd.pid_mask(df,particle='proton')
 
     #shape_mask = bd.shape_mask(df)
     #print(df.columns)
@@ -70,25 +71,30 @@ for infilename in infilenames:
 
     #dfs.append(df)
     print("------------")
-    print(len(df))
-    print(len(df[muon_mask & proton_mask]))
-    #print(len(df[muon_mask & proton_mask & shape_mask]))
-    print(len(df[muon_mask & proton_mask])/len(df))
-    #print(len(df[shape_mask & muon_mask & proton_mask])/len(df))
+    print("Total:    ", len(df))
+    print("Lepton:   ", len(df[lepton_mask]))
+    print("Lepton:   ", len(df[lepton_mask])/len(df))
+    print("Proton:   ", len(df[proton_mask]))
+    print("Proton:   ", len(df[proton_mask])/len(df))
+    print("Lep&Prot: ", len(df[lepton_mask & proton_mask]))
+    print("Lep&Prot: ", len(df[lepton_mask & proton_mask])/len(df))
+    #print(len(df[shape_mask & lepton_mask & proton_mask])/len(df))
     print("------------")
 
-    #df_mu = df[muon_mask]
+    #side_bands = bd.side_bands_mask(df,region='DeltaEmES')
+
+    #df_mu = df[lepton_mask]
     #dfs.append(df_mu)
     #df_proton = df[proton_mask]
     #dfs.append(df_proton)
-    #df_both = df[muon_mask & proton_mask]
+    #df_both = df[lepton_mask & proton_mask]
     #dfs.append(df_both)
 
-    #dftmp = df[shape_mask & proton_mask & muon_mask]
-    #dftmp = df[proton_mask & muon_mask]
-    dftmp = df[proton_mask & muon_mask]
+    #dftmp = df[shape_mask & proton_mask & lepton_mask]
+    #dftmp = df[proton_mask & lepton_mask]
+    dftmp = df[proton_mask & lepton_mask]
     dfs.append(dftmp)
-    #dftmp = df[proton_mask & muon_mask & ~blinding_mask]
+    #dftmp = df[proton_mask & lepton_mask & ~blinding_mask]
     #dfs.append(dftmp)
 
     print(infilename)
