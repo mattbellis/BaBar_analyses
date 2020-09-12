@@ -59,10 +59,11 @@ for infilename in infilenames:
 
     #print(df.columns)
     #lepton_mask = bd.pid_mask(df,particle='muon')
-    lepton_mask = bd.pid_mask(df,particle='electron')
-    #lepton_mask = bd.pid_mask(df,particle='proton')
+    #lepton_mask = bd.pid_mask(df,particle='electron')
+    lepton_mask = bd.pid_mask(df,particle='proton')
     #proton_mask = bd.pid_mask(df,particle='proton')
     proton_mask = bd.pid_mask(df,particle='proton')
+    #proton_mask = bd.pid_mask(df,particle='electron')
 
     #shape_mask = bd.shape_mask(df)
     #print(df.columns)
