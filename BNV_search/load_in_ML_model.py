@@ -17,6 +17,6 @@ from tensorflow import keras
 
 from matplotlib import pyplot
 
-modelfile = sys.argv[1]
+modelfilename = sys.argv[1]
 
-model = keras.models.load_model("keras_model")
+model = keras.models.load_model(modelfilename)

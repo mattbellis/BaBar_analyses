@@ -94,10 +94,12 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
     nplots_per_figure = grid_of_plots[0]*grid_of_plots[1]
 
     grid_count = 0
-    for i,name in enumerate(names):
+    i = 0
+    for icount,name in enumerate(names):
 
         if len(specific_plots)>0 and name not in specific_plots:
             continue
+
 
         if i%nplots_per_figure==0:
             plt.figure(figsize=figsize)
@@ -164,6 +166,7 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
 
                 vals = df[name]
 
+                print("weights[j]: ",j,weights[j])
                 weight=np.ones(len(vals))
                 if type(weights) == list:
                     weight *= weights[j]
@@ -188,14 +191,15 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
                 plt.xlabel(name,fontsize=xlabelfontsize)
 
             if labels is not None:
-                plt.legend(fontsize=8)
-
+                plt.legend(fontsize=8,loc='upper left')
 
         ########################################################################
         if i%nplots_per_figure==nplots_per_figure-1 or i==nplots-1:
             print("Here!")
             plt.tight_layout()
 
+        i += 1
+        plt.tight_layout()
         grid_count += 1
 
 

@@ -30,6 +30,8 @@ color_scheme = {'1235':'b',
 
 infilenames = sys.argv[1:]
 
+#raw["MC"]["9456"]["weight"] = 0.001
+
 decay = None
 decays = ['pmu', 'pe', 'pnu', 'nmu', 'ne']
 for d in decays:
@@ -70,6 +72,11 @@ for infilename in infilenames:
 
     blinding_mask = bd.blinding_mask(df)
 
+    #side_bands_mask = bd.side_bands_mask(df,region='DeltaEmES')
+    side_bands_mask = bd.side_bands_mask(df,region='protonp3')
+
+    bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton')
+
     #dfs.append(df)
     print("------------")
     print("Total:    ", len(df))
@@ -79,10 +86,10 @@ for infilename in infilenames:
     print("Proton:   ", len(df[proton_mask])/len(df))
     print("Lep&Prot: ", len(df[lepton_mask & proton_mask]))
     print("Lep&Prot: ", len(df[lepton_mask & proton_mask])/len(df))
+    print("Sideband: ", len(df[side_bands_mask]))
+    print("Sideband: ", len(df[side_bands_mask])/len(df))
     #print(len(df[shape_mask & lepton_mask & proton_mask])/len(df))
     print("------------")
-
-    #side_bands = bd.side_bands_mask(df,region='DeltaEmES')
 
     #df_mu = df[lepton_mask]
     #dfs.append(df_mu)
@@ -92,10 +99,11 @@ for infilename in infilenames:
     #dfs.append(df_both)
 
     #dftmp = df[shape_mask & proton_mask & lepton_mask]
-    #dftmp = df[proton_mask & lepton_mask]
     dftmp = df[proton_mask & lepton_mask]
     dfs.append(dftmp)
     #dftmp = df[proton_mask & lepton_mask & ~blinding_mask]
+    #dftmp = df[proton_mask & lepton_mask & side_bands_mask]
+    #dftmp = df[proton_mask & lepton_mask & bnv_children_momentum_mask]
     #dfs.append(dftmp)
 
     print(infilename)
@@ -121,7 +129,8 @@ for infilename in infilenames:
 
 print("Making the plots.......")
 plot_params = pt.get_variable_parameters_for_plotting()
-plot_params['bnvbcandDeltaE']['range'] = (-1.0,1.0)
+#plot_params['bnvbcandDeltaE']['range'] = (-1.0,1.0)
+plot_params['bnvbcandDeltaE']['range'] = (-3.0,-2.0)
 plot_params['bnvbcandMES']['range'] = (5.2,5.3)
 #pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,norm_hist=True,labels=labels,plot_params=plot_params)
 #pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=False,weights=weights)
@@ -131,7 +140,12 @@ plot_params['bnvbcandMES']['range'] = (5.2,5.3)
 
 ############### USE THIS FOR MC STACKING ##############
 # For stacked histograms
-pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(3,3),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,figsize=(12,7))
+#pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(3,3),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,figsize=(12,7))
+pt.make_all_plots(dfs,specific_plots=['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES'],backend='matplotlib',grid_of_plots=(1,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,figsize=(15,3))
+#plt.savefig('plots/summary_plots_bkg_pmu.png')
+#plt.savefig('plots/summary_plots_sig_pmu.png')
+plt.savefig('plots/summary_plots_bkg_pnu.png')
+#plt.savefig('plots/summary_plots_sig_pnu.png')
 
 # For comparing cuts
 #pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(3,3),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=False,weights=weights,color=colors,figsize=(12,7),norm_hist=True)

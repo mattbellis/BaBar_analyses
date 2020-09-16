@@ -55,7 +55,7 @@ print(len(df1),infilenames[1])
 
 toberemoved = []
 
-'''
+#'''
 # Manually remove some of the columns that are about PID
 # BaBar
 for name in list(df0.keys()):
@@ -71,10 +71,10 @@ toberemoved.append('bnvbcandmass')
 toberemoved.append('bnvlepp3')
 toberemoved.append('bnvprotp3')
 toberemoved.append('bnvprotp3')
-toberemoved.append('pp')
+#toberemoved.append('pp')
 #toberemoved.append('ep')
 toberemoved.append('mup')
-'''
+#'''
 
 
 #df0 = format(df0, ['cos(theta)', 'p3'], 0, 'positive')
@@ -128,7 +128,9 @@ print('Predicted: %.3f' % yhat) # 1 = proton, 0 = not proton
 
 model.summary()
 #model.save('keras_model')
-model.save('TT_keras_model.h5')
+modelfilename = 'KERAS_TRAINING_{0}_{1}.h5'.format(infilenames[0].split('.h5')[0],infilenames[1].split('.h5')[0])
+#model.save('TT_keras_model.h5')
+model.save(modelfilename)
 
 
 # summarize the model

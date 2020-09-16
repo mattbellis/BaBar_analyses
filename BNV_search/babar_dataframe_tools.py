@@ -58,12 +58,38 @@ def blinding_mask(df):
 ################################################################################
 def side_bands_mask(df,region='DeltaEmES'):
 
-    x = df['bnvbcandMES']
-    y = df['bnvbcandDeltaE']
+    mask = None
 
-    maskA = (x>5.265) & (y>0.12) & (y<0.2)
-    maskB = (x>5.265) & (y<-0.12) & (y>-0.2)
+    if region=='DeltaEmES':
 
-    mask = (maskA) & (maskB)
+        x = df['bnvbcandMES']
+        y = df['bnvbcandDeltaE']
+
+        maskA = (x>5.265) & (y>0.12) & (y<0.2)
+        maskB = (x>5.265) & (y<-0.12) & (y>-0.2)
+
+        mask = (maskA) & (maskB)
+
+    elif region=='protonp3':
+
+        x = df['bnvprotp3']
+
+        maskA = (x>2.0) & (x<2.3)
+        maskB = (x>2.8) & (x<3.1)
+
+        mask = (maskA) | (maskB)
+
+    return mask
+
+################################################################################
+def bnv_children_momentum_mask(df,child='proton'):
+
+    mask = None
+
+    if child=='proton':
+
+        x = df['bnvprotp3']
+
+        mask = (x>2.3) & (x<2.8)
 
     return mask
