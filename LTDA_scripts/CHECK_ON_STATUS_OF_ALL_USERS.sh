@@ -1,0 +1,1 @@
+bjobs -u all
