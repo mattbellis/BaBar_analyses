@@ -15,6 +15,8 @@ from tensorflow.keras.utils import plot_model
 
 from matplotlib import pyplot
 
+tag = 'pmu_1005'
+
 # **********************************************
 # Output: dataset without specified 
 #           rows/columns, additional "Class" 
@@ -53,6 +55,13 @@ df0,df1 = sktools.read_in_files_and_return_dataframe(infilenames)
 print(len(df0),infilenames[0])
 print(len(df1),infilenames[1])
 
+print(df0.columns)
+print()
+print(df1.columns)
+print()
+
+#exit()
+
 toberemoved = []
 
 #'''
@@ -65,8 +74,10 @@ toberemoved.append('ne')
 toberemoved.append('np')
 toberemoved.append('nmu')
 toberemoved.append('nbnvbcand')
-toberemoved.append('bnvbcandMES')
-toberemoved.append('bnvbcandDeltaE')
+toberemoved.append('tagbcandmass')
+toberemoved.append('nhighmom')
+#toberemoved.append('bnvbcandMES')
+#toberemoved.append('bnvbcandDeltaE')
 toberemoved.append('bnvbcandmass')
 toberemoved.append('bnvlepp3')
 toberemoved.append('bnvprotp3')
@@ -81,8 +92,12 @@ toberemoved.append('mup')
 #df1 = format(df1, ['cos(theta)', 'p3'], 0, 'negative')
 df0 = format(df0, toberemoved, 0, 'positive')
 df1 = format(df1, toberemoved, 0, 'negative')
-#df = mergeDataframes([df0[0:1000], df1[0:1000]])
+#df = mergeDataframes([df0[0:10000], df1[0:10000]])
 df = mergeDataframes([df0, df1])
+
+print(df.columns)
+print()
+#exit()
 
 
 # split into input and output columns
@@ -145,7 +160,7 @@ pyplot.ylabel('Cross Entropy')
 pyplot.plot(history.history['loss'], label='train')
 pyplot.plot(history.history['val_loss'], label='val')
 pyplot.legend()
-pyplot.savefig('keras_learning_curve.png')
+pyplot.savefig('keras_learning_curve' + tag + '.png')
 
 from sklearn.metrics import roc_curve
 y_pred_keras = model.predict(X_test).ravel()
@@ -186,7 +201,7 @@ pyplot.xlabel('False positive rate')
 pyplot.ylabel('True positive rate')
 pyplot.title('ROC curve')
 pyplot.legend(loc='best')
-pyplot.savefig('keras_roc_curve.png')
+pyplot.savefig('keras_roc_curve' + tag + '.png')
 #pyplot.show()
 '''
 # Zoom in view of the upper left corner.
