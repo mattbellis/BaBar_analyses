@@ -59,8 +59,8 @@ toberemoved.append('mup')
 df0 = sktools.format(df0,'signal',columns_to_drop=toberemoved)
 df1 = sktools.format(df1,'background',columns_to_drop=toberemoved)
 
-data = {'df':sktools.mergeDataframes([df0, df1]),
-        'zeroClass':'signal', 'oneClass':'background', 'twoClass':'both', 'title':'training data'}
+#data = {'df':sktools.mergeDataframes([df0, df1]), 'zeroClass':'signal', 'oneClass':'background', 'twoClass':'both', 'title':'training data'}
+data = {'df':sktools.mergeDataframes([df0[0:10000], df1[0:10000]]), 'zeroClass':'signal', 'oneClass':'background', 'twoClass':'both', 'title':'training data'}
 
 sktools.plot_corr_matrix(data['df'])
 #plt.show()

@@ -92,7 +92,8 @@ toberemoved.append('mup')
 #df1 = format(df1, ['cos(theta)', 'p3'], 0, 'negative')
 df0 = format(df0, toberemoved, 0, 'positive')
 df1 = format(df1, toberemoved, 0, 'negative')
-#df = mergeDataframes([df0[0:10000], df1[0:10000]])
+#df = mergeDataframes([df0[0:100000], df1[0:100000]])
+#df = mergeDataframes([df0[100000:200000], df1[100000:200000]])
 df = mergeDataframes([df0, df1])
 
 print(df.columns)
@@ -146,6 +147,9 @@ model.summary()
 modelfilename = 'KERAS_TRAINING_{0}_{1}.h5'.format(infilenames[0].split('.h5')[0],infilenames[1].split('.h5')[0])
 #model.save('TT_keras_model.h5')
 model.save(modelfilename)
+
+sktools.compare_train_test(model, X_train, y_train, X_test, y_test, bins=200)
+
 
 
 # summarize the model

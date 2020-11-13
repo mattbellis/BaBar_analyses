@@ -206,18 +206,26 @@ def graphROCfromDict(myDict, ax):
 ################################################################################
 
 ################################################################################
-def compare_train_test(clf, X_train, y_train, X_test, y_test, bins=30):
+def compare_train_test(model, X_train, y_train, X_test, y_test, bins=30):
     decisions = []
 
-    mask0 = y_test.values.ravel()<0.5
-    mask1 = y_test.values.ravel()>0.5
-    mask2 = y_train.values.ravel()<0.5
-    mask3 = y_train.values.ravel()>0.5
+    mask0, mask1, mask2, mask3 = None, None, None, None
+    if type(y_test) == np.ndarray:
+        mask0 = y_test.ravel()<0.5
+        mask1 = y_test.ravel()>0.5
+        mask2 = y_train.ravel()<0.5
+        mask3 = y_train.ravel()>0.5
 
-    predictions0 = mlp.predict(X_test[mask0])
-    predictions1 = mlp.predict(X_test[mask1])
-    predictions2 = mlp.predict(X_train[mask2])
-    predictions3 = mlp.predict(X_train[mask3])
+    else:
+        mask0 = y_test.values.ravel()<0.5
+        mask1 = y_test.values.ravel()>0.5
+        mask2 = y_train.values.ravel()<0.5
+        mask3 = y_train.values.ravel()>0.5
+
+    predictions0 = model.predict(X_test[mask0])
+    predictions1 = model.predict(X_test[mask1])
+    predictions2 = model.predict(X_train[mask2])
+    predictions3 = model.predict(X_train[mask3])
 
     decisions = [predictions0, predictions1, predictions2, predictions3]
         
@@ -252,7 +260,7 @@ def compare_train_test(clf, X_train, y_train, X_test, y_test, bins=30):
 
     plt.errorbar(center, hist, yerr=err, fmt='o', c='b', label='Protons (test)')
 
-    plt.xlabel("MLP output", color = 'k')
+    plt.xlabel("Model output", color = 'k')
     plt.ylabel("Arbitrary units", color = 'k')
     plt.legend(loc='best')
     plt.title('Compare Train Test', color = 'k')
@@ -494,6 +502,7 @@ def plot_corr_matrix(df,title="Correlation matrix"):
 	return figs,axes
 ################################################################################
 ################################################################################
+'''
 def compare_train_test(clf, X_train, y_train, X_test, y_test, bins=30):
     decisions = []
     for X,y in ((X_train, y_train), (X_test, y_test)):
@@ -547,6 +556,7 @@ def compare_train_test(clf, X_train, y_train, X_test, y_test, bins=30):
 
     plt.savefig("plots/BDT_output.png")
     return fig
+'''
  
 
 
