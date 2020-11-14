@@ -15,6 +15,8 @@ from tensorflow.keras.utils import plot_model
 
 from matplotlib import pyplot
 
+tag = 'pmu_1005'
+
 # **********************************************
 # Output: dataset without specified 
 #           rows/columns, additional "Class" 
@@ -59,6 +61,13 @@ cols = df1.columns
 print(len(df0),infilenames[0])
 print(len(df1),infilenames[1])
 
+print(df0.columns)
+print()
+print(df1.columns)
+print()
+
+#exit()
+
 toberemoved = []
 
 #'''
@@ -73,10 +82,19 @@ for name in list(df0.keys()):
 toberemoved.append('ne')
 toberemoved.append('np')
 toberemoved.append('nmu')
+<<<<<<< HEAD
 #toberemoved.append('nbnvbcand')
 toberemoved.append('bnvbcandMES')
 toberemoved.append('bnvbcandDeltaE')
 #toberemoved.append('bnvbcandmass')
+=======
+toberemoved.append('nbnvbcand')
+toberemoved.append('tagbcandmass')
+toberemoved.append('nhighmom')
+#toberemoved.append('bnvbcandMES')
+#toberemoved.append('bnvbcandDeltaE')
+toberemoved.append('bnvbcandmass')
+>>>>>>> 45ad02d9424741dec6ea0e7c4ba7042491c9c756
 toberemoved.append('bnvlepp3')
 toberemoved.append('bnvprotp3')
 #toberemoved.append('bnvprotp3')
@@ -97,11 +115,16 @@ for tbr in toberemoved:
 #df1 = format(df1, ['cos(theta)', 'p3'], 0, 'negative')
 df0 = format(df0, toberemoved, 0, 'positive')
 df1 = format(df1, toberemoved, 0, 'negative')
-#df = mergeDataframes([df0[0:1000], df1[0:1000]])
+#df = mergeDataframes([df0[0:100000], df1[0:100000]])
+#df = mergeDataframes([df0[100000:200000], df1[100000:200000]])
 df = mergeDataframes([df0, df1])
+
+# Get rid of nans
+df.dropna(0,inplace=True)
 
 print(df.columns)
 print()
+#exit()
 
 
 # split into input and output columns
@@ -151,6 +174,9 @@ modelfilename = 'KERAS_TRAINING_{0}_{1}.h5'.format(infilenames[0].split('.h5')[0
 #model.save('TT_keras_model.h5')
 model.save(modelfilename)
 
+sktools.compare_train_test(model, X_train, y_train, X_test, y_test, bins=200)
+
+
 
 # summarize the model
 plot_model(model, 'model.png', show_shapes=True)
@@ -164,7 +190,7 @@ pyplot.ylabel('Cross Entropy')
 pyplot.plot(history.history['loss'], label='train')
 pyplot.plot(history.history['val_loss'], label='val')
 pyplot.legend()
-pyplot.savefig('keras_learning_curve.png')
+pyplot.savefig('keras_learning_curve' + tag + '.png')
 
 from sklearn.metrics import roc_curve
 y_pred_keras = model.predict(X_test).ravel()
@@ -205,7 +231,7 @@ pyplot.xlabel('False positive rate')
 pyplot.ylabel('True positive rate')
 pyplot.title('ROC curve')
 pyplot.legend(loc='best')
-pyplot.savefig('keras_roc_curve.png')
+pyplot.savefig('keras_roc_curve' + tag + '.png')
 #pyplot.show()
 '''
 # Zoom in view of the upper left corner.

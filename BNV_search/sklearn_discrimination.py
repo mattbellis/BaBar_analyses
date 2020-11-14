@@ -46,21 +46,21 @@ toberemoved.append('ne')
 toberemoved.append('np')
 toberemoved.append('nmu')
 toberemoved.append('nbnvbcand')
-toberemoved.append('bnvbcandMES')
-toberemoved.append('bnvbcandDeltaE')
+#toberemoved.append('bnvbcandMES')
+#toberemoved.append('bnvbcandDeltaE')
 toberemoved.append('bnvbcandmass')
 toberemoved.append('bnvlepp3')
 toberemoved.append('bnvprotp3')
 toberemoved.append('bnvprotp3')
-toberemoved.append('pp')
+#toberemoved.append('pp')
 #toberemoved.append('ep')
 toberemoved.append('mup')
 
 df0 = sktools.format(df0,'signal',columns_to_drop=toberemoved)
 df1 = sktools.format(df1,'background',columns_to_drop=toberemoved)
 
-data = {'df':sktools.mergeDataframes([df0, df1]),
-        'zeroClass':'signal', 'oneClass':'background', 'twoClass':'both', 'title':'training data'}
+#data = {'df':sktools.mergeDataframes([df0, df1]), 'zeroClass':'signal', 'oneClass':'background', 'twoClass':'both', 'title':'training data'}
+data = {'df':sktools.mergeDataframes([df0[0:10000], df1[0:10000]]), 'zeroClass':'signal', 'oneClass':'background', 'twoClass':'both', 'title':'training data'}
 
 sktools.plot_corr_matrix(data['df'])
 #plt.show()
