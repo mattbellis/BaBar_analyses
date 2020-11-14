@@ -70,6 +70,10 @@ def mergeDataframes(dfs):
 
   for df in dfs:
     mergedDfs = pd.concat([mergedDfs, df])
+
+  # Get rid of nans
+  mergedDFs.dropna(0,inplace=True)
+
   return mergedDfs
 
 

@@ -96,6 +96,9 @@ df1 = format(df1, toberemoved, 0, 'negative')
 #df = mergeDataframes([df0[100000:200000], df1[100000:200000]])
 df = mergeDataframes([df0, df1])
 
+# Get rid of nans
+df.dropna(0,inplace=True)
+
 print(df.columns)
 print()
 #exit()
