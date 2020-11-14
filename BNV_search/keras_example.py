@@ -24,7 +24,8 @@ tag = 'pmu_1005'
 # **********************************************
 def format(df, columnsToDrop, rowsToDrop, className=None):
   df = df.drop(columns=columnsToDrop) # remove specified columns
-  df = df.drop(rowsToDrop) # remove specified rows
+  #print(rowsToDrop)
+  #df = df.drop(rowsToDrop) # remove specified rows
 
   if className != None:
     # add column with class name
@@ -52,6 +53,11 @@ infilenames = sys.argv[1:]
 
 df0,df1 = sktools.read_in_files_and_return_dataframe(infilenames)
 
+print(df0.columns)
+print()
+print(df1.columns)
+cols = df1.columns
+
 print(len(df0),infilenames[0])
 print(len(df1),infilenames[1])
 
@@ -67,25 +73,42 @@ toberemoved = []
 #'''
 # Manually remove some of the columns that are about PID
 # BaBar
+'''
 for name in list(df0.keys()):
     if name.find('Is')>=0 or name.find('BDT')>=0 or name.find('KM')>=0:
         toberemoved.append(name)
+'''
+
 toberemoved.append('ne')
 toberemoved.append('np')
 toberemoved.append('nmu')
+<<<<<<< HEAD
+#toberemoved.append('nbnvbcand')
+toberemoved.append('bnvbcandMES')
+toberemoved.append('bnvbcandDeltaE')
+#toberemoved.append('bnvbcandmass')
+=======
 toberemoved.append('nbnvbcand')
 toberemoved.append('tagbcandmass')
 toberemoved.append('nhighmom')
 #toberemoved.append('bnvbcandMES')
 #toberemoved.append('bnvbcandDeltaE')
 toberemoved.append('bnvbcandmass')
+>>>>>>> 45ad02d9424741dec6ea0e7c4ba7042491c9c756
 toberemoved.append('bnvlepp3')
 toberemoved.append('bnvprotp3')
-toberemoved.append('bnvprotp3')
-#toberemoved.append('pp')
-#toberemoved.append('ep')
+#toberemoved.append('bnvprotp3')
+toberemoved.append('pp')
+toberemoved.append('ep')
 toberemoved.append('mup')
 #'''
+
+for tbr in toberemoved:
+    if tbr in cols:
+        print("Yes! ",tbr)
+    else:
+        print("No! ",tbr)
+
 
 
 #df0 = format(df0, ['cos(theta)', 'p3'], 0, 'positive')
