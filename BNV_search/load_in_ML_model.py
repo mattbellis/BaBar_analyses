@@ -19,4 +19,45 @@ from matplotlib import pyplot
 
 modelfilename = sys.argv[1]
 
+datafilename = sys.argv[2]
+
 model = keras.models.load_model(modelfilename)
+
+df,df = sktools.read_in_files_and_return_dataframe([datafilename,datafilename])
+
+#'''
+# Manually remove some of the columns that are about PID
+# BaBar
+toberemoved = []
+for name in list(df.keys()):
+    if name.find('Is')>=0 or name.find('BDT')>=0 or name.find('KM')>=0:
+        toberemoved.append(name)
+toberemoved.append('ne')
+toberemoved.append('np')
+toberemoved.append('nmu')
+toberemoved.append('nbnvbcand')
+toberemoved.append('tagbcandmass')
+toberemoved.append('nhighmom')
+#toberemoved.append('bnvbcandMES')
+#toberemoved.append('bnvbcandDeltaE')
+toberemoved.append('bnvbcandmass')
+toberemoved.append('bnvlepp3')
+toberemoved.append('bnvprotp3')
+toberemoved.append('bnvprotp3')
+#toberemoved.append('pp')
+#toberemoved.append('ep')
+toberemoved.append('mup')
+#'''
+
+df = sktools.format(df, className='positive', columns_to_drop=toberemoved)
+
+df.dropna(0,inplace=True)
+
+X, X_train, X_test, y, y_train, y_test = sktools.preprocess(df, class_string = 'Class', test_size=0.0)
+
+predictions = model.predict(X_train)
+
+np.save('PREDICTIONS_'+datafilename.split('.')[0]+'_'+modelfilename.split('.')[0],predictions)
+
+
+

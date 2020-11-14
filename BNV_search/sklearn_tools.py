@@ -30,7 +30,7 @@ def read_in_pickle_files(infiles):
 ################################################################################
 def read_in_files_and_return_dataframe(infilenames):
 
-    infilenames = sys.argv[1:]
+    #infilenames = sys.argv[1:]
     if len(infilenames) != 2:
         print("Wrong number of input files!")
         print("Should be 2!")
@@ -78,9 +78,11 @@ def mergeDataframes(dfs):
 
 
 ################################################################################
-def preprocess(df, xCols, test_size=0.20):
-  X = df.iloc[:, 0:xCols] # all features except label
-  y = df.iloc[:, xCols+1:xCols+2] # column with label
+def preprocess(df, class_string='Class', test_size=0.20):
+  #X = df.iloc[:, 0:xCols] # all features except label
+  #y = df.iloc[:, xCols+1:xCols+2] # column with label
+  X = df.drop(class_string,axis=1) # all features except label
+  y = df[[class_string]] # column with label
 
   # convert categories into numerical labels
   le = preprocessing.LabelEncoder()
