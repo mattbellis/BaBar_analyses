@@ -10,24 +10,34 @@
 
 import ROOT
 from pdf_definitions import argus_in_x
+import numpy as np
 
-def main():
+import sys
+
+def main(argv):
     # Set up component pdfs
     # ---------------------------------------
 
+
     # Declare observable x
-    x = ROOT.RooRealVar("x", "x", 0.5, 1.0)
+    x = ROOT.RooRealVar("x", "x", 0.7, 1.0)
     x.setBins(25)
 
     # Create two Gaussian PDFs g1(x,mean1,sigma) anf g2(x,mean2,sigma) and
     # their parameters
     pars_bkg, argus_bkg = argus_in_x(x,'bkg')
-    pars_bkg[0].setVal(1)
-    pars_bkg[1].setVal(0.98)
+    pars_bkg[0].setVal(1.0)
+    pars_bkg[0].setRange(0.8,1.5)
+
+    pars_bkg[1].setVal(1.0)
+    pars_bkg[1].setRange(0.97,1.001)
 
     pars_sig, argus_sig = argus_in_x(x,'sig')
     pars_sig[0].setVal(-7)
-    pars_sig[1].setVal(0.98)
+    pars_sig[0].setRange(-7.5,-6.5)
+
+    pars_sig[1].setVal(1.0)
+    pars_sig[1].setRange(0.97,1.001)
 
 
     # Method 1 - Construct extended composite model
@@ -35,8 +45,8 @@ def main():
     
     # Sum the composite signal and background into an extended pdf
     # nsig*sig+nbkg*bkg
-    nsig = ROOT.RooRealVar("nsig", "number of signal events", 100, 0., 10000)
-    nbkg = ROOT.RooRealVar( "nbkg", "number of background events", 300, 0, 10000)
+    nsig = ROOT.RooRealVar("nsig", "number of signal events", 100000, 0., 1000000)
+    nbkg = ROOT.RooRealVar( "nbkg", "number of background events", 300, 0, 1000000)
     model = ROOT.RooAddPdf("model", "a1+a2",
         ROOT.RooArgList( argus_bkg, argus_sig), ROOT.RooArgList( nbkg, nsig))
 
@@ -46,6 +56,26 @@ def main():
     # Generate a data sample of expected number events in x from model
     # = model.expectedEvents() = nsig+nbkg
     data = model.generate(ROOT.RooArgSet(x))
+    
+    # Or read one in
+    infilename = argv[1]
+    real_data = np.load(infilename)
+    print(real_data)
+
+    data = ROOT.RooDataSet("data","data",ROOT.RooArgSet(x))
+    xlo = x.getRange()[0]
+    xhi = x.getRange()[1]
+    print(xlo,xhi)
+    for i,d in enumerate(real_data):
+        #print(d)
+        if i%100000==0:
+            print(i,len(real_data))
+        if i>1000000:
+            break
+        if d>xlo and d<xhi:
+            x.setVal(d)
+            data.add(ROOT.RooArgSet(x))
+
 
     # Fit model to data, ML term automatically included
     model.fitTo(data)
@@ -106,6 +136,6 @@ def main():
 
 ################################################################################
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
 
 
