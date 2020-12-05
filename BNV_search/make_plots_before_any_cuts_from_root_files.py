@@ -6,6 +6,8 @@ import sys
 #import pickle
 import uproot
 
+plt.switch_backend("Agg")
+
 import plotting_tools as pt
 
 ################################################################################

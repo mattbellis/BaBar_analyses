@@ -76,6 +76,7 @@ def get_color_scheme(sp=None):
 
     color_scheme = {'1235':'b', 
                     '1237':'c', 
+                    '980':'darkcyan', 
                     '998':'g', 
                     '1005':'r', 
                     '3429':'m', 
@@ -396,7 +397,12 @@ def get_sptag(name):
     labels['3429'] = r'$\tau^+\tau^-$'
     labels['3981'] = r'$\mu^+\mu^-$'
     labels['signal'] = r'$B\rightarrow p \ell^-$'
-    labels['9456'] = r'$B\rightarrow p \ell^-$'
+    labels['9456'] = r'$B\rightarrow p \mu^-$'
+    labels['9457'] = r'$B\rightarrow p e^-$'
+    labels['11975'] = r'$B\rightarrow p \nu$'
+    labels['11976'] = r'$B\rightarrow n \mu^-$'
+    labels['11977'] = r'$B\rightarrow n e^-$'
+    labels['980'] = r'$B\rightarrow \pi \pi$'
     labels['Data'] = r'Data'
 
     tag = None
@@ -410,7 +416,7 @@ def get_sptag(name):
     elif name.find('SP')>=0:
         # MC
         index = name.find('SP')+1
-        sps = ['1235', '1237', '1005', '998', '3429', '3981','9456']
+        sps = ['1235', '1237', '1005', '998', '3429', '3981','9456', '9457', '11975', '11976', '11977', '980']
         for sp in sps:
             if name.find(sp,index)>=index:
                 break

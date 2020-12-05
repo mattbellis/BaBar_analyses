@@ -7,6 +7,8 @@ import pickle
 
 import plotting_tools as pt
 
+plt.switch_backend("Agg")
+
 ################################################################################
 
 # Variables of interest
@@ -65,6 +67,7 @@ plt.legend(fontsize=12)
 plt.tight_layout()
 
 filename = 'plots/before_any_cuts_ncharged_momentum_{0}.png'.format(sptag[0])
+print(filename)
 plt.savefig(filename)
-plt.show()
+#plt.show()
 
