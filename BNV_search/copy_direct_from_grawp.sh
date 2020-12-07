@@ -27,6 +27,8 @@ scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-998-R2
 scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-998-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pmu/ SP-998-R24/
 
 scp -r -P 22000 "mbellis@localhost:/home/mbellis/BaBar_analyses/BNV_search/plots/before*.png" plots/.
+scp -r -P 22000 "mbellis@localhost:/home/mbellis/BaBar_analyses/BNV_search/log*.dat" .
+
 
 
 
