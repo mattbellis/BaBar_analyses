@@ -3,6 +3,9 @@
 #python plot_many_variables.py CUT_SUMMARY_SP-998_pnu.h5 CUT_SUMMARY_SP-1005_pnu.h5 CUT_SUMMARY_SP-123[57]_pnu.h5  CUT_SUMMARY_SP-3429_pnu.h5
 #python plot_many_variables.py CUT_SUMMARY_SP-11975_pnu.h5
 
+#python plot_many_variables.py CUT_SUMMARY_SP-998_nmu.h5 CUT_SUMMARY_SP-1005_nmu.h5 CUT_SUMMARY_SP-123[57]_nmu.h5  CUT_SUMMARY_SP-3429_nmu.h5
+#python plot_many_variables.py CUT_SUMMARY_SP-998_pe.h5 CUT_SUMMARY_SP-1005_pe.h5 CUT_SUMMARY_SP-123[57]_pe.h5  CUT_SUMMARY_SP-3429_pe.h5
 python plot_many_variables.py CUT_SUMMARY_SP-998_nmu.h5 CUT_SUMMARY_SP-1005_nmu.h5 CUT_SUMMARY_SP-123[57]_nmu.h5  CUT_SUMMARY_SP-3429_nmu.h5
+
 #python plot_many_variables.py CUT_SUMMARY_SP-11976_nmu.h5
 

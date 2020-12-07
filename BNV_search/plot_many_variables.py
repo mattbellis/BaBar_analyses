@@ -71,12 +71,12 @@ for infilename in infilenames:
     #shape_mask = bd.shape_mask(df)
     #print(df.columns)
 
-    blinding_mask = bd.blinding_mask(df)
+    #blinding_mask = bd.blinding_mask(df)
 
     #side_bands_mask = bd.side_bands_mask(df,region='DeltaEmES')
-    side_bands_mask = bd.side_bands_mask(df,region='protonp3')
+    #side_bands_mask = bd.side_bands_mask(df,region='protonp3')
 
-    bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton')
+    #bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton')
 
     #dfs.append(df)
     print("------------")
@@ -87,8 +87,8 @@ for infilename in infilenames:
     print("Proton:   ", len(df[proton_mask])/len(df))
     print("Lep&Prot: ", len(df[lepton_mask & proton_mask]))
     print("Lep&Prot: ", len(df[lepton_mask & proton_mask])/len(df))
-    print("Sideband: ", len(df[side_bands_mask]))
-    print("Sideband: ", len(df[side_bands_mask])/len(df))
+    #print("Sideband: ", len(df[side_bands_mask]))
+    #print("Sideband: ", len(df[side_bands_mask])/len(df))
     #print(len(df[shape_mask & lepton_mask & proton_mask])/len(df))
     print("------------")
 
@@ -100,8 +100,12 @@ for infilename in infilenames:
     #dfs.append(df_both)
 
     #dftmp = df[shape_mask & proton_mask & lepton_mask]
-    dftmp = df[proton_mask & lepton_mask]
-    dfs.append(dftmp)
+    #dftmp = df[proton_mask & lepton_mask]
+    #dfs.append(dftmp)
+
+    # No cuts
+    dfs.append(df)
+
     #dftmp = df[proton_mask & lepton_mask & ~blinding_mask]
     #dftmp = df[proton_mask & lepton_mask & side_bands_mask]
     #dftmp = df[proton_mask & lepton_mask & bnv_children_momentum_mask]
