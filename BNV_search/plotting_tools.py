@@ -100,7 +100,9 @@ def get_color_scheme(sp=None):
         return color_scheme[sp]
 
 ################################################################################
-def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,labels=None,xlabelfontsize=12,ignorePID=False,weights=1.0,stacked=False,alpha=0.5,color=None):
+def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,labels=None,sps=None,xlabelfontsize=12,ignorePID=False,weights=1.0,stacked=False,alpha=0.5,color=None):
+
+    signalMC = ['9456','9457','11975','11976','11977']
 
     if type(dfs) != list:
         dfs = [dfs]
@@ -191,29 +193,53 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
             allvals = []
             allweights=[]
             last_df = len(dfs)
+
+            signal_vals,signal_label,signal_weights = None,None,None
+
             if overlay_data:
                 last_df -= 1
             for j in range(last_df):
                 df = dfs[j]
-                #label = None
-                #if labels is not None:
-                    #label = labels[j]
 
-                vals = df[name]
+                print('LEN: ',len(df))
 
-                #print("weights[j]: ",j,weights[j])
-                weight=np.ones(len(vals))
-                if type(weights) == list:
-                    weight *= weights[j]
+                if sps is not None and sps[j] not in signalMC:
 
-                allvals.append(df[name].values)
-                #print(weights)
-                allweights.append(weight)
+                    #label = None
+                    #if labels is not None:
+                        #label = labels[j]
+
+                    vals = df[name]
+
+                    #print("weights[j]: ",j,weights[j])
+                    weight=np.ones(len(vals))
+                    if type(weights) == list:
+                        weight *= weights[j]
+
+                    allvals.append(df[name].values)
+                    #print(weights)
+                    allweights.append(weight)
+                    print("THIS!")
+                    print(sps[j])
+
+                elif sps is not None and sps[j] in signalMC:
+                    print(sps[j])
+                    signal_vals = df[name].values
+                    print("Signal vals: ",len(signal_vals))
+                    signal_label = labels[j]
+                    signal_weights = 0.001*np.ones(len(signal_vals))
 
             tmpcolor=None
             if color is not None:
-                tmpcolor=color[:last_df]
+                tmpcolor=color[:last_df-1]
+
+            print(tmpcolor)
+            print(len(allvals))
             plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,label=labels[:last_df],color=tmpcolor,histtype='stepfilled',density=norm_hist)
+            
+            if sps is not None and sps[j] in signalMC:
+                plt.hist(signal_vals,bins=bins,range=plotrange,weights=signal_weights,stacked=False,alpha=alpha,label=signal_label,color='b',histtype='stepfilled',density=False)
+
 
             if overlay_data:
                 hist_with_errors(dfs[-1][name],bins=bins,range=plotrange,label='Data')

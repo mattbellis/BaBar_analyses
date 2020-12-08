@@ -141,14 +141,14 @@ for icount,infilename in enumerate(infilenames):
     #dftmp = df[proton_mask & lepton_mask & ~blinding_mask]
     #dftmp = df[proton_mask & lepton_mask & side_bands_mask]
     #dftmp = df[proton_mask & lepton_mask & bnv_children_momentum_mask]
-    #dftmp = df[pid_mask & bnv_children_momentum_mask]
-    dftmp = df[pid_mask & bnv_children_momentum_mask & (df['sphericityall']>0.02) & (df['thrustmagall']<0.92) & (df['thrustmagall']<0.92) & (bd.pid_mask(df,particle='electron'))]
+    dftmp = df[pid_mask & bnv_children_momentum_mask]
+    #dftmp = df[pid_mask & bnv_children_momentum_mask & (df['sphericityall']>0.02) & (df['thrustmagall']<0.92) & (df['thrustmagall']<0.92) & (bd.pid_mask(df,particle='electron'))]
     dfs.append(dftmp)
 
     print(infilename)
     sp,label = pt.get_sptag(infilename)
     print(sp,label)
-    sps.append(label)
+    sps.append(sp)
     labels.append(label)
 
     wt = 1.0
@@ -186,7 +186,7 @@ plot_params['bnvbcandMES']['range'] = (5.2,5.3)
 # Shape
 specific_plots = ['thrustmag','thrustcosth','thrustmagall','thrustcosthall', 'sphericityall','r2','r2all','nphot','ncharged','missingE','missingmom','missingmass','scalarmomsum','bnvprotp3','bnvlepp3']
 specific_plots += ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES']
-pt.make_all_plots(dfs,specific_plots=specific_plots,backend='matplotlib',grid_of_plots=(1,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,figsize=(15,3), overlay_data=True)
+pt.make_all_plots(dfs,specific_plots=specific_plots,backend='matplotlib',grid_of_plots=(1,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,sps=sps,stacked=True,weights=weights,color=colors,figsize=(15,3), overlay_data=True)
 #plt.savefig('plots/summary_plots_bkg_pmu.png')
 #plt.savefig('plots/summary_plots_sig_pmu.png')
 #plt.savefig('plots/summary_plots_bkg_pnu.png')
