@@ -92,4 +92,11 @@ def bnv_children_momentum_mask(df,child='proton'):
 
         mask = (x>2.3) & (x<2.8)
 
+    elif child=='muon' or child=='electron' or child=='nu':
+
+        x = df['bnvlepp3']
+
+        mask = (x>2.3) & (x<2.8)
+
+
     return mask

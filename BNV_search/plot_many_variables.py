@@ -8,25 +8,37 @@ import plotting_tools as pt
 import babar_dataframe_tools as bd
 #import babar_tools as bt
 
-raw = pt.return_dataset_information(verbose=True)
 
-color_scheme = {'1235':'b', 
-                '1237':'c', 
-                '998':'g', 
-                '1005':'r', 
-                '3429':'m', 
-                '9456':'k', 
-                '9457':'k', 
-                '11975':'k', 
-                '11976':'k', 
-                '11977':'k', 
-                'Run1':'k', 
-                'Run2':'k', 
-                'Run3':'k', 
-                'Run4':'k', 
-                'Run5':'k', 
-                'Run6':'k', 
-                }
+#raw = pt.return_dataset_information(verbose=True)
+
+
+#########################
+from raw_event_numbers_and_cross_section import *# raw_event_numbers as raw
+#raw = raw_event_numbers
+
+tot = 0
+for key in raw_event_numbers["DATA"].keys():
+	tot += raw_event_numbers["DATA"][key]["raw"]
+
+print(tot,tot/1e9)
+
+bkg = [1235, 1237, 1005, 998, 3429, 3981, 2400]
+tot = 0
+for sp in bkg:
+	key = "{0}".format(sp)
+	xsec = raw_event_numbers["MC"][key]["xsec"]
+	raw = raw_event_numbers["MC"][key]["raw"]
+	weight = (raw/1e6)/(xsec*intlumi)
+	raw_event_numbers["MC"][key]["scale_factor"] = weight
+	raw_event_numbers["MC"][key]["weight"] = 1.0/weight
+
+	print("{0:4s} {1:6.2f} {2:9.2f} {3:9.2f} {4:9.2f} {5:9.2f} {6:9.2f}".format(key, xsec, xsec*intlumi, raw/1e6, (raw/1e6)/(xsec*intlumi), weight, 1/weight))
+	tot += xsec
+
+print(tot)
+
+raw = raw_event_numbers
+####################
 
 infilenames = sys.argv[1:]
 
@@ -52,45 +64,65 @@ sps = []
 labels = []
 weights = []
 colors = []
-for infilename in infilenames:
+for icount,infilename in enumerate(infilenames):
 
     if infilename.find('.csv')>=0:
         df = pd.read_csv(infilename)
     elif infilename.find('.h5')>=0:
         df = pd.read_hdf(infilename)
 
-    #print(df.columns)
-    lepton_mask = bd.pid_mask(df,particle='muon')
+
+    if icount==0:
+        print(df.columns)
+    #lepton_mask = bd.pid_mask(df,particle='muon')
     #lepton_mask = bd.pid_mask(df,particle='electron')
     #lepton_mask = bd.pid_mask(df,particle='proton')
     #proton_mask = bd.pid_mask(df,particle='proton')
     #proton_mask = bd.pid_mask(df,particle='proton')
-    proton_mask = bd.pid_mask(df,particle='muon')
+    #proton_mask = bd.pid_mask(df,particle='muon')
     #proton_mask = bd.pid_mask(df,particle='electron')
+
+	
+    if decay=='pmu':
+        pid_mask = bd.pid_mask(df,particle='proton') & bd.pid_mask(df,particle='muon')
+        bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='muon')
+    elif decay=='pe':
+        pid_mask = bd.pid_mask(df,particle='proton') & bd.pid_mask(df,particle='electron')
+        bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='electron')
+    elif decay=='pnu':
+        pid_mask = bd.pid_mask(df,particle='proton')
+        bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='nu')
+    elif decay=='nmu':
+        pid_mask = bd.pid_mask(df,particle='muon')
+        bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='muon')
+    elif decay=='ne':
+        pid_mask = bd.pid_mask(df,particle='electron')
+        bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='electron')
 
     #shape_mask = bd.shape_mask(df)
     #print(df.columns)
 
-    blinding_mask = bd.blinding_mask(df)
+    #blinding_mask = bd.blinding_mask(df)
 
     #side_bands_mask = bd.side_bands_mask(df,region='DeltaEmES')
-    side_bands_mask = bd.side_bands_mask(df,region='protonp3')
+    #side_bands_mask = bd.side_bands_mask(df,region='protonp3')
 
-    bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton')
+    #bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton')
+    #bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='electron')
 
     #dfs.append(df)
-    print("------------")
-    print("Total:    ", len(df))
-    print("Lepton:   ", len(df[lepton_mask]))
-    print("Lepton:   ", len(df[lepton_mask])/len(df))
-    print("Proton:   ", len(df[proton_mask]))
-    print("Proton:   ", len(df[proton_mask])/len(df))
-    print("Lep&Prot: ", len(df[lepton_mask & proton_mask]))
-    print("Lep&Prot: ", len(df[lepton_mask & proton_mask])/len(df))
-    print("Sideband: ", len(df[side_bands_mask]))
-    print("Sideband: ", len(df[side_bands_mask])/len(df))
-    #print(len(df[shape_mask & lepton_mask & proton_mask])/len(df))
-    print("------------")
+    #print("------------")
+    #print("Total:    ", len(df))
+    #print("Lepton:   ", len(df[lepton_mask]))
+    #print("Lepton:   ", len(df[lepton_mask])/len(df))
+    #print("Proton:   ", len(df[proton_mask]))
+    #print("Proton:   ", len(df[proton_mask])/len(df))
+    #print("Lep&Prot: ", len(df[lepton_mask & proton_mask]))
+    #print("Lep&Prot: ", len(df[lepton_mask & proton_mask])/len(df))
+    ##print("Sideband: ", len(df[side_bands_mask]))
+    ##print("Sideband: ", len(df[side_bands_mask])/len(df))
+    ##print(len(df[shape_mask & lepton_mask & proton_mask])/len(df))
+    #print("------------")
 
     #df_mu = df[lepton_mask]
     #dfs.append(df_mu)
@@ -100,27 +132,34 @@ for infilename in infilenames:
     #dfs.append(df_both)
 
     #dftmp = df[shape_mask & proton_mask & lepton_mask]
-    dftmp = df[proton_mask & lepton_mask]
-    dfs.append(dftmp)
+    #dftmp = df[proton_mask & lepton_mask]
+    #dfs.append(dftmp)
+
+    # No cuts
+    #dfs.append(df)
+
     #dftmp = df[proton_mask & lepton_mask & ~blinding_mask]
     #dftmp = df[proton_mask & lepton_mask & side_bands_mask]
     #dftmp = df[proton_mask & lepton_mask & bnv_children_momentum_mask]
-    #dfs.append(dftmp)
+    dftmp = df[pid_mask & bnv_children_momentum_mask]
+    #dftmp = df[pid_mask & bnv_children_momentum_mask & (df['sphericityall']>0.02) & (df['thrustmagall']<0.92) & (df['thrustmagall']<0.92) & (bd.pid_mask(df,particle='electron'))]
+    dfs.append(dftmp)
 
     print(infilename)
     sp,label = pt.get_sptag(infilename)
     print(sp,label)
-    sps.append(label)
+    sps.append(sp)
     labels.append(label)
 
     wt = 1.0
-    if sp.find('Run')<0:
+    print(sp)
+    if sp.find('Run')<0 and sp.find('runs')<0:
         if 'weight' in list(raw['MC'][sp].keys()):
             wt = raw['MC'][sp]['weight']
     print(wt)
     weights.append(wt)
     #weights.append(wt)
-    colors.append(color_scheme[sp])
+    colors.append(pt.get_color_scheme(sp))
     #colors.append('r')
 
 # Use this for testing cuts
@@ -143,7 +182,11 @@ plot_params['bnvbcandMES']['range'] = (5.2,5.3)
 ############### USE THIS FOR MC STACKING ##############
 # For stacked histograms
 #pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(3,3),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,figsize=(12,7))
-pt.make_all_plots(dfs,specific_plots=['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES'],backend='matplotlib',grid_of_plots=(1,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,figsize=(15,3))
+#specific_plots = ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES']
+# Shape
+specific_plots = ['thrustmag','thrustcosth','thrustmagall','thrustcosthall', 'sphericityall','r2','r2all','nphot','ncharged','missingE','missingmom','missingmass','scalarmomsum','bnvprotp3','bnvlepp3']
+specific_plots += ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES']
+pt.make_all_plots(dfs,specific_plots=specific_plots,backend='matplotlib',grid_of_plots=(1,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,sps=sps,stacked=True,weights=weights,color=colors,figsize=(15,3), overlay_data=True)
 #plt.savefig('plots/summary_plots_bkg_pmu.png')
 #plt.savefig('plots/summary_plots_sig_pmu.png')
 #plt.savefig('plots/summary_plots_bkg_pnu.png')

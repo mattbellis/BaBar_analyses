@@ -33,12 +33,12 @@ def get_variable_parameters_for_plotting():
     plotvars["mup"] = {"values":[], "xlabel":r"muon $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,4),"bins":100} 
     plotvars["ep"] = {"values":[], "xlabel":r"electron $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,4),"bins":100}
     plotvars["r2"] = {"values":[], "xlabel":r"R2", "ylabel":r"# E","range":(0,1)} 
-    plotvars["r2all"] = {"values":[], "xlabel":r"R2 all", "ylabel":r"# E","range":(0,1)} 
-    plotvars["thrustmag"] = {"values":[], "xlabel":r"Thrust mag", "ylabel":r"# E","range":(0,1)} 
-    plotvars["thrustmagall"] = {"values":[], "xlabel":r"Thrust mag all", "ylabel":r"# E","range":(0,1)} 
-    plotvars["thrustcosth"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$", "ylabel":r"# E","range":(-1,1)} 
-    plotvars["thrustcosthall"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$ all", "ylabel":r"# E","range":(-1,1)} 
-    plotvars["sphericityall"] = {"values":[], "xlabel":r"Sphericity all", "ylabel":r"# E","range":(0,1)} 
+    plotvars["r2all"] = {"values":[], "xlabel":r"R2 all", "ylabel":r"# E","range":(0,2)} 
+    plotvars["thrustmag"] = {"values":[], "xlabel":r"Thrust mag", "ylabel":r"# E","range":(0,2)} 
+    plotvars["thrustmagall"] = {"values":[], "xlabel":r"Thrust mag all", "ylabel":r"# E","range":(0,2)} 
+    plotvars["thrustcosth"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$", "ylabel":r"# E","range":(-1,2)} 
+    plotvars["thrustcosthall"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$ all", "ylabel":r"# E","range":(-1,2)} 
+    plotvars["sphericityall"] = {"values":[], "xlabel":r"Sphericity all", "ylabel":r"# E","range":(0,2)} 
     plotvars["ncharged"] = {"values":[], "xlabel":r"# charged particles", "ylabel":r"# E","range":(0,20),"bins":20} 
     plotvars["nphot"] = {"values":[], "xlabel":r"# photons","ylabel":r"# E","range":(0,20),"bins":20} 
 
@@ -91,6 +91,7 @@ def get_color_scheme(sp=None):
                     'Run4':'k', 
                     'Run5':'k', 
                     'Run6':'k', 
+                    'All runs':'k', 
                     }
 
     if sp==None:
@@ -99,7 +100,9 @@ def get_color_scheme(sp=None):
         return color_scheme[sp]
 
 ################################################################################
-def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,labels=None,xlabelfontsize=12,ignorePID=False,weights=1.0,stacked=False,alpha=0.5,color=None):
+def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,labels=None,sps=None,xlabelfontsize=12,ignorePID=False,weights=1.0,stacked=False,alpha=0.5,color=None):
+
+    signalMC = ['9456','9457','11975','11976','11977']
 
     if type(dfs) != list:
         dfs = [dfs]
@@ -122,9 +125,14 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
 
     grid_count = 0
     i = 0
-    for icount,name in enumerate(names):
+    if len(specific_plots) == 0:
+        specific_plots = list(names)
 
-        if len(specific_plots)>0 and name not in specific_plots:
+    #for icount,name in enumerate(names):
+    for icount,name in enumerate(specific_plots):
+
+        #if len(specific_plots)>0 and name not in specific_plots:
+        if name not in names:
             continue
 
 
@@ -140,6 +148,8 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
         if name in plot_params.keys():
             xlabel = plot_params[name]['xlabel']
             plotrange = plot_params[name]['range']
+            if 'bins' in list(plot_params[name].keys()):
+                bins = plot_params[name]['bins']
 
         if name.find('Is')>=0 or name.find('BDT')>=0 or name.find('KM')>=0:
             plotrange=(0,1)
@@ -183,28 +193,53 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
             allvals = []
             allweights=[]
             last_df = len(dfs)
+
+            signal_vals,signal_label,signal_weights = None,None,None
+
             if overlay_data:
                 last_df -= 1
             for j in range(last_df):
                 df = dfs[j]
-                #label = None
-                #if labels is not None:
-                    #label = labels[j]
 
-                vals = df[name]
+                print('LEN: ',len(df))
 
-                print("weights[j]: ",j,weights[j])
-                weight=np.ones(len(vals))
-                if type(weights) == list:
-                    weight *= weights[j]
+                if sps is not None and sps[j] not in signalMC:
 
-                allvals.append(df[name].values)
-                allweights.append(weight)
+                    #label = None
+                    #if labels is not None:
+                        #label = labels[j]
+
+                    vals = df[name]
+
+                    #print("weights[j]: ",j,weights[j])
+                    weight=np.ones(len(vals))
+                    if type(weights) == list:
+                        weight *= weights[j]
+
+                    allvals.append(df[name].values)
+                    #print(weights)
+                    allweights.append(weight)
+                    print("THIS!")
+                    print(sps[j])
+
+                elif sps is not None and sps[j] in signalMC:
+                    print(sps[j])
+                    signal_vals = df[name].values
+                    print("Signal vals: ",len(signal_vals))
+                    signal_label = labels[j]
+                    signal_weights = 0.001*np.ones(len(signal_vals))
 
             tmpcolor=None
             if color is not None:
-                tmpcolor=color[:last_df]
+                tmpcolor=color[:last_df-1]
+
+            print(tmpcolor)
+            print(len(allvals))
             plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,label=labels[:last_df],color=tmpcolor,histtype='stepfilled',density=norm_hist)
+            
+            if sps is not None and sps[j] in signalMC:
+                plt.hist(signal_vals,bins=bins,range=plotrange,weights=signal_weights,stacked=False,alpha=alpha,label=signal_label,color='b',histtype='stepfilled',density=False)
+
 
             if overlay_data:
                 hist_with_errors(dfs[-1][name],bins=bins,range=plotrange,label='Data')
@@ -218,7 +253,9 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
                 plt.xlabel(name,fontsize=xlabelfontsize)
 
             if labels is not None:
-                plt.legend(fontsize=8,loc='upper left')
+                #plt.legend(fontsize=8,loc='upper left')
+                #plt.legend(fontsize=8,loc='lower left')
+                plt.legend(fontsize=8)
 
         ########################################################################
         if i%nplots_per_figure==nplots_per_figure-1 or i==nplots-1:
@@ -414,8 +451,12 @@ def get_sptag(name):
         # Data
         # basicPID_R24-AllEvents-Run1-OnPeak-R24-9_SKIMMED.root
         #tag = name.split('basicPID_R24-AllEvents-')[1].split('-OnPeak-R24-')[0]
-        tag = 'Run' + name.split('Run')[1][0]
+        tag = 'All runs'
+        if name.find('Run')>=0 and name.find('AllRuns')<0:
+            tag = 'Run' + name.split('Run')[1][0]
         label = 'Data'
+        print("HERE!!!")
+        print(tag,label)
     elif name.find('SP')>=0:
         # MC
         index = name.find('SP')+1
