@@ -361,7 +361,12 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
                     # Try to improve the resolution by replacing some of the 
                     # B beam energy with 1/2 the beam
                     #totp4_temp[0] = halfbeam - bcp4[0]
-                    totp4_temp[0] = beam[0] - (halfbeam + bcp4[0])
+                    if decay=='pmu' or decay=='pe':
+                        totp4_temp[0] = beam[0] - (halfbeam + bcp4[0])
+                    elif decay=='pnu':
+                        totp4_temp[0] = beam[0] - (halfbeam + p0[0])
+                    elif decay=='nmu' or decay=='ne':
+                        totp4_temp[0] = beam[0] - (halfbeam + l0[0])
                     m = invmass([totp4_temp],return_squared=True)
                     #print(totp4_temp)
                     #print(m,halfbeam,bcp4[0])
