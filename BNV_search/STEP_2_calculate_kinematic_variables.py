@@ -600,7 +600,10 @@ for i in range(nentries):
     '''
 
     # Fill the bcandidates
+    #print("====================")
+    #print("# tracks!: ", ne[0],nmu[0],npi[0],nk[0],nproton[0], ne[0]+nmu[0]+npi[0]+nk[0]+nproton[0])
     nbnvbcand[0],temp_bcand,temp_dE,temp_mes,temp_bnvprotp3,temp_bnvlepp3,temp_bnvprotidx,temp_bnvlepidx, temp_tagbcand,temp_tagdE,temp_tagmes,temp_tagq,missingmom[0],missingE[0],temp_missingmass = calc_B_variables(myparticles,beam,decay)
+    #print("nbnvbcand: ",nbnvbcand[0])
     for n in range(nbnvbcand[0]):
         bcand[n] = temp_bcand[n]
         dE[n] = temp_dE[n]

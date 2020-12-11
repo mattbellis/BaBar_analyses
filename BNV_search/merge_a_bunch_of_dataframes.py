@@ -28,6 +28,7 @@ for i,infilename in enumerate(infilenames):
         print(i,nfiles,infilename)
 
     df = pd.read_hdf(infilename)
+    print(len(df))
 
     frames.append(df)
 

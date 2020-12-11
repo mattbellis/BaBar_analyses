@@ -102,8 +102,8 @@ def main():
         # Yes plot the kinvars, or at least build the pickle files
         ########################################
         #'''
-        for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
-        #for d in ['ne']:
+        #for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
+        for d in ['ne']:
             if subset[0].find('_'+d)<0:
                 continue
             print(d)

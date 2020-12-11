@@ -389,6 +389,8 @@ def return_dataset_information(verbose=False):
 ################################################################################
 def get_sptag(name):
 
+    decays = ['/pmu/','/pe/','/pnu/','/nmu/','/ne/']
+
     labels = {}
     labels['1235'] = r'$B^+B^-$'
     labels['1237'] = r'$B^0\bar{B}^0$'
@@ -407,6 +409,7 @@ def get_sptag(name):
 
     tag = None
     label = None
+    decay = None
     if name.find('AllEvents')>=0:
         # Data
         # basicPID_R24-AllEvents-Run1-OnPeak-R24-9_SKIMMED.root
@@ -422,5 +425,11 @@ def get_sptag(name):
                 break
         tag = sp
         label = labels[sp]
-    return tag,label
+
+    for d in decays:
+        if name.find(d)>=0:
+            decay = d
+            break
+
+    return tag,label,decay
 ################################################################################

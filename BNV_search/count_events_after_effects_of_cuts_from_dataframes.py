@@ -11,7 +11,7 @@ infilenames = sys.argv[1:]
 
 
 sptag = pt.get_sptag(infilenames[0])
-print(sptag)
+#print(sptag)
 
 tot = 0
 for infilename in infilenames:
@@ -20,5 +20,5 @@ for infilename in infilenames:
     tot += size
     #print(tot,size)
 
-print(sptag[0],'\tTotal: ',tot)
+print(sptag[0],'\t',sptag[2],'\tTotal: ',tot)
 

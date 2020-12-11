@@ -338,11 +338,14 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     #print(leps)
     if 1:
         for p0 in prots:
+            #print('----')
             for l0 in leps:
                 #print(p0)
                 #print(l0)
                 # Check the charge
+                #print("Tot charge: ", p0[-3]*l0[-3])
                 if p0[-3]*l0[-3]<=0:
+                    #print('FOUND BCAND!')
                     bcp4 = p0+l0
                     #print("here!!!!!!!!!")
                     #print(bcp4)

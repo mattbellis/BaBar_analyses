@@ -187,7 +187,8 @@ def get_sptag(name):
 
 outfilename = None
 outfilename_df = None
-sptag = None
+#sptag = None
+sptag = 'AllEvents'
 
 if args.outfile is None:
     sptag = get_sptag(args.infiles[0][0]) 
