@@ -35,12 +35,15 @@ def pid_mask(df,particle='muon'):
 ################################################################################
 def shape_mask(df):
 
-    mask = (df['r2all']>0.2) \
-         & (df['r2all']<0.9) \
+    # ne
+    mask = (df['r2all']>0.05) \
+         & (df['r2all']<0.75) \
+         & (df['scalarmomsum']>5) \
+         & (df['scalarmomsum']<9) \
          & (df['thrustmag']>0.65) \
-         & (df['thrustmag']<0.9) \
-         & (df['thrustmagall']>0.72) \
-         & (df['thrustmagall']<0.85) \
+         & (df['thrustmag']<0.92) \
+         & (df['thrustmagall']>0.60) \
+         & (df['thrustmagall']<0.92) \
 
     return mask
 
