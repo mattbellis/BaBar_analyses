@@ -214,6 +214,8 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     # Pmag for particles in B candidate
     protp3 = []
     lepp3 = []
+    protcosth = []
+    lepcosth = []
     protidx = []
     lepidx = []
 
@@ -349,9 +351,11 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
                     #bcands_temp.append(p0+l0)
                     bcands_temp.append(bcp4)
                     protp3.append(vec_mag(p0[1:4]))
+                    protcosth.append(p0[3]/vec_mag(p0[1:4]))
                     protidx.append(p0[-2])
                     #print(l0)
                     lepp3.append(vec_mag(l0[1:4]))
+                    lepcosth.append(l0[3]/vec_mag(l0[1:4]))
                     lepidx.append(l0[-2])
 
                     # Recalculate the missing mass assuming B on one side
@@ -438,6 +442,6 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     tagmes = invmass([tagbc])
     '''
 
-    return nbnvbcand,bcand,dE,mes,protp3,lepp3,protidx,lepidx, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass
+    return nbnvbcand,bcand,dE,mes,protp3,lepp3,protcosth,lepcosth,protidx,lepidx, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass
 
 

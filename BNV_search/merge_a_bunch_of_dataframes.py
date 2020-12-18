@@ -38,8 +38,9 @@ for i,infilename in enumerate(infilenames):
     df = pd.read_hdf(infilename)
 
 
+    bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') 
     #bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='electron')
-    bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='electron')
+    #bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='electron')
 
 
     frames.append(df[bnv_children_momentum_mask])

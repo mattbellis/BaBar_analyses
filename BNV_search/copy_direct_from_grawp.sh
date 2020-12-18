@@ -9,6 +9,8 @@ scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/AllEvent
 scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-9456-R24/basicPID_pi0_R24/*10*.root" SP-9456-R24/basicPID_pi0_R24/.
 scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-9456-R24/basicPID_pi0_R24/PID_assignment/*10*.root" SP-9456-R24/basicPID_pi0_R24/PID_assignment/.
 
+scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-11977-R24/basicPID_pi0_R24/*10*.root" SP-11977-R24/basicPID_pi0_R24/.
+
 #scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles//SP-9456-R24/basicPID_pi0_R24/*.root"
 #scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles//SP-9456-R24/basicPID_pi0_R24/SP-9456-R24-100_SKIMMED.root"
 

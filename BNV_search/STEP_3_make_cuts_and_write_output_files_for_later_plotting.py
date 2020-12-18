@@ -410,17 +410,23 @@ for i in range(nentries):
             cut3 *= bnvprotp3[0]>lopcut and bnvprotp3[0]<hipcut
             cut3 *= bnvlepp3[0]>lopcut and bnvlepp3[0]<hipcut
     elif decay=='pnu':
+        lopcut = 1.5
+        hipcut = 4.5
         cut3 = nbnvbcand==1 
         if nbnvbcand>0:
             cut3 *= bnvprotp3[0]>lopcut and bnvprotp3[0]<hipcut
             cut3 *= bnvlepp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
     elif decay=='nmu':
+        lopcut = 0.0
+        hipcut = 4.0
         cut3 = nbnvbcand==1 
         if nbnvbcand>0:
             cut3 *= bnvprotp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
             cut3 *= bnvlepp3[0]>lopcut and bnvlepp3[0]<hipcut
     elif decay=='ne':
         cut3 = nbnvbcand==1 
+        lopcut = 0.0
+        hipcut = 4.0
         if nbnvbcand>0:
             cut3 *= bnvprotp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
             cut3 *= bnvlepp3[0]>lopcut and bnvlepp3[0]<hipcut

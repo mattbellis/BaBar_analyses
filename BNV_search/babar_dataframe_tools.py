@@ -19,7 +19,7 @@ def pid_mask(df,particle='muon'):
 
 
     tot = len(df)
-    print(tot)
+    #print(tot)
 
     mask = True
     for cut in failing:
@@ -28,7 +28,7 @@ def pid_mask(df,particle='muon'):
         mask &= (df[cut]==1)
 
     tot = len(df[mask])
-    print(tot)
+    #print(tot)
 
     return mask
 
@@ -90,16 +90,20 @@ def bnv_children_momentum_mask(df,child='proton'):
     mask = None
 
     if child=='proton':
-
         x = df['bnvprotp3']
-
         mask = (x>2.3) & (x<2.8)
 
-    elif child=='muon' or child=='electron' or child=='nu':
-
+    elif child=='muon' or child=='electron':
         x = df['bnvlepp3']
-
         mask = (x>2.3) & (x<2.8)
+
+    elif child=='nu':
+        x = df['bnvlepp3']
+        mask = (x>1.5) & (x<4.5)
+
+    elif child=='neutron':
+        x = df['bnvprotp3']
+        mask = (x>0.0) & (x<4.0)
 
 
     return mask
