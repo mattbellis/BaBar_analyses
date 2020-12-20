@@ -36,6 +36,8 @@ plotvars["bnvbcandMES"] = {"values":[], "xlabel":r"BNV M$_{\rm ES}$ [GeV/c$^{2}$
 plotvars["bnvbcandDeltaE"] = {"values":[], "xlabel":r"BNV $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
 plotvars["bnvprotp3"] = {"values":[], "xlabel":r"BNV proton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
 plotvars["bnvlepp3"] = {"values":[], "xlabel":r"BNV lepton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
+plotvars["bnvprotcosth"] = {"values":[], "xlabel":r"BNV proton $\cos(\theta)$ ", "ylabel":r"# E","range":(-1,1)} 
+plotvars["bnvlepcosth"] = {"values":[], "xlabel":r"BNV lepton $\cos(\theta)$ ", "ylabel":r"# E","range":(-1,1)} 
 
 plotvars["tagbcandmass"] = {"values":[], "xlabel":r"Mass tag B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
 plotvars["tagbcandMES"] = {"values":[], "xlabel":r"tag M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
@@ -264,6 +266,9 @@ for i in range(nentries):
     bnvbcandDeltaE = tree.dE
     bnvprotp3 = tree.bnvprotp3
     bnvlepp3 = tree.bnvlepp3
+    bnvprotcosth = tree.bnvprotcosth
+    bnvlepcosth = tree.bnvlepcosth
+
 
     tagbcandmass = tree.tagbcand
     tagbcandMES = tree.tagmes
@@ -283,6 +288,9 @@ for i in range(nentries):
     pp = tree.protonp3
     mup = tree.mup3
     ep = tree.ep3
+    pcosth = tree.protoncosth
+    mucosth = tree.mucosth
+    ecosth = tree.ecosth
 
 
     protonIsTightKMProton = tree.protonIsTightKMProton
@@ -464,6 +472,8 @@ for i in range(nentries):
                 plotvars["bnvbcandDeltaE"]["values"][icut].append(bnvbcandDeltaE[k])
                 plotvars["bnvprotp3"]["values"][icut].append(bnvprotp3[k])
                 plotvars["bnvlepp3"]["values"][icut].append(bnvlepp3[k])
+                plotvars["bnvprotcosth"]["values"][icut].append(bnvprotcosth[k])
+                plotvars["bnvlepcosth"]["values"][icut].append(bnvlepcosth[k])
 
                 plotvars["tagbcandmass"]["values"][icut].append(tagbcandmass[k])
                 plotvars["tagbcandMES"]["values"][icut].append(tagbcandMES[k])
