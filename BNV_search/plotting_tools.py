@@ -22,6 +22,8 @@ def get_variable_parameters_for_plotting():
     plotvars["tagbcandDeltaE"] = {"values":[], "xlabel":r"tag $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
     plotvars["tagq"] = {"values":[], "xlabel":r"tag charge", "ylabel":r"# E","range":(-5,5)} 
     plotvars["missingmass"] = {"values":[], "xlabel":r"Missing mass [GeV/c$^2$]", "ylabel":r"# E","range":(-10,10)} 
+    plotvars["missingmass_byhand"] =  {"values":[], "xlabel":r"Missing mass [GeV/c$^2$]", "ylabel":r"# E","range":(-5,5)} 
+    plotvars["missingmass2_byhand"] = {"values":[], "xlabel":r"Missing mass$^2$ [GeV$^2$/c$^4$]", "ylabel":r"# E","range":(-5,5)} 
     plotvars["missingmom"] = {"values":[], "xlabel":r"Missing momentum [GeV/c]", "ylabel":r"# E","range":(0,10)} 
     plotvars["missingE"] = {"values":[], "xlabel":r"Missing E [GeV]", "ylabel":r"# E","range":(-2,10)} 
     plotvars["scalarmomsum"] = {"values":[], "xlabel":r"Scalar momentum sum [GeV/c]", "ylabel":r"# E","range":(0,15)} 
@@ -32,13 +34,13 @@ def get_variable_parameters_for_plotting():
     plotvars["pp"] = {"values":[], "xlabel":r"proton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,4),"bins":100} 
     plotvars["mup"] = {"values":[], "xlabel":r"muon $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,4),"bins":100} 
     plotvars["ep"] = {"values":[], "xlabel":r"electron $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,4),"bins":100}
-    plotvars["r2"] = {"values":[], "xlabel":r"R2", "ylabel":r"# E","range":(0,1)} 
-    plotvars["r2all"] = {"values":[], "xlabel":r"R2 all", "ylabel":r"# E","range":(0,2)} 
-    plotvars["thrustmag"] = {"values":[], "xlabel":r"Thrust mag", "ylabel":r"# E","range":(0,2)} 
-    plotvars["thrustmagall"] = {"values":[], "xlabel":r"Thrust mag all", "ylabel":r"# E","range":(0,2)} 
-    plotvars["thrustcosth"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$", "ylabel":r"# E","range":(-1,2)} 
-    plotvars["thrustcosthall"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$ all", "ylabel":r"# E","range":(-1,2)} 
-    plotvars["sphericityall"] = {"values":[], "xlabel":r"Sphericity all", "ylabel":r"# E","range":(0,2)} 
+    plotvars["r2"] = {"values":[], "xlabel":r"R2", "ylabel":r"# E","range":(0,1.2)} 
+    plotvars["r2all"] = {"values":[], "xlabel":r"R2 all", "ylabel":r"# E","range":(0,1.2)} 
+    plotvars["thrustmag"] = {"values":[], "xlabel":r"Thrust mag", "ylabel":r"# E","range":(0,1.2)} 
+    plotvars["thrustmagall"] = {"values":[], "xlabel":r"Thrust mag all", "ylabel":r"# E","range":(0,1.2)} 
+    plotvars["thrustcosth"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$", "ylabel":r"# E","range":(-0.2,1.2)} 
+    plotvars["thrustcosthall"] = {"values":[], "xlabel":r"Thrust $\cos(\theta)$ all", "ylabel":r"# E","range":(-0.2,1.2)} 
+    plotvars["sphericityall"] = {"values":[], "xlabel":r"Sphericity all", "ylabel":r"# E","range":(0,1.2)} 
     plotvars["ncharged"] = {"values":[], "xlabel":r"# charged particles", "ylabel":r"# E","range":(0,20),"bins":20} 
     plotvars["nphot"] = {"values":[], "xlabel":r"# photons","ylabel":r"# E","range":(0,20),"bins":20} 
 
@@ -100,7 +102,44 @@ def get_color_scheme(sp=None):
         return color_scheme[sp]
 
 ################################################################################
-def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,labels=None,sps=None,xlabelfontsize=12,ignorePID=False,weights=1.0,stacked=False,alpha=0.5,color=None):
+def plot_mes_vs_de(dfs,specific_plots=['bnvbcandMES','bnvbcandDeltaE'],plot_params=None,figsize=(5,3.5),ranges=None,bins=None,labels=None,sps=None,xlabelfontsize=12,alpha=0.5,color='k', markersize=1, decay=None, tag='default'):
+
+    plotvars = get_variable_parameters_for_plotting()
+
+    axeslabels = []
+    axeslabels.append(plotvars[specific_plots[0]]['xlabel'])
+    axeslabels.append(plotvars[specific_plots[1]]['xlabel'])
+
+    if ranges is None:
+        ranges = []
+        ranges.append(plotvars[specific_plots[0]]['range'])
+        ranges.append(plotvars[specific_plots[1]]['range'])
+
+    plt.figure(figsize=figsize)
+    plt.subplot(1,1,1)
+
+    for df in dfs:
+        x = df[specific_plots[0]]
+        y = df[specific_plots[1]]
+
+        #plt.plot(x,y,'.',markersize=markersize,color
+        print("LABELS: ",labels)
+        sns.histplot(df,x=specific_plots[0],y=specific_plots[1],binrange=(ranges[0],ranges[1]),bins=bins,cbar=True)#,ax=plt.gca())
+        plt.xlabel(axeslabels[0],fontsize=xlabelfontsize)
+        plt.ylabel(axeslabels[1],fontsize=xlabelfontsize)
+        plt.title(label=labels[0])
+
+    plt.tight_layout()
+
+    # MC
+    filename = 'plots/de_vs_mes_cut_summary_files_SP-{0}_{1}_{2}.png'.format(sps[0],decay,tag)
+    # Data
+    #filename = 'plots/de_vs_mes_cut_summary_files_{0}_{1}_{2}.png'.format(labels[0],decay,tag)
+    print(filename)
+    plt.savefig(filename)
+
+################################################################################
+def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,labels=None,sps=None,xlabelfontsize=12,ignorePID=False,weights=1.0,stacked=False,alpha=0.5,color=None, decay=None, tag='default'):
 
     signalMC = ['9456','9457','11975','11976','11977']
 
@@ -127,6 +166,8 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
     i = 0
     if len(specific_plots) == 0:
         specific_plots = list(names)
+
+    figcount = 0
 
     #for icount,name in enumerate(names):
     for icount,name in enumerate(specific_plots):
@@ -201,7 +242,7 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
             for j in range(last_df):
                 df = dfs[j]
 
-                print('LEN: ',len(df))
+                #print('LEN: ',len(df))
 
                 if sps is not None and sps[j] not in signalMC:
 
@@ -219,13 +260,13 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
                     allvals.append(df[name].values)
                     #print(weights)
                     allweights.append(weight)
-                    print("THIS!")
-                    print(sps[j])
+                    #print("THIS!")
+                    #print(sps[j])
 
                 elif sps is not None and sps[j] in signalMC:
-                    print(sps[j])
+                    #print(sps[j])
                     signal_vals = df[name].values
-                    print("Signal vals: ",len(signal_vals))
+                    #print("Signal vals: ",len(signal_vals))
                     signal_label = labels[j]
                     signal_weights = 0.001*np.ones(len(signal_vals))
 
@@ -233,12 +274,22 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
             if color is not None:
                 tmpcolor=color[:last_df-1]
 
-            print(tmpcolor)
-            print(len(allvals))
+            #print(tmpcolor)
+            #print(len(allvals))
             plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,label=labels[:last_df],color=tmpcolor,histtype='stepfilled',density=norm_hist)
             
             if sps is not None and sps[j] in signalMC:
-                plt.hist(signal_vals,bins=bins,range=plotrange,weights=signal_weights,stacked=False,alpha=alpha,label=signal_label,color='b',histtype='stepfilled',density=False)
+
+                wtot = 0
+                for w in allweights:
+                    wtot += w.sum()
+                nsigvals = len(signal_vals)
+
+                sigweight = wtot/nsigvals
+                # Make the signal 10% of the total
+                signal_weights = 0.1*sigweight*np.ones(len(signal_vals))
+
+                plt.hist(signal_vals,bins=bins,range=plotrange,weights=signal_weights,stacked=False,lw=2,ls='--',label=signal_label,color='b',histtype='step',density=False)
 
 
             if overlay_data:
@@ -261,10 +312,16 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
         if i%nplots_per_figure==nplots_per_figure-1 or i==nplots-1:
             print("Here!")
             plt.tight_layout()
+            filename = 'plots/stacked_cut_summary_files_{0}_{1}_{2}.png'.format(decay,tag,figcount)
+            plt.savefig(filename)
+            figcount += 1
 
         i += 1
         plt.tight_layout()
         grid_count += 1
+
+        filename = 'plots/stacked_cut_summary_files_{0}_{1}_{2}.png'.format(decay,tag,figcount)
+        plt.savefig(filename)
 
 
 

@@ -1,3 +1,9 @@
+########################################
+# # of charged cuts
+# BNV child p 2.3-2.8 GeV/c
+# # of high-p tracks is 1 or 2
+# # of BNV tracks is 1
+########################################
 event_numbers = {}
 event_numbers["DATA"] = {}
 event_numbers["MC"] = {}

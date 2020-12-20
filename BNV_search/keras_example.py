@@ -15,7 +15,7 @@ from tensorflow.keras.utils import plot_model
 
 from matplotlib import pyplot
 
-tag = 'pmu_1005'
+#tag = 'pmu_1005'
 
 # **********************************************
 # Output: dataset without specified 
@@ -82,25 +82,17 @@ for name in list(df0.keys()):
 toberemoved.append('ne')
 toberemoved.append('np')
 toberemoved.append('nmu')
-<<<<<<< HEAD
-#toberemoved.append('nbnvbcand')
-toberemoved.append('bnvbcandMES')
-toberemoved.append('bnvbcandDeltaE')
-#toberemoved.append('bnvbcandmass')
-=======
-toberemoved.append('nbnvbcand')
-toberemoved.append('tagbcandmass')
-toberemoved.append('nhighmom')
 #toberemoved.append('bnvbcandMES')
 #toberemoved.append('bnvbcandDeltaE')
 toberemoved.append('bnvbcandmass')
->>>>>>> 45ad02d9424741dec6ea0e7c4ba7042491c9c756
+toberemoved.append('nbnvbcand')
+#toberemoved.append('tagbcandmass')
+toberemoved.append('nhighmom')
 toberemoved.append('bnvlepp3')
 toberemoved.append('bnvprotp3')
-#toberemoved.append('bnvprotp3')
 toberemoved.append('pp')
-toberemoved.append('ep')
-toberemoved.append('mup')
+#toberemoved.append('ep')
+#toberemoved.append('mup')
 #'''
 
 for tbr in toberemoved:
@@ -170,11 +162,12 @@ print('Predicted: %.3f' % yhat) # 1 = proton, 0 = not proton
 
 model.summary()
 #model.save('keras_model')
-modelfilename = 'KERAS_TRAINING_{0}_{1}.h5'.format(infilenames[0].split('.h5')[0],infilenames[1].split('.h5')[0])
+tag = '{0}_{1}'.format(infilenames[0].split('.h5')[0],infilenames[1].split('.h5')[0])
+modelfilename = 'KERAS_TRAINING_{0}.h5'.format(tag)
 #model.save('TT_keras_model.h5')
 model.save(modelfilename)
 
-sktools.compare_train_test(model, X_train, y_train, X_test, y_test, bins=200)
+sktools.compare_train_test(model, X_train, y_train, X_test, y_test, bins=200,tag=tag)
 
 
 
@@ -220,7 +213,7 @@ data_to_save['fpr_keras'] = fpr_keras
 data_to_save['tpr_keras'] = tpr_keras
 data_to_save['thresholds_keras'] = thresholds_keras
 df_out = pd.DataFrame.from_dict(data_to_save)
-df_out.to_hdf('roc_out.h5','df_out')
+df_out.to_hdf('roc_out_{0}.h5'.format(tag),'df_out')
 
 pyplot.figure()
 pyplot.plot([0, 1], [0, 1], 'k--')

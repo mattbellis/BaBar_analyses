@@ -94,15 +94,15 @@ for icount,infilename in enumerate(infilenames):
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='nu')
     elif decay=='nmu':
         pid_mask = bd.pid_mask(df,particle='muon')
-        bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='muon')
+        bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='neutron') & bd.bnv_children_momentum_mask(df,child='muon')
     elif decay=='ne':
         pid_mask = bd.pid_mask(df,particle='electron')
-        bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='electron')
+        bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='neutron') & bd.bnv_children_momentum_mask(df,child='electron')
 
-    #shape_mask = bd.shape_mask(df)
+    shape_mask = bd.shape_mask(df)
     #print(df.columns)
 
-    #blinding_mask = bd.blinding_mask(df)
+    blinding_mask = bd.blinding_mask(df)
 
     #side_bands_mask = bd.side_bands_mask(df,region='DeltaEmES')
     #side_bands_mask = bd.side_bands_mask(df,region='protonp3')
@@ -141,8 +141,20 @@ for icount,infilename in enumerate(infilenames):
     #dftmp = df[proton_mask & lepton_mask & ~blinding_mask]
     #dftmp = df[proton_mask & lepton_mask & side_bands_mask]
     #dftmp = df[proton_mask & lepton_mask & bnv_children_momentum_mask]
-    dftmp = df[pid_mask & bnv_children_momentum_mask]
-    #dftmp = df[pid_mask & bnv_children_momentum_mask & (df['sphericityall']>0.02) & (df['thrustmagall']<0.92) & (df['thrustmagall']<0.92) & (bd.pid_mask(df,particle='electron'))]
+    #dftmp = df[pid_mask & bnv_children_momentum_mask]
+    #dftmp = df[pid_mask & bnv_children_momentum_mask & (df['ncharged']>5) & (df['ne']==1) & (df['sphericityall']>0.02) & (df['thrustmagall']<0.92) & (df['thrustmagall']<0.92) ]
+    #dftmp = df[pid_mask & bnv_children_momentum_mask & (df['sphericityall']>0.02)  ]
+    #dftmp = df[bnv_children_momentum_mask & (df['sphericityall']>0.02) & (df['ne']==1)   & (df['ncharged']>5) & shape_mask   ]
+    dftmp = None
+    print("Checking!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    #if infilenames[0].find('AllEvents')>=0:
+    if infilename.find('AllEvents')>=0:
+        print("DATA!!!!!!!!!!!!!!")
+        #dftmp = df[pid_mask & bnv_children_momentum_mask & ~blinding_mask ]
+        dftmp = df[pid_mask & ~blinding_mask ]
+        #dftmp = df[pid_mask & bnv_children_momentum_mask ]
+    else:
+        dftmp = df[pid_mask & bnv_children_momentum_mask ]
     dfs.append(dftmp)
 
     print(infilename)
@@ -169,12 +181,31 @@ for icount,infilename in enumerate(infilenames):
 
 print("Making the plots.......")
 plot_params = pt.get_variable_parameters_for_plotting()
-#plot_params['bnvbcandDeltaE']['range'] = (-1.0,1.0)
-#plot_params['bnvbcandDeltaE']['range'] = (-3.0,-2.0)
-plot_params['bnvbcandDeltaE']['range'] = (-4.0,-2.0)
-plot_params['bnvbcandMES']['range'] = (5.2,5.3)
+# pe and pmu
+#plot_params['bnvbcandDeltaE']['range'] = (-0.6,0.6)
+#plot_params['missingmass']['range'] = (-5.0,1.0)
+#plot_params['missingE']['range'] = (-4.0,4.0)
+#plot_params['missingmom']['range'] = (-1.2,4.0)
+# pnu
+#plot_params['bnvbcandDeltaE']['range'] = (-3,-2)
+#plot_params['missingmass2_byhand']['range'] = (-10.0,14.0)
+#plot_params['missingmass_byhand']['range'] = (-3.0,6.0)
+#plot_params['missingE']['range'] = (-4.0,8.0)
+#plot_params['missingmom']['range'] = (1.0,4.0)
+
+# nmu
+plot_params['bnvbcandDeltaE']['range'] = (-3,-2)
+plot_params['missingmass2_byhand']['range'] = (-10.0,14.0)
+plot_params['missingmass_byhand']['range'] = (-3.0,6.0)
+plot_params['missingE']['range'] = (-4.0,8.0)
+plot_params['missingmom']['range'] = (0.0,5.0)
+plot_params['bnvbcandmass']['range'] = (0.0,10.0)
+plot_params['tagbcandmass']['range'] = (0.0,10.0)
+
 #pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,norm_hist=True,labels=labels,plot_params=plot_params)
 #pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=False,weights=weights)
+
+plot_params['bnvbcandMES']['range'] = (5.2,5.3)
 
 # For overlaying the data - STILL IN TESTING STATE
 #pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,overlay_data=True)
@@ -184,15 +215,32 @@ plot_params['bnvbcandMES']['range'] = (5.2,5.3)
 #pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(3,3),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=True,weights=weights,color=colors,figsize=(12,7))
 #specific_plots = ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES']
 # Shape
-specific_plots = ['thrustmag','thrustcosth','thrustmagall','thrustcosthall', 'sphericityall','r2','r2all','nphot','ncharged','missingE','missingmom','missingmass','scalarmomsum','bnvprotp3','bnvlepp3']
+specific_plots = ['thrustmag','thrustcosth','thrustmagall','thrustcosthall', 'sphericityall','r2','r2all','nphot','ncharged','missingE','missingmom','missingmass','scalarmomsum','bnvprotp3','bnvlepp3', 'ne','nmu','np','nbnvbcand']
 specific_plots += ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES']
-pt.make_all_plots(dfs,specific_plots=specific_plots,backend='matplotlib',grid_of_plots=(1,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,sps=sps,stacked=True,weights=weights,color=colors,figsize=(15,3), overlay_data=True)
-#plt.savefig('plots/summary_plots_bkg_pmu.png')
-#plt.savefig('plots/summary_plots_sig_pmu.png')
-#plt.savefig('plots/summary_plots_bkg_pnu.png')
-#plt.savefig('plots/summary_plots_sig_pnu.png')
-#plt.savefig('plots/summary_plots_sig_nmu.png')
-plt.savefig('plots/summary_plots_bkg_nmu.png')
+# For documentation
+specific_plots = ['thrustmag','thrustcosth','thrustmagall','thrustcosthall', \
+                  'sphericityall','r2','r2all','scalarmomsum', \
+                   'bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES', \
+                  'missingE','missingmom','missingmass2_byhand']
+grid_of_plots = (1,4)
+figsize=(15,3)
+tag = 'tighterPID_childmomentum'
+
+#specific_plots = ['bnvprotp3']
+#specific_plots = ['bnvbcandmass', 'tagbcandmass']
+#grid_of_plots = (1,2)
+#figsize=(8,3)
+##tag = 'tighterPID_childmomentum_momentumplots_TEST'
+#tag = 'tighterPID_childmomentum_Bmasses'
+
+
+pt.make_all_plots(dfs,specific_plots=specific_plots,backend='matplotlib',grid_of_plots=grid_of_plots,xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,sps=sps,stacked=True,weights=weights,color=colors,figsize=figsize, overlay_data=True, decay=decay, tag=tag)
+################################################################################
+
+################################################################################
+# MES vs DeltaE
+#pt.plot_mes_vs_de(dfs,bins=100,ranges=((5.2,5.3),(-0.5,0.5)),decay=decay,labels=labels,sps=sps, tag=tag)#,xlabelfontsize=12,alpha=0.5,color='k', markersize=1, decay=None, tag='default'):
+################################################################################
 
 # For comparing cuts
 #pt.make_all_plots(dfs,backend='matplotlib',grid_of_plots=(3,3),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=False,weights=weights,color=colors,figsize=(12,7),norm_hist=True)

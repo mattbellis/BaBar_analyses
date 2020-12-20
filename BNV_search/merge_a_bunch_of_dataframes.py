@@ -39,11 +39,13 @@ for i,infilename in enumerate(infilenames):
     print(len(df))
 
 
+    #bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') 
     #bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='electron')
-    bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='electron')
+    #bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='electron')
 
 
-    frames.append(df[bnv_children_momentum_mask])
+    #frames.append(df[bnv_children_momentum_mask])
+    frames.append(df)
 
 
 df_merged = pd.concat(frames)
