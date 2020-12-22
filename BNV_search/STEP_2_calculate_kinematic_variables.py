@@ -143,8 +143,10 @@ outtree.Branch('tagmes', tagmes, 'tagmes[nbnvbcand]/F')
 tagq = array('f', 64*[-1.0])
 outtree.Branch('tagq', tagq, 'tagq[nbnvbcand]/F')
 
-missingmass = array('f', 64*[-1.])
-outtree.Branch('missingmass', missingmass, 'missingmass[nbnvbcand]/F')
+missingmassES = array('f', 64*[-1.])
+outtree.Branch('missingmassES', missingmassES, 'missingmassES[nbnvbcand]/F')
+missingmass2 = array('f', 64*[-1.])
+outtree.Branch('missingmass2', missingmass2, 'missingmass2[nbnvbcand]/F')
 
 
 r2 = array('f', [-1.])
@@ -617,7 +619,7 @@ for i in range(nentries):
     # Fill the bcandidates
     #print("====================")
     #print("# tracks!: ", ne[0],nmu[0],npi[0],nk[0],nproton[0], ne[0]+nmu[0]+npi[0]+nk[0]+nproton[0])
-    nbnvbcand[0],temp_bcand,temp_dE,temp_mes,temp_bnvprotp3,temp_bnvlepp3,temp_bnvprotcosth,temp_bnvlepcosth,temp_bnvprotidx,temp_bnvlepidx, temp_tagbcand,temp_tagdE,temp_tagmes,temp_tagq,missingmom[0],missingE[0],temp_missingmass = calc_B_variables(myparticles,beam,decay)
+    nbnvbcand[0],temp_bcand,temp_dE,temp_mes,temp_bnvprotp3,temp_bnvlepp3,temp_bnvprotcosth,temp_bnvlepcosth,temp_bnvprotidx,temp_bnvlepidx, temp_tagbcand,temp_tagdE,temp_tagmes,temp_tagq,missingmom[0],missingE[0],temp_missingmass2,temp_missingmassES = calc_B_variables(myparticles,beam,decay)
     #print("nbnvbcand: ",nbnvbcand[0])
     for n in range(nbnvbcand[0]):
         bcand[n] = temp_bcand[n]
@@ -634,7 +636,8 @@ for i in range(nentries):
         tagdE[n] = temp_tagdE[n]
         tagmes[n] = temp_tagmes[n]
         tagq[n] = temp_tagq[n]
-        missingmass[n] = temp_missingmass[n]
+        missingmass2[n] = temp_missingmass2[n]
+        missingmassES[n] = temp_missingmassES[n]
         #bnvlepidx[n] = int(temp_bnvlepidx[n])
         #bnvlepidx[n] = int(temp_bnvlepidx[n])
 

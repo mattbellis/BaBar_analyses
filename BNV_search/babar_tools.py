@@ -320,12 +320,15 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     bcands_temp = []
     tagcands_temp = []
     bcand = []
+    bcandp3 = []
     dE = []
     mes = []
     tagbcand = []
+    tagbcandp3 = []
     tagdE = []
     tagmes = []
-    missingmass = []
+    missingmassES = []
+    missingmass2 = []
     if decay=='nmu' or decay=='ne':
         #if len(prots)==0:
         #prots = [np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0])]
@@ -353,6 +356,7 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
                     #print(bcp4)
                     #bcands_temp.append(p0+l0)
                     bcands_temp.append(bcp4)
+                    bcandsp3.append(vec_mag(pcp4[1:4]))
                     protp3.append(vec_mag(p0[1:4]))
                     protcosth.append(p0[3]/vec_mag(p0[1:4]))
                     protidx.append(p0[-2])
@@ -369,6 +373,8 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
                     # B beam energy with 1/2 the beam
                     #totp4_temp[0] = halfbeam - bcp4[0]
                     # Need to not use the combined p4 for the calculation of missing energies
+                    mm2 = invmass([missingp4],return_squared=True)
+                    missingmass2.append(mm2)
                     if decay=='pmu' or decay=='pe':
                         totp4_temp[0] = beam[0] - (halfbeam + bcp4[0])
                     elif decay=='pnu':
@@ -378,7 +384,7 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
                     m = invmass([totp4_temp],return_squared=True)
                     #print(totp4_temp)
                     #print(m,halfbeam,bcp4[0])
-                    missingmass.append(m)
+                    missingmassES.append(m)
 
                     #for bc in bcands_temp:
                     bcand.append(invmass([bcp4]))
@@ -445,6 +451,6 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     tagmes = invmass([tagbc])
     '''
 
-    return nbnvbcand,bcand,dE,mes,protp3,lepp3,protcosth,lepcosth,protidx,lepidx, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass
+    return nbnvbcand,bcand,dE,mes,protp3,lepp3,protcosth,lepcosth,protidx,lepidx, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass2, missingmassES
 
 

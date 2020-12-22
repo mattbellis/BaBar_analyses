@@ -7,8 +7,12 @@ import sys
 
 infilenames = sys.argv[1:]
 
-masses = []
+masses_pn = []
+masses_pp = []
+masses_nn = []
+
 for infilename in infilenames:
+    print(infilename)
     f = uproot.open(infilename)
 
     #print(f.keys())
@@ -25,22 +29,24 @@ for infilename in infilenames:
     a_epx = events['epx'].array()
     a_epy = events['epy'].array()
     a_epz = events['epz'].array()
+    a_eq = events['eq'].array()
 
     a_protone = events['protone'].array()
     a_protonpx = events['protonpx'].array()
     a_protonpy = events['protonpy'].array()
     a_protonpz = events['protonpz'].array()
+    a_protonq = events['protonq'].array()
 
-    for ee,epx,epy,epz,pe,ppx,ppy,ppz  in zip(a_ee,a_epx,a_epy,a_epz,a_protone,a_protonpx,a_protonpy,a_protonpz):
+    for ee,epx,epy,epz,eq,pe,ppx,ppy,ppz,pq  in zip(a_ee,a_epx,a_epy,a_epz,a_eq,a_protone,a_protonpx,a_protonpy,a_protonpz,a_protonq):
         #print(ee,epx,epy,epz)
         #print(pe,ppx,ppy,ppz)
         ne = len(ee)
         nprot = len(pe)
         #print(ne,nprot)
         for i in range(ne):
-            e0,px0,py0,pz0 = ee[i],epx[i],epy[i],epz[i]
+            e0,px0,py0,pz0,q0 = ee[i],epx[i],epy[i],epz[i],eq[i]
             for j in range(nprot):
-                e1,px1,py1,pz1 = pe[j],ppx[j],ppy[j],ppz[j]
+                e1,px1,py1,pz1,q1 = pe[j],ppx[j],ppy[j],ppz[j],pq[j]
                 mtemp0 = np.sqrt(e0*e0 - (px0*px0 + py0*py0 + pz0*pz0))
                 mtemp1 = np.sqrt(e1*e1 - (px1*px1 + py1*py1 + pz1*pz1))
                 #print(mtemp0,mtemp1)
@@ -60,8 +66,18 @@ for infilename in infilenames:
 
                 if m<0.98:
                     print(m)
-                masses.append(m)
+                if q0*q1<0:
+                    masses_pn.append(m)
+                elif q0*q1>0 and q0>0:
+                    masses_pp.append(m)
+                elif q0*q1>0 and q0<0:
+                    masses_nn.append(m)
 
-print("# masses: ",len(masses))
-plt.hist(masses,bins=200)
-plt.show()
+print("# masses pn: ",len(masses_pn))
+print("# masses nn: ",len(masses_nn))
+print("# masses pp: ",len(masses_pp))
+np.savetxt('ep_masses_pn.dat',np.array(masses_pn))
+np.savetxt('ep_masses_nn.dat',np.array(masses_nn))
+np.savetxt('ep_masses_pp.dat',np.array(masses_pp))
+#plt.hist(masses,bins=200)
+#plt.show()
