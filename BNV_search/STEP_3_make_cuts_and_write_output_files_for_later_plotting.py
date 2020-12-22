@@ -45,7 +45,8 @@ plotvars["tagbcandp3"] = {"values":[], "xlabel":r"|p| tag B-candidate [GeV/c$^{2
 plotvars["tagbcandMES"] = {"values":[], "xlabel":r"tag M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
 plotvars["tagbcandDeltaE"] = {"values":[], "xlabel":r"tag $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
 plotvars["tagq"] = {"values":[], "xlabel":r"tag charge", "ylabel":r"# E","range":(-5,5)} 
-plotvars["missingmass"] = {"values":[], "xlabel":r"Missing mass [GeV/c$^2$]", "ylabel":r"# E","range":(-10,10)} 
+plotvars["missingmass2"] = {"values":[], "xlabel":r"Missing mass$^2$ [GeV^2/c$^4$]", "ylabel":r"# E","range":(-10,10)} 
+plotvars["missingmassES"] = {"values":[], "xlabel":r"Missing mass$^2$ ES [GeV^2/c$^4$]", "ylabel":r"# E","range":(-10,10)} 
 plotvars["missingmom"] = {"values":[], "xlabel":r"Missing momentum [GeV/c]", "ylabel":r"# E","range":(0,10)} 
 plotvars["missingE"] = {"values":[], "xlabel":r"Missing E [GeV]", "ylabel":r"# E","range":(-2,10)} 
 plotvars["scalarmomsum"] = {"values":[], "xlabel":r"Scalar momentum sum [GeV/c]", "ylabel":r"# E","range":(0,15)} 
@@ -192,6 +193,8 @@ def get_sptag(name):
 outfilename = None
 outfilename_df = None
 sptag = 'SP'
+#sptag = None
+#sptag = 'AllEvents'
 
 if args.outfile is None:
     sptag = get_sptag(args.infiles[0][0]) 
@@ -278,7 +281,8 @@ for i in range(nentries):
     tagbcandMES = tree.tagmes
     tagbcandDeltaE = tree.tagdE
     tagq = tree.tagq
-    missingmass = tree.missingmass
+    missingmass2 = tree.missingmass2
+    missingmassES = tree.missingmassES
     missingmom = tree.missingmom
     missingE = tree.missingE
     scalarmomsum = tree.scalarmomsum
@@ -485,7 +489,8 @@ for i in range(nentries):
                 plotvars["tagbcandMES"]["values"][icut].append(tagbcandMES[k])
                 plotvars["tagbcandDeltaE"]["values"][icut].append(tagbcandDeltaE[k])
                 plotvars["tagq"]["values"][icut].append(tagq[k])
-                plotvars["missingmass"]["values"][icut].append(missingmass[k])
+                plotvars["missingmass2"]["values"][icut].append(missingmass2[k])
+                plotvars["missingmassES"]["values"][icut].append(missingmassES[k])
 
                 # Dump the PID flags for the BNV candidate decay products
                 if not args.dump_all_pid_flags:

@@ -103,6 +103,7 @@ def main():
         ########################################
         #'''
         for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
+        #for d in ['pnu', 'nmu', 'ne']:
         #for d in ['ne']:
             if subset[0].find('_'+d)<0:
                 continue
