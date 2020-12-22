@@ -32,6 +32,7 @@ decay = args.decay
 plotvars = {}
 plotvars["nbnvbcand"] = {"values":[], "xlabel":r"# of BNV B-candidates", "ylabel":r"# E","range":(0,10)} 
 plotvars["bnvbcandmass"] = {"values":[], "xlabel":r"Mass BNV B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
+plotvars["bnvbcandp3"] = {"values":[], "xlabel":r"|p| BNV B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
 plotvars["bnvbcandMES"] = {"values":[], "xlabel":r"BNV M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
 plotvars["bnvbcandDeltaE"] = {"values":[], "xlabel":r"BNV $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
 plotvars["bnvprotp3"] = {"values":[], "xlabel":r"BNV proton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
@@ -40,6 +41,7 @@ plotvars["bnvprotcosth"] = {"values":[], "xlabel":r"BNV proton $\cos(\theta)$ ",
 plotvars["bnvlepcosth"] = {"values":[], "xlabel":r"BNV lepton $\cos(\theta)$ ", "ylabel":r"# E","range":(-1,1)} 
 
 plotvars["tagbcandmass"] = {"values":[], "xlabel":r"Mass tag B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
+plotvars["tagbcandp3"] = {"values":[], "xlabel":r"|p| tag B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
 plotvars["tagbcandMES"] = {"values":[], "xlabel":r"tag M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
 plotvars["tagbcandDeltaE"] = {"values":[], "xlabel":r"tag $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
 plotvars["tagq"] = {"values":[], "xlabel":r"tag charge", "ylabel":r"# E","range":(-5,5)} 
@@ -189,7 +191,7 @@ def get_sptag(name):
 
 outfilename = None
 outfilename_df = None
-sptag = None
+sptag = 'SP'
 
 if args.outfile is None:
     sptag = get_sptag(args.infiles[0][0]) 
@@ -262,6 +264,7 @@ for i in range(nentries):
 
     nbnvbcand = tree.nbnvbcand
     bnvbcandmass = tree.bcand
+    bnvbcandp3 = tree.bcandp3
     bnvbcandMES = tree.mes
     bnvbcandDeltaE = tree.dE
     bnvprotp3 = tree.bnvprotp3
@@ -271,6 +274,7 @@ for i in range(nentries):
 
 
     tagbcandmass = tree.tagbcand
+    tagbcandp3 = tree.tagbcandp3
     tagbcandMES = tree.tagmes
     tagbcandDeltaE = tree.tagdE
     tagq = tree.tagq
@@ -468,6 +472,7 @@ for i in range(nentries):
 
             for k in range(nbnvbcand):
                 plotvars["bnvbcandmass"]["values"][icut].append(bnvbcandmass[k])
+                plotvars["bnvbcandp3"]["values"][icut].append(bnvbcandp3[k])
                 plotvars["bnvbcandMES"]["values"][icut].append(bnvbcandMES[k])
                 plotvars["bnvbcandDeltaE"]["values"][icut].append(bnvbcandDeltaE[k])
                 plotvars["bnvprotp3"]["values"][icut].append(bnvprotp3[k])
@@ -476,6 +481,7 @@ for i in range(nentries):
                 plotvars["bnvlepcosth"]["values"][icut].append(bnvlepcosth[k])
 
                 plotvars["tagbcandmass"]["values"][icut].append(tagbcandmass[k])
+                plotvars["tagbcandp3"]["values"][icut].append(tagbcandp3[k])
                 plotvars["tagbcandMES"]["values"][icut].append(tagbcandMES[k])
                 plotvars["tagbcandDeltaE"]["values"][icut].append(tagbcandDeltaE[k])
                 plotvars["tagq"]["values"][icut].append(tagq[k])

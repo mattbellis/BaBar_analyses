@@ -320,9 +320,11 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     bcands_temp = []
     tagcands_temp = []
     bcand = []
+    bcandp3 = []
     dE = []
     mes = []
     tagbcand = []
+    tagbcandp3 = []
     tagdE = []
     tagmes = []
     missingmass = []
@@ -379,6 +381,7 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
 
                     #for bc in bcands_temp:
                     bcand.append(invmass([bcp4]))
+                    bcandp3.append(vec_mag(bcp4[1:4]))
                     dE.append(bcp4[0] - halfbeam)
                     # Save this for use with the tag side
                     bcp4E_org = bcp4[0]
@@ -401,6 +404,7 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
 
                     #tagbcand.append(invmass([tagbc-bcp4]))
                     tagbcand.append(invmass([tagbp4]))
+                    tagbcandp3.append(vec_mag(tagbp4[1:4]))
                     #tagdE.append(tagbc[0] - halfbeam)
                     # Need to use the original bcp4 because we modified it.
                     tagdE.append(totp4[0] - bcp4E_org - halfbeam)
@@ -442,6 +446,6 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     tagmes = invmass([tagbc])
     '''
 
-    return nbnvbcand,bcand,dE,mes,protp3,lepp3,protcosth,lepcosth,protidx,lepidx, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass
+    return nbnvbcand,bcand,dE,mes,protp3,lepp3,protcosth,lepcosth,protidx,lepidx, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass,bcandp3,tagbcandp3
 
 
