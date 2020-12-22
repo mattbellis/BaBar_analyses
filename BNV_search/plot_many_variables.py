@@ -151,8 +151,8 @@ for icount,infilename in enumerate(infilenames):
     if infilename.find('AllEvents')>=0:
         print("DATA!!!!!!!!!!!!!!")
         #dftmp = df[pid_mask & bnv_children_momentum_mask & ~blinding_mask ]
-        dftmp = df[pid_mask & ~blinding_mask ]
-        #dftmp = df[pid_mask & bnv_children_momentum_mask ]
+        #dftmp = df[pid_mask & ~blinding_mask ]
+        dftmp = df[pid_mask & bnv_children_momentum_mask & (df['missingmom'])]
     else:
         dftmp = df[pid_mask & bnv_children_momentum_mask ]
     dfs.append(dftmp)
@@ -222,9 +222,10 @@ specific_plots = ['thrustmag','thrustcosth','thrustmagall','thrustcosthall', \
                   'sphericityall','r2','r2all','scalarmomsum', \
                    'bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES', \
                   'missingE','missingmom','missingmass2_byhand']
+specific_plots += ['nphot','ncharged','bnvprotp3','bnvlepp3', 'ne','nmu','np','nbnvbcand']
 grid_of_plots = (1,4)
 figsize=(15,3)
-tag = 'tighterPID_childmomentum'
+tag = 'tighterPID_childmomentum_TEST'
 
 #specific_plots = ['bnvprotp3']
 #specific_plots = ['bnvbcandmass', 'tagbcandmass']
