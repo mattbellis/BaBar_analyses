@@ -11,7 +11,7 @@ def get_variable_parameters_for_plotting():
     plotvars["bnvbcandmass"] = {"values":[], "xlabel":r"Mass BNV B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
     plotvars["bnvbcandMES"] = {"values":[], "xlabel":r"BNV M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
     plotvars["bnvbcandDeltaE"] = {"values":[], "xlabel":r"BNV $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
-    plotvars["bnvprotp3"] = {"values":[], "xlabel":r"BNV proton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
+    plotvars["bnvprotp3"] = {"values":[], "xlabel":r"BNV baryon $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
     plotvars["bnvlepp3"] = {"values":[], "xlabel":r"BNV lepton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
 
     plotvars["p3"] = {"values":[], "xlabel":r"$|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
@@ -82,6 +82,8 @@ def get_color_scheme(sp=None):
                     '998':'g', 
                     '1005':'r', 
                     '3429':'m', 
+                    '3981':'sandybrown', 
+                    '2400':'lawngreen', 
                     '9456':'k', 
                     '9457':'k', 
                     '11975':'k', 
@@ -492,6 +494,7 @@ def get_sptag(name):
     labels['998'] = r'$u\bar{u},d\bar{d},s\bar{s}$'
     labels['3429'] = r'$\tau^+\tau^-$'
     labels['3981'] = r'$\mu^+\mu^-$'
+    labels['2400'] = r'$e^+e^-$'
     labels['signal'] = r'$B\rightarrow p \ell^-$'
     labels['9456'] = r'$B\rightarrow p \mu^-$'
     labels['9457'] = r'$B\rightarrow p e^-$'
@@ -517,7 +520,7 @@ def get_sptag(name):
     elif name.find('SP')>=0:
         # MC
         index = name.find('SP')+1
-        sps = ['1235', '1237', '1005', '998', '3429', '3981','9456', '9457', '11975', '11976', '11977', '980']
+        sps = ['1235', '1237', '1005', '998', '3429', '3981','2400','9456', '9457', '11975', '11976', '11977', '980']
         for sp in sps:
             if name.find(sp,index)>=index:
                 break
