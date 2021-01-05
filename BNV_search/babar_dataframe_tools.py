@@ -107,3 +107,18 @@ def bnv_children_momentum_mask(df,child='proton'):
 
 
     return mask
+
+################################################################################
+def bnv_children_costh_mask(df,child='proton'):
+
+    mask = None
+
+    if child=='proton':
+        x = df['bnvprotcosth']
+        mask = (x>-0.92) & (x<1.0)
+
+    elif child=='muon' or child=='electron':
+        x = df['bnvlepcosth']
+        mask = (x>-0.92) & (x<1.0)
+
+    return mask

@@ -66,6 +66,8 @@ weights = []
 colors = []
 for icount,infilename in enumerate(infilenames):
 
+    print(infilename)
+
     if infilename.find('.csv')>=0:
         df = pd.read_csv(infilename)
     elif infilename.find('.h5')>=0:
@@ -86,18 +88,23 @@ for icount,infilename in enumerate(infilenames):
     if decay=='pmu':
         pid_mask = bd.pid_mask(df,particle='proton') & bd.pid_mask(df,particle='muon')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='muon')
+        bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='proton') & bd.bnv_children_costh_mask(df,child='muon')
     elif decay=='pe':
         pid_mask = bd.pid_mask(df,particle='proton') & bd.pid_mask(df,particle='electron')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='electron')
+        bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='proton') & bd.bnv_children_costh_mask(df,child='electron')
     elif decay=='pnu':
         pid_mask = bd.pid_mask(df,particle='proton')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='nu')
+        bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='proton') 
     elif decay=='nmu':
         pid_mask = bd.pid_mask(df,particle='muon')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='neutron') & bd.bnv_children_momentum_mask(df,child='muon')
+        bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='muon') 
     elif decay=='ne':
         pid_mask = bd.pid_mask(df,particle='electron')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='neutron') & bd.bnv_children_momentum_mask(df,child='electron')
+        bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='electron') 
 
     shape_mask = bd.shape_mask(df)
     #print(df.columns)
@@ -152,13 +159,14 @@ for icount,infilename in enumerate(infilenames):
         print("DATA!!!!!!!!!!!!!!")
         #dftmp = df[pid_mask & bnv_children_momentum_mask & ~blinding_mask ]
         #dftmp = df[pid_mask & ~blinding_mask ]
-        dftmp = df[pid_mask & bnv_children_momentum_mask & (df['missingmom'])]
+        #dftmp = df[pid_mask & bnv_children_momentum_mask & bnv_children_costh_mask & (df['missingmom'])]
+        dftmp = df[pid_mask & bnv_children_momentum_mask & bnv_children_costh_mask & ~blinding_mask ]
     else:
-        dftmp = df[pid_mask & bnv_children_momentum_mask ]
+        dftmp = df[pid_mask & bnv_children_momentum_mask & bnv_children_costh_mask ]
     dfs.append(dftmp)
 
     print(infilename)
-    sp,label = pt.get_sptag(infilename)
+    sp,label,DECAY_TMP = pt.get_sptag(infilename)
     print(sp,label)
     sps.append(sp)
     labels.append(label)
@@ -182,10 +190,12 @@ for icount,infilename in enumerate(infilenames):
 print("Making the plots.......")
 plot_params = pt.get_variable_parameters_for_plotting()
 # pe and pmu
-#plot_params['bnvbcandDeltaE']['range'] = (-0.6,0.6)
-#plot_params['missingmass']['range'] = (-5.0,1.0)
+plot_params['bnvbcandDeltaE']['range'] = (-0.6,0.6)
+plot_params['missingmass2']['range'] = (-10.0,1.0)
+plot_params['missingmassES']['range'] = (-10.0,1.0)
 #plot_params['missingE']['range'] = (-4.0,4.0)
 #plot_params['missingmom']['range'] = (-1.2,4.0)
+
 # pnu
 #plot_params['bnvbcandDeltaE']['range'] = (-3,-2)
 #plot_params['missingmass2_byhand']['range'] = (-10.0,14.0)
@@ -194,13 +204,13 @@ plot_params = pt.get_variable_parameters_for_plotting()
 #plot_params['missingmom']['range'] = (1.0,4.0)
 
 # nmu
-plot_params['bnvbcandDeltaE']['range'] = (-3,-2)
-plot_params['missingmass2_byhand']['range'] = (-10.0,14.0)
-plot_params['missingmass_byhand']['range'] = (-3.0,6.0)
-plot_params['missingE']['range'] = (-4.0,8.0)
-plot_params['missingmom']['range'] = (0.0,5.0)
-plot_params['bnvbcandmass']['range'] = (0.0,10.0)
-plot_params['tagbcandmass']['range'] = (0.0,10.0)
+#plot_params['bnvbcandDeltaE']['range'] = (-3,-2)
+#plot_params['missingmass2_byhand']['range'] = (-10.0,14.0)
+#plot_params['missingmass_byhand']['range'] = (-3.0,6.0)
+#plot_params['missingE']['range'] = (-4.0,8.0)
+#plot_params['missingmom']['range'] = (0.0,5.0)
+#plot_params['bnvbcandmass']['range'] = (0.0,10.0)
+#plot_params['tagbcandmass']['range'] = (0.0,10.0)
 
 #pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,norm_hist=True,labels=labels,plot_params=plot_params)
 #pt.make_all_plots(dfs,grid_of_plots=(4,4),xlabelfontsize=10,ignorePID=True,plot_params=plot_params,labels=labels,stacked=False,weights=weights)
@@ -221,8 +231,9 @@ specific_plots += ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES'
 specific_plots = ['thrustmag','thrustcosth','thrustmagall','thrustcosthall', \
                   'sphericityall','r2','r2all','scalarmomsum', \
                    'bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES', \
-                  'missingE','missingmom','missingmass2_byhand']
+                  'missingE','missingmom','missingmass2','missingmassES']
 specific_plots += ['nphot','ncharged','bnvprotp3','bnvlepp3', 'ne','nmu','np','nbnvbcand']
+specific_plots += ['bnvlepcosth','bnvprotcosth','bnvbcandp3']
 grid_of_plots = (1,4)
 figsize=(15,3)
 tag = 'tighterPID_childmomentum_TEST'

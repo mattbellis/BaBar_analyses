@@ -9,10 +9,13 @@ def get_variable_parameters_for_plotting():
     plotvars = {}
     plotvars["nbnvbcand"] = {"values":[], "xlabel":r"# of BNV B-candidates", "ylabel":r"# E","range":(0,10)} 
     plotvars["bnvbcandmass"] = {"values":[], "xlabel":r"Mass BNV B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
+    plotvars["bnvbcandp3"] = {"values":[], "xlabel":r"|p| BNV B-candidate [GeV/c]", "ylabel":r"# E","range":(0,9)} 
     plotvars["bnvbcandMES"] = {"values":[], "xlabel":r"BNV M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
     plotvars["bnvbcandDeltaE"] = {"values":[], "xlabel":r"BNV $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
     plotvars["bnvprotp3"] = {"values":[], "xlabel":r"BNV baryon $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
     plotvars["bnvlepp3"] = {"values":[], "xlabel":r"BNV lepton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
+    plotvars["bnvprotcosth"] = {"values":[], "xlabel":r"BNV baryon $\cos(\theta)$ ", "ylabel":r"# E","range":(-1.1,1.1)} 
+    plotvars["bnvlepcosth"] = {"values":[], "xlabel":r"BNV lepton $\cos(\theta)$ ", "ylabel":r"# E","range":(-1.1,1.1)} 
 
     plotvars["p3"] = {"values":[], "xlabel":r"$|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
     plotvars["cos(theta)"] = {"values":[], "xlabel":r"$\cos(\theta)$", "ylabel":r"# E","range":(-1,1)} 
@@ -21,9 +24,8 @@ def get_variable_parameters_for_plotting():
     plotvars["tagbcandMES"] = {"values":[], "xlabel":r"tag M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
     plotvars["tagbcandDeltaE"] = {"values":[], "xlabel":r"tag $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
     plotvars["tagq"] = {"values":[], "xlabel":r"tag charge", "ylabel":r"# E","range":(-5,5)} 
-    plotvars["missingmass"] = {"values":[], "xlabel":r"Missing mass [GeV/c$^2$]", "ylabel":r"# E","range":(-10,10)} 
-    plotvars["missingmass_byhand"] =  {"values":[], "xlabel":r"Missing mass [GeV/c$^2$]", "ylabel":r"# E","range":(-5,5)} 
-    plotvars["missingmass2_byhand"] = {"values":[], "xlabel":r"Missing mass$^2$ [GeV$^2$/c$^4$]", "ylabel":r"# E","range":(-5,5)} 
+    plotvars["missingmassES"] = {"values":[], "xlabel":r"Missing mass [GeV/c$^2$]", "ylabel":r"# E","range":(-10,10)} 
+    plotvars["missingmass2"] = {"values":[], "xlabel":r"Missing mass$^2$ [GeV$^2$/c$^4$]", "ylabel":r"# E","range":(-5,5)} 
     plotvars["missingmom"] = {"values":[], "xlabel":r"Missing momentum [GeV/c]", "ylabel":r"# E","range":(0,10)} 
     plotvars["missingE"] = {"values":[], "xlabel":r"Missing E [GeV]", "ylabel":r"# E","range":(-2,10)} 
     plotvars["scalarmomsum"] = {"values":[], "xlabel":r"Scalar momentum sum [GeV/c]", "ylabel":r"# E","range":(0,15)} 
@@ -171,6 +173,8 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
 
     figcount = 0
 
+    sps_for_labels = []
+
     #for icount,name in enumerate(names):
     for icount,name in enumerate(specific_plots):
 
@@ -278,7 +282,11 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
 
             #print(tmpcolor)
             #print(len(allvals))
-            plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,label=labels[:last_df],color=tmpcolor,histtype='stepfilled',density=norm_hist)
+            if sps[j] not in sps_for_labels:
+                plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,label=labels[:last_df],color=tmpcolor,histtype='stepfilled',density=norm_hist)
+                sps_for_labels.append(sps[j])
+            else:
+                plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,color=tmpcolor,histtype='stepfilled',density=norm_hist)
             
             if sps is not None and sps[j] in signalMC:
 
