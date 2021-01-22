@@ -24,7 +24,7 @@ def get_variable_parameters_for_plotting():
     plotvars["tagbcandMES"] = {"values":[], "xlabel":r"tag M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
     plotvars["tagbcandDeltaE"] = {"values":[], "xlabel":r"tag $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
     plotvars["tagq"] = {"values":[], "xlabel":r"tag charge", "ylabel":r"# E","range":(-5,5)} 
-    plotvars["missingmassES"] = {"values":[], "xlabel":r"Missing mass [GeV/c$^2$]", "ylabel":r"# E","range":(-10,10)} 
+    plotvars["missingmassES"] = {"values":[], "xlabel":r"Missing mass ES$^2$ [GeV$^2$/c$^4$]", "ylabel":r"# E","range":(-10,10)} 
     plotvars["missingmass2"] = {"values":[], "xlabel":r"Missing mass$^2$ [GeV$^2$/c$^4$]", "ylabel":r"# E","range":(-5,5)} 
     plotvars["missingmom"] = {"values":[], "xlabel":r"Missing momentum [GeV/c]", "ylabel":r"# E","range":(0,10)} 
     plotvars["missingE"] = {"values":[], "xlabel":r"Missing E [GeV]", "ylabel":r"# E","range":(-2,10)} 
@@ -138,22 +138,27 @@ def plot_mes_vs_de(dfs,specific_plots=['bnvbcandMES','bnvbcandDeltaE'],plot_para
     # MC
     filename = 'plots/de_vs_mes_cut_summary_files_SP-{0}_{1}_{2}.png'.format(sps[0],decay,tag)
     # Data
-    #filename = 'plots/de_vs_mes_cut_summary_files_{0}_{1}_{2}.png'.format(labels[0],decay,tag)
+    if sps[0].find('runs')>=0:
+        filename = 'plots/de_vs_mes_cut_summary_files_{0}_{1}_{2}.png'.format(labels[0],decay,tag)
     print(filename)
     plt.savefig(filename)
 
 ################################################################################
-def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,labels=None,sps=None,xlabelfontsize=12,ignorePID=False,weights=1.0,stacked=False,alpha=0.5,color=None, decay=None, tag='default'):
-
-    signalMC = ['9456','9457','11975','11976','11977']
-
-    if type(dfs) != list:
-        dfs = [dfs]
+def make_all_plots(df_plotting_container,specific_plots=[],backend='matplotlib',grid_of_plots=(2,2),kde=False,plot_params=None,figsize=(9,7),norm_hist=False,xlabelfontsize=12,ignorePID=False,stacked=False,alpha=0.5,decay=None, tag='default'):
 
     if plot_params is None:
         plot_params = get_variable_parameters_for_plotting()
 
-    tempnames = dfs[0].columns.values
+    sps_in_container = list(df_plotting_container.keys())
+    print(sps_in_container)
+    tempdf = df_plotting_container[sps_in_container[0]]['df']
+    tempnames = None
+    if type(tempdf) is list:
+        tempnames = tempdf[0].columns
+    else:
+        tempnames = tempdf.columns
+    #tempnames = df_plotting_container[sps_in_container[0]]['dfs'][0].columns
+
     names = []
     if ignorePID:
         for name in tempnames:
@@ -203,6 +208,7 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
             bins=2
         
         ########################################################################
+        '''
         if backend=='seaborn':
             if plotrange is not None:
                 for j,df in enumerate(dfs):
@@ -234,76 +240,58 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
             if labels is not None:
                 plt.legend(fontsize=8)
 
+        '''
         ########################################################################
-        elif backend=='matplotlib':
+        if backend=='matplotlib':
             #if plotrange is not None:
             allvals = []
             allweights=[]
-            last_df = len(dfs)
+            #last_df = len(dfs)
 
-            signal_vals,signal_label,signal_weights = None,None,None
+            backgroundMC = {'values': [], 'weights': [], 'colors': [], 'labels': []}
+            signalMC = {'values': [], 'weights': [], 'colors': [], 'labels': []}
+            data = {'values': [], 'weights': [], 'colors': [], 'labels': []}
 
-            if overlay_data:
-                last_df -= 1
-            for j in range(last_df):
-                df = dfs[j]
-
-                #print('LEN: ',len(df))
-
-                if sps is not None and sps[j] not in signalMC:
-
-                    #label = None
-                    #if labels is not None:
-                        #label = labels[j]
-
-                    vals = df[name]
-
-                    #print("weights[j]: ",j,weights[j])
-                    weight=np.ones(len(vals))
-                    if type(weights) == list:
-                        weight *= weights[j]
-
-                    allvals.append(df[name].values)
-                    #print(weights)
-                    allweights.append(weight)
-                    #print("THIS!")
-                    #print(sps[j])
-
-                elif sps is not None and sps[j] in signalMC:
-                    #print(sps[j])
-                    signal_vals = df[name].values
-                    #print("Signal vals: ",len(signal_vals))
-                    signal_label = labels[j]
-                    signal_weights = 0.001*np.ones(len(signal_vals))
-
-            tmpcolor=None
-            if color is not None:
-                tmpcolor=color[:last_df-1]
-
-            #print(tmpcolor)
-            #print(len(allvals))
-            if sps[j] not in sps_for_labels:
-                plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,label=labels[:last_df],color=tmpcolor,histtype='stepfilled',density=norm_hist)
-                sps_for_labels.append(sps[j])
-            else:
-                plt.hist(allvals,bins=bins,range=plotrange,weights=allweights,stacked=stacked,alpha=alpha,color=tmpcolor,histtype='stepfilled',density=norm_hist)
-            
-            if sps is not None and sps[j] in signalMC:
-
-                wtot = 0
-                for w in allweights:
-                    wtot += w.sum()
-                nsigvals = len(signal_vals)
-
-                sigweight = wtot/nsigvals
-                # Make the signal 10% of the total
-                signal_weights = 0.1*sigweight*np.ones(len(signal_vals))
-
-                plt.hist(signal_vals,bins=bins,range=plotrange,weights=signal_weights,stacked=False,lw=2,ls='--',label=signal_label,color='b',histtype='step',density=False)
+            totweights = 0
+            for sp in sps_in_container:
+                c = df_plotting_container[sp]
+                if c['isSignalMC'] is True:
+                    signalMC['values'] = c['df'][name]
+                    signalMC['colors'] = c['color']
+                    signalMC['weights'] = np.ones(len(c['df'][name]))*c['weights']
+                    signalMC['labels'] = c['label']
+                elif c['isData'] is True:
+                    data['values'] = c['df'][name]
+                    data['colors'] = c['color']
+                    data['weights'] = np.ones(len(c['df'][name]))*c['weights']
+                    data['labels'] = c['label']
+                else:
+                    backgroundMC['values'].append(c['df'][name])
+                    backgroundMC['colors'].append(c['color'])
+                    backgroundMC['weights'].append(np.ones(len(c['df'][name]))*c['weights'])
+                    backgroundMC['labels'].append(c['label'])
+                    totweights += c['weights']*np.sum(len(c['df'][name]))
 
 
-            if overlay_data:
-                hist_with_errors(dfs[-1][name],bins=bins,range=plotrange,label='Data')
+            #print(backgroundMC)
+            #print(backgroundMC['values'])
+            #print(backgroundMC['weights'])
+            #print(len(backgroundMC['values']))
+            #print(len(backgroundMC['weights']))
+
+            # Background
+            plt.hist(backgroundMC['values'],bins=bins,range=plotrange,weights=backgroundMC['weights'],stacked=stacked,alpha=alpha,label=backgroundMC['labels'],color=backgroundMC['colors'],histtype='stepfilled',density=norm_hist)
+
+            # Signal
+            if len(signalMC['values'])>0:
+                nentries = len(signalMC['values'])
+                #print(f"totweights: {totweights}")
+                signalMC['weights'] = np.ones(nentries)*(totweights/nentries)*0.15
+                plt.hist(signalMC['values'],bins=bins,range=plotrange,weights=signalMC['weights'],lw=2,ls='--',alpha=1.0,label=signalMC['labels'],color='b',histtype='step',density=norm_hist)
+
+            # Data
+            if len(data['values'])>0:
+                hist_with_errors(data['values'],bins=bins,range=plotrange,label='Data')
 
             if plotrange is not None:
                 plt.xlim(plotrange[0],plotrange[1])
@@ -313,10 +301,8 @@ def make_all_plots(dfs,specific_plots=[],overlay_data=False,backend='seaborn',gr
             else:
                 plt.xlabel(name,fontsize=xlabelfontsize)
 
-            if labels is not None:
-                #plt.legend(fontsize=8,loc='upper left')
-                #plt.legend(fontsize=8,loc='lower left')
-                plt.legend(fontsize=8)
+            #plt.legend(fontsize=8,loc='upper left')
+            plt.legend(fontsize=8,loc='best')
 
         ########################################################################
         if i%nplots_per_figure==nplots_per_figure-1 or i==nplots-1:
@@ -523,8 +509,8 @@ def get_sptag(name):
         if name.find('Run')>=0 and name.find('AllRuns')<0:
             tag = 'Run' + name.split('Run')[1][0]
         label = 'Data'
-        print("HERE!!!")
-        print(tag,label)
+        #print("HERE!!!")
+        #print(tag,label)
     elif name.find('SP')>=0:
         # MC
         index = name.find('SP')+1
@@ -542,3 +528,50 @@ def get_sptag(name):
 
     return tag,label,decay
 ################################################################################
+def create_df_plotting_containers(dfs,sps,labels,weights,colors):
+
+    signalMC = ['9456','9457','11975','11976','11977']
+
+    df_plotting_container = {}
+
+    unique_sps = np.unique(sps).tolist()
+
+    for sp in unique_sps:
+        #print("First: ",sp)
+        df_plotting_container[sp] = {'df':[], 'label':[], 'weights':[], 'color':[], 'isData':False, 'isSignalMC':False}
+
+    for sp,df,label,weight,color in zip(sps,dfs,labels,weights,colors):
+        #print("Second: ",label)
+        df_plotting_container[sp]['df'].append(df)
+        df_plotting_container[sp]['label'].append(label)
+        df_plotting_container[sp]['weights'].append(weight)
+        df_plotting_container[sp]['color'].append(color)
+    
+    for sp in df_plotting_container.keys():
+        #print("Third: ",sp)
+        dataframes = df_plotting_container[sp]['df']
+        allweights = df_plotting_container[sp]['weights']
+        if len(dataframes)>1:
+            newdf = pd.concat(dataframes)
+            print(newdf)
+            print(len(newdf['bnvbcandDeltaE']))
+            print(allweights)
+            #newweights = np.concatenate(weights)
+            # Delete them in reverse order
+            for i in range(len(dataframes)-1,-1,-1):
+                print(i,len(dataframes[i]['bnvbcandDeltaE']))
+                #del dataframes[i]
+            df_plotting_container[sp]['df'] = newdf
+            df_plotting_container[sp]['weights'] = allweights[0]
+        else:
+            df_plotting_container[sp]['df'] = dataframes[0]
+            df_plotting_container[sp]['weights'] = allweights[0]
+        df_plotting_container[sp]['label'] = df_plotting_container[sp]['label'][0]
+        df_plotting_container[sp]['color'] = df_plotting_container[sp]['color'][0]
+        if sp in signalMC:
+            df_plotting_container[sp]['isSignalMC'] = True
+        if sp == 'All runs':
+            df_plotting_container[sp]['isData'] = True
+
+    #print(list(df_plotting_container.keys()))
+    return df_plotting_container

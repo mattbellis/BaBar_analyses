@@ -122,3 +122,129 @@ def bnv_children_costh_mask(df,child='proton'):
         mask = (x>-0.92) & (x<1.0)
 
     return mask
+
+################################################################################
+def decay_specific_cuts(df,decay='pmu'):
+
+    mask = None
+    extra_mask = None
+    all_pid_mask = None
+
+    if decay=='pmu' or decay=='pe':
+        if decay=='pmu':
+            all_pid_mask = pid_mask(df,particle='proton') & pid_mask(df,particle='muon')
+        elif decay=='pe':
+            all_pid_mask = pid_mask(df,particle='proton') & pid_mask(df,particle='electron') & (df['ne']==1)
+
+        extra_mask = (df['bnvprotcosth']<0.75) & \
+                     (df['bnvprotcosth']>-0.80) & \
+                     (df['bnvlepcosth']<0.80) & \
+                     (df['bnvlepcosth']>-0.70) & \
+                     (df['np']==1) & \
+                     (df['bnvprotp3']>2.3) & \
+                     (df['bnvprotp3']<2.7) & \
+                     (df['bnvlepp3']>2.3) & \
+                     (df['bnvlepp3']<2.7) & \
+                     (df['missingmass2']>-2.0) & \
+                     (df['missingmassES']>-2.0) & \
+                     (df['r2all']<0.7) & \
+                     (df['r2']<0.8) & \
+                     (df['sphericityall']<0.8) & \
+                     (df['scalarmomsum']<11.0) & \
+                     (df['scalarmomsum']>7.5) & \
+                     (df['thrustmag']<0.95) & \
+                     (df['thrustmagall']<0.95) & \
+                     (df['tagbcandDeltaE']>-2.5) & \
+                     (df['tagbcandDeltaE']<1.0) & \
+                     (df['tagbcandMES']>5.1) 
+
+
+    elif decay=='pnu':
+        all_pid_mask = pid_mask(df,particle='proton') 
+
+        extra_mask = (df['bnvprotcosth']<0.70) & \
+                     (df['bnvprotcosth']>-0.85) & \
+                     (df['bnvlepcosth']<0.90) & \
+                     (df['bnvlepcosth']>-0.75) & \
+                     (df['np']==1) & \
+                     (df['bnvprotp3']>2.3) & \
+                     (df['bnvprotp3']<2.7) & \
+                     (df['bnvlepp3']>1.8) & \
+                     (df['bnvlepp3']<4.0) & \
+                     (df['missingE']>1.0) & \
+                     (df['missingE']<5.0) & \
+                     (df['missingmass2']<-3.0) & \
+                     (df['missingmassES']<4.0) & \
+                     (df['r2all']<0.6) & \
+                     (df['r2']<0.7) & \
+                     (df['sphericityall']<0.6) & \
+                     (df['scalarmomsum']<8.5) & \
+                     (df['scalarmomsum']>4.5) & \
+                     (df['thrustmag']<0.95) & \
+                     (df['thrustmagall']<0.90) & \
+                     (df['bnvbcandDeltaE']>-2.75) & \
+                     (df['bnvbcandDeltaE']<-2.4) & \
+                     (df['bnvbcandMES']>5.1) & \
+                     (df['tagbcandDeltaE']<1.0) & \
+                     (df['tagbcandDeltaE']>-2.50) 
+
+    elif decay=='nmu':#NEED TO FIGURE THIS OUT!
+        all_pid_mask = pid_mask(df,particle='muon') 
+
+        extra_mask = (df['bnvprotcosth']<0.70) & \
+                     (df['bnvprotcosth']>-0.85) & \
+                     (df['bnvlepcosth']<0.90) & \
+                     (df['bnvlepcosth']>-0.75) & \
+                     (df['np']==1) & \
+                     (df['bnvprotp3']>2.3) & \
+                     (df['bnvprotp3']<2.7) & \
+                     (df['bnvlepp3']>1.8) & \
+                     (df['bnvlepp3']<4.0) & \
+                     (df['missingE']>1.0) & \
+                     (df['missingE']<5.0) & \
+                     (df['missingmass2']<-3.0) & \
+                     (df['missingmassES']<4.0) & \
+                     (df['r2all']<0.6) & \
+                     (df['r2']<0.7) & \
+                     (df['sphericityall']<0.6) & \
+                     (df['scalarmomsum']<8.5) & \
+                     (df['scalarmomsum']>4.5) & \
+                     (df['thrustmag']<0.95) & \
+                     (df['thrustmagall']<0.90) & \
+                     (df['bnvbcandDeltaE']>-2.75) & \
+                     (df['bnvbcandDeltaE']<-2.4) & \
+                     (df['bnvbcandMES']>5.1) & \
+                     (df['tagbcandDeltaE']<1.0) & \
+                     (df['tagbcandDeltaE']>-2.50) 
+
+    elif decay=='ne':#NEED TO FIGURE THIS OUT!
+        all_pid_mask = pid_mask(df,particle='electron') 
+
+        extra_mask = (df['bnvprotcosth']<0.70) & \
+                     (df['bnvprotcosth']>-0.85) & \
+                     (df['bnvlepcosth']<0.90) & \
+                     (df['bnvlepcosth']>-0.75) & \
+                     (df['np']==1) & \
+                     (df['bnvprotp3']>2.3) & \
+                     (df['bnvprotp3']<2.7) & \
+                     (df['bnvlepp3']>1.8) & \
+                     (df['bnvlepp3']<4.0) & \
+                     (df['missingE']>1.0) & \
+                     (df['missingE']<5.0) & \
+                     (df['missingmass2']<-3.0) & \
+                     (df['missingmassES']<4.0) & \
+                     (df['r2all']<0.6) & \
+                     (df['r2']<0.7) & \
+                     (df['sphericityall']<0.6) & \
+                     (df['scalarmomsum']<8.5) & \
+                     (df['scalarmomsum']>4.5) & \
+                     (df['thrustmag']<0.95) & \
+                     (df['thrustmagall']<0.90) & \
+                     (df['bnvbcandDeltaE']>-2.75) & \
+                     (df['bnvbcandDeltaE']<-2.4) & \
+                     (df['bnvbcandMES']>5.1) & \
+                     (df['tagbcandDeltaE']<1.0) & \
+                     (df['tagbcandDeltaE']>-2.50) 
+
+    mask = all_pid_mask & extra_mask
+    return mask

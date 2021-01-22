@@ -16,6 +16,7 @@ color_scheme = {'1235':'b',
                 '1005':'r', 
                 '3429':'m', 
                 '9456':'k', 
+                'All runs':'k', 
                 }
 
 infilenames = sys.argv[1:]
@@ -33,30 +34,37 @@ for infilename in infilenames:
     elif infilename.find('.h5')>=0:
         df = pd.read_hdf(infilename)
 
-    muon_mask = bd.pid_mask(df,particle='muon')
-    proton_mask = bd.pid_mask(df,particle='proton')
-    shape_mask = bd.shape_mask(df)
+    sp,label,decay = pt.get_sptag(infilename)
+    print(sp,label,decay)
+    sps.append(label)
+    labels.append(label)
 
-    #dfs.append(df)
+    #muon_mask = bd.pid_mask(df,particle='muon')
+    #proton_mask = bd.pid_mask(df,particle='proton')
+    #shape_mask = bd.shape_mask(df)
+
+    #dsc_mask = bd.decay_specific_cuts(df,decay='pmu')
+    dsc_mask = bd.decay_specific_cuts(df,decay='pe')
+    blinding_mask = bd.blinding_mask(df)
+    dftmp = df[dsc_mask]# & ~blinding_mask ]
+
+    dfs.append(dftmp)
 
     #df_mu = df[muon_mask]
     #dfs.append(df_mu)
     #df_proton = df[proton_mask]
     #dfs.append(df_proton)
-    df_both = df[muon_mask & proton_mask & shape_mask]
-    dfs.append(df_both)
-
-    sp,label = pt.get_sptag(infilename)
-    print(sp,label)
-    sps.append(label)
-    labels.append(label)
+    #df_both = df[muon_mask & proton_mask & shape_mask]
+    #dfs.append(df_both)
 
     wt = 1.0
+    '''
     #print(sp)
     #print(list(raw['MC'].keys()))
     if 'weight' in list(raw['MC'][sp].keys()):
         wt = raw['MC'][sp]['weight']
     #print(wt)
+    '''
     weights.append(wt)
     colors.append(color_scheme[sp])
 
@@ -96,6 +104,6 @@ for label,df in zip(labels,dfs):
     bkgA = len(x[maskA])
     bkgB = len(x[maskB])
     avg = np.mean([bkgA,bkgB])
-    print(bkgA,bkgB,avg,b,b/avg)
+    print(f'bkgA: {bkgA} bkgB: {bkgB}  avg: {avg}  nentries: {b}  nentries/avg: {b/avg}')
 
 plt.show()
