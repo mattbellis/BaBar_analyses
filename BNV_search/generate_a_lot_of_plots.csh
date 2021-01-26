@@ -28,7 +28,7 @@ python plot_many_variables.py CUT_SUMMARY_SP-998_nmu.h5 CUT_SUMMARY_SP-998_nmu_B
 ################################################################################
 # For 2D DeltaE vs mES
 #foreach decay('pe' 'pmu')
-#foreach sp("SP-1005" "SP-11975" "SP-11976" "SP-11977" "SP-1235" "SP-1237" "SP-3429" "SP-9456" "SP-9457" "SP-980" "SP-998")
+#foreach sp("SP-1005" "SP-11975" "SP-11976" "SP-11977" "SP-1235" "SP-1237" "SP-2400" "SP-3429" "SP-3981" "SP-9456" "SP-9457" "SP-980" "SP-998")
 #python plot_many_variables.py CUT_SUMMARY_"$sp"_"$decay".h5
 #end
 #end

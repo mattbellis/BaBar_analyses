@@ -27,6 +27,8 @@ def get_variable_parameters_for_plotting():
     plotvars["tagq"] = {"values":[], "xlabel":r"tag charge", "ylabel":r"# E","range":(-5,5)} 
     plotvars["missingmassES"] = {"values":[], "xlabel":r"Missing mass ES$^2$ [GeV$^2$/c$^4$]", "ylabel":r"# E","range":(-10,10)} 
     plotvars["missingmass2"] = {"values":[], "xlabel":r"Missing mass$^2$ [GeV$^2$/c$^4$]", "ylabel":r"# E","range":(-5,5)} 
+    plotvars["missingmass2_byhand"] = {"values":[], "xlabel":r"Missing mass$^2$ (by hand) [GeV$^2$/c$^4$]", "ylabel":r"# E","range":(-5,5)} 
+    plotvars["missingmass_byhand"] = {"values":[], "xlabel":r"Missing mass (by hand) [GeV/c$^2$]", "ylabel":r"# E","range":(-5,5)} 
     plotvars["missingmom"] = {"values":[], "xlabel":r"Missing momentum [GeV/c]", "ylabel":r"# E","range":(0,10)} 
     plotvars["missingE"] = {"values":[], "xlabel":r"Missing E [GeV]", "ylabel":r"# E","range":(-2,10)} 
     plotvars["scalarmomsum"] = {"values":[], "xlabel":r"Scalar momentum sum [GeV/c]", "ylabel":r"# E","range":(0,15)} 

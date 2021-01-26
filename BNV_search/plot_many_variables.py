@@ -48,7 +48,7 @@ raw = raw_event_numbers
 specific_plots = ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES', \
                   'thrustmag','thrustcosth','thrustmagall','thrustcosthall', \
                   'sphericityall','r2','r2all','scalarmomsum', \
-                  'missingE','missingmom','missingmass2','missingmassES']
+                  'missingE','missingmom','missingmass2_byhand','missingmassES']
 specific_plots += ['nphot','ncharged','bnvprotp3','bnvlepp3', 'ne','nmu','np','nbnvbcand']
 specific_plots += ['bnvlepcosth','bnvprotcosth','bnvbcandp3','tagbcandp3']
 specific_plots += ['bnvbcandmass','tagbcandmass']
@@ -103,6 +103,7 @@ for icount,infilename in enumerate(infilenames):
     #proton_mask = bd.pid_mask(df,particle='electron')
 
 	
+    #'''
     if decay=='pmu':
         pid_mask = bd.pid_mask(df,particle='proton') & bd.pid_mask(df,particle='muon')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='muon')
@@ -124,10 +125,10 @@ for icount,infilename in enumerate(infilenames):
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='neutron') & bd.bnv_children_momentum_mask(df,child='electron')
         bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='electron') 
 
-    shape_mask = bd.shape_mask(df)
+    #shape_mask = bd.shape_mask(df)
     #print(df.columns)
+    #'''
 
-    blinding_mask = bd.blinding_mask(df)
 
     #side_bands_mask = bd.side_bands_mask(df,region='DeltaEmES')
     #side_bands_mask = bd.side_bands_mask(df,region='protonp3')
@@ -170,6 +171,8 @@ for icount,infilename in enumerate(infilenames):
     #dftmp = df[pid_mask & bnv_children_momentum_mask & (df['ncharged']>5) & (df['ne']==1) & (df['sphericityall']>0.02) & (df['thrustmagall']<0.92) & (df['thrustmagall']<0.92) ]
     #dftmp = df[pid_mask & bnv_children_momentum_mask & (df['sphericityall']>0.02)  ]
     #dftmp = df[bnv_children_momentum_mask & (df['sphericityall']>0.02) & (df['ne']==1)   & (df['ncharged']>5) & shape_mask   ]
+    blinding_mask = bd.blinding_mask(df)
+
     dftmp = None
     #print("Checking!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     #if infilenames[0].find('AllEvents')>=0:
@@ -251,6 +254,7 @@ if decay=='pmu' or decay=='pe':
 # pnu
 elif decay=='pnu':
     plot_params['bnvbcandDeltaE']['range'] = (-3,-2)
+    plot_params['missingmass2_byhand']['range'] = (-10.0,24)
     plot_params['missingmass2']['range'] = (-14.0,1.0)
     plot_params['missingmassES']['range'] = (-10.0,10.0)
     plot_params['missingE']['range'] = (-4.0,8.0)
@@ -260,9 +264,10 @@ elif decay=='pnu':
     plot_params['tagbcandDeltaE']['range'] = (-5, 8)
 
 # nmu
-elif decay=='nmu':
+elif decay=='nmu' or decay=='ne':
     plot_params['bnvbcandDeltaE']['range'] = (-3,-2)
     plot_params['bnvbcandMES']['range'] = (4.5,5.34)
+    plot_params['missingmass2_byhand']['range'] = (-10.0,24)
     plot_params['missingmass2']['range'] = (-15.0,10.0)
     plot_params['missingmassES']['range'] = (-10.0,10.0)
     plot_params['missingE']['range'] = (-4.0,8.0)
