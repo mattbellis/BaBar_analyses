@@ -429,29 +429,6 @@ def calc_B_variables(particles, beam, decay='pnu', momentum_cut=1.7):
     #if len(bcands_temp)==1:
         #bc = bcands_temp[0]
 
-    ########################################################
-    # Recalculate the missing mass assuming B on one side
-    #totp4[0] = halfbeam - highmomE
-    #missingmass = invmass([totp4],return_squared=True)
-
-    #print(beam)
-    #print(halfbeam)
-
-    '''
-    bcand = []
-    dE = []
-    mes = []
-    for bc in bcands_temp:
-        bcand.append(invmass([bc]))
-        dE.append(bc[0] - halfbeam)
-        bc[0] = halfbeam
-        mes.append(invmass([bc]))
-
-    tagbcand = invmass([tagbc])
-    tagdE = tagbc[0] - halfbeam
-    tagbc[0] = halfbeam
-    tagmes = invmass([tagbc])
-    '''
 
     return nbnvbcand,bcand,dE,mes,protp3,lepp3,protcosth,lepcosth,protidx,lepidx, tagbcand,tagdE,tagmes, tagq, missingmom, missingE, missingmass2, missingmassES, bcandp3,tagbcandp3
 

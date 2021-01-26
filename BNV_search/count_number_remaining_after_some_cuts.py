@@ -36,30 +36,43 @@ for infilename in infilenames:
         pid_mask0 = bd.pid_mask(df,particle='proton')
         pid_mask1 = bd.pid_mask(df,particle='muon')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='muon')
+        bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='proton') & bd.bnv_children_costh_mask(df,child='muon')
     elif decay=='pe':
         pid_mask0 = bd.pid_mask(df,particle='proton')
         pid_mask1 = bd.pid_mask(df,particle='electron')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='electron')
+        bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='proton') & bd.bnv_children_costh_mask(df,child='electron')
     elif decay=='pnu':
         pid_mask0 = bd.pid_mask(df,particle='proton')
         pid_mask1 = bd.pid_mask(df,particle='proton')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='proton') & bd.bnv_children_momentum_mask(df,child='nu')
+        bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='proton') 
     elif decay=='nmu':
         pid_mask0 = bd.pid_mask(df,particle='muon')
         pid_mask1 = bd.pid_mask(df,particle='muon')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='neutron') & bd.bnv_children_momentum_mask(df,child='muon')
+        bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='muon')
     elif decay=='ne':
         pid_mask0 = bd.pid_mask(df,particle='electron')
         pid_mask1 = bd.pid_mask(df,particle='electron')
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='neutron') & bd.bnv_children_momentum_mask(df,child='electron')
+        bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='electron')
 
 
+
+    #cut1 = len(df[pid_mask0])
+    #cut2 = len(df[pid_mask1])
+    #cut3 = len(df[pid_mask0 & pid_mask1])
+    #cut4 = len(df[bnv_children_momentum_mask])
+    #cut5 = len(df[pid_mask0 & pid_mask1 & bnv_children_momentum_mask])
+
+    dsc_mask = bd.decay_specific_cuts(df,decay=decay)
 
     cut1 = len(df[pid_mask0])
-    cut2 = len(df[pid_mask1])
-    cut3 = len(df[pid_mask0 & pid_mask1])
-    cut4 = len(df[bnv_children_momentum_mask])
-    cut5 = len(df[pid_mask0 & pid_mask1 & bnv_children_momentum_mask])
+    cut2 = len(df[pid_mask0 & pid_mask1])
+    cut3 = len(df[pid_mask0 & pid_mask1 & bnv_children_momentum_mask])
+    cut4 = len(df[pid_mask0 & pid_mask1 & bnv_children_momentum_mask & bnv_children_costh_mask])
+    cut5 = len(df[dsc_mask])
 
     counts[decay][sp[0]] = cut5
 

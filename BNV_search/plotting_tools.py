@@ -9,7 +9,7 @@ def get_variable_parameters_for_plotting():
     plotvars = {}
     plotvars["nbnvbcand"] = {"values":[], "xlabel":r"# of BNV B-candidates", "ylabel":r"# E","range":(0,10)} 
     plotvars["bnvbcandmass"] = {"values":[], "xlabel":r"Mass BNV B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
-    plotvars["bnvbcandp3"] = {"values":[], "xlabel":r"|p| BNV B-candidate [GeV/c]", "ylabel":r"# E","range":(0,9)} 
+    plotvars["bnvbcandp3"] = {"values":[], "xlabel":r"|p| BNV B-candidate [GeV/c]", "ylabel":r"# E","range":(0,6)} 
     plotvars["bnvbcandMES"] = {"values":[], "xlabel":r"BNV M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
     plotvars["bnvbcandDeltaE"] = {"values":[], "xlabel":r"BNV $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
     plotvars["bnvprotp3"] = {"values":[], "xlabel":r"BNV baryon $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
@@ -23,6 +23,7 @@ def get_variable_parameters_for_plotting():
     plotvars["tagbcandmass"] = {"values":[], "xlabel":r"Mass tag B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
     plotvars["tagbcandMES"] = {"values":[], "xlabel":r"tag M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
     plotvars["tagbcandDeltaE"] = {"values":[], "xlabel":r"tag $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
+    plotvars["tagbcandp3"] = {"values":[], "xlabel":r"|p| tag B-candidate [GeV/c]", "ylabel":r"# E","range":(0,6)} 
     plotvars["tagq"] = {"values":[], "xlabel":r"tag charge", "ylabel":r"# E","range":(-5,5)} 
     plotvars["missingmassES"] = {"values":[], "xlabel":r"Missing mass ES$^2$ [GeV$^2$/c$^4$]", "ylabel":r"# E","range":(-10,10)} 
     plotvars["missingmass2"] = {"values":[], "xlabel":r"Missing mass$^2$ [GeV$^2$/c$^4$]", "ylabel":r"# E","range":(-5,5)} 
