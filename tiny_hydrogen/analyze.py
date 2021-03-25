@@ -1,83 +1,105 @@
+import uproot
+import awkward as ak
 import numpy as np
 import matplotlib.pylab as plt
-import uproot 
-import awkward as ak
 
 import sys
 
 infilenames = sys.argv[1:]
 
-masses_pn = []
-masses_pp = []
-masses_nn = []
+#'''
+nfiles = len(infilenames)
+data = {}
+data['nMass'] = [[],[],[],[],[]]
+data['eenergy'] = [[],[],[],[],[]]
+data['penergy'] = [[],[],[],[],[]]
 
-for infilename in infilenames:
-    print(infilename)
-    f = uproot.open(infilename)
+for i,infilename in enumerate(infilenames):
+    name = infilename+":ntp1;1"
+    print(i,nfiles,name)
 
-    #print(f.keys())
-
-    events = f['Tskim']
-
+    events = uproot.open(name)
     #print(events.keys())
+    nevents = len(events['nn'].array())
 
-    #print(len(events))
+    nn = events['nn'].array()
+    nMass = events['nMass'].array()
+    nd1Idx = events['nd1Idx'].array()
+    nd2Idx = events['nd2Idx'].array()
+    eenergy = events['eenergy'].array()
+    penergy = events['penergy'].array()
 
-    #exit()
+    for j in range(nevents):
+        #event = events[j]
+        #print(event.keys())
+        #print(len(nn),nevents)
+        for n in range(nn[j]):
+            idx1 = nd1Idx[j][n]
+            idx2 = nd2Idx[j][n]
 
-    a_ee = events['ee'].array()
-    a_epx = events['epx'].array()
-    a_epy = events['epy'].array()
-    a_epz = events['epz'].array()
-    a_eq = events['eq'].array()
+            data['nMass'][0].append(nMass[j][n])
+            data['penergy'][0].append(penergy[j][idx1])
+            data['eenergy'][0].append(eenergy[j][idx2])
 
-    a_protone = events['protone'].array()
-    a_protonpx = events['protonpx'].array()
-    a_protonpy = events['protonpy'].array()
-    a_protonpz = events['protonpz'].array()
-    a_protonq = events['protonq'].array()
+            if eenergy[j][idx2]<0.200:
+                data['nMass'][1].append(nMass[j][n])
+                data['penergy'][1].append(penergy[j][idx1])
+                data['eenergy'][1].append(eenergy[j][idx2])
 
-    for ee,epx,epy,epz,eq,pe,ppx,ppy,ppz,pq  in zip(a_ee,a_epx,a_epy,a_epz,a_eq,a_protone,a_protonpx,a_protonpy,a_protonpz,a_protonq):
-        #print(ee,epx,epy,epz)
-        #print(pe,ppx,ppy,ppz)
-        ne = len(ee)
-        nprot = len(pe)
-        #print(ne,nprot)
-        for i in range(ne):
-            e0,px0,py0,pz0,q0 = ee[i],epx[i],epy[i],epz[i],eq[i]
-            for j in range(nprot):
-                e1,px1,py1,pz1,q1 = pe[j],ppx[j],ppy[j],ppz[j],pq[j]
-                mtemp0 = np.sqrt(e0*e0 - (px0*px0 + py0*py0 + pz0*pz0))
-                mtemp1 = np.sqrt(e1*e1 - (px1*px1 + py1*py1 + pz1*pz1))
-                #print(mtemp0,mtemp1)
+            if eenergy[j][idx2]<0.100:
+                data['nMass'][2].append(nMass[j][n])
+                data['penergy'][2].append(penergy[j][idx1])
+                data['eenergy'][2].append(eenergy[j][idx2])
 
-                e = e0+e1
-                px = px0+px1
-                py = py0+py1
-                pz = pz0+pz1
+            if eenergy[j][idx2]>0.060 and eenergy[j][idx2]<0.080:
+                data['nMass'][3].append(nMass[j][n])
+                data['penergy'][3].append(penergy[j][idx1])
+                data['eenergy'][3].append(eenergy[j][idx2])
 
-                m2 = e*e - (px*px + py*py + pz*pz)
+            if eenergy[j][idx2]>0.064 and eenergy[j][idx2]<0.070:
+                data['nMass'][4].append(nMass[j][n])
+                data['penergy'][4].append(penergy[j][idx1])
+                data['eenergy'][4].append(eenergy[j][idx2])
 
-                m = -999
-                if m2>=0:
-                    m = np.sqrt(m2)
-                else:
-                    m = -np.sqrt(abs(m2))
+            
+        #print(nn)
+        #print(nMass)
+        #print(nd1Idx)
+        #print(nd2Idx)
+        #print(eenergy)
+        #print(penergy)
+        #exit()
+    #print(events['nMass'])
+    #masses += ak.to_numpy(ak.flatten(events['nMass'].array())).tolist()
+    #e_energies += ak.to_numpy(ak.flatten(events['eenergy'].array())).tolist()
+#'''
 
-                if m<0.98:
-                    print(m)
-                if q0*q1<0:
-                    masses_pn.append(m)
-                elif q0*q1>0 and q0>0:
-                    masses_pp.append(m)
-                elif q0*q1>0 and q0<0:
-                    masses_nn.append(m)
 
-print("# masses pn: ",len(masses_pn))
-print("# masses nn: ",len(masses_nn))
-print("# masses pp: ",len(masses_pp))
-np.savetxt('ep_masses_pn.dat',np.array(masses_pn))
-np.savetxt('ep_masses_nn.dat',np.array(masses_nn))
-np.savetxt('ep_masses_pp.dat',np.array(masses_pp))
-#plt.hist(masses,bins=200)
-#plt.show()
+
+#print(masses)
+ee_ranges = [(0,5),(0,0.3),(0,0.120), (0,0.120), (0,0.120)]
+pe_ranges = [(0,5),(0,5),(0,5),(0,5),(0,5)]
+
+for i in range(0,5):
+    plt.figure(figsize=(12,6))
+
+    plt.subplot(2,2,1)
+    plt.hist(data['nMass'][i],range=(0.0,1.3),bins=100)
+    plt.xlabel(r'$M_{pe^-}$ [GeV/c$^2$]',fontsize=18)
+
+    plt.subplot(2,2,3)
+    plt.hist(data['eenergy'][i],range=ee_ranges[i],bins=100)
+    plt.xlabel(r'$E_{e^-}$ [GeV]',fontsize=18)
+
+    plt.subplot(2,2,4)
+    plt.hist(data['penergy'][i],range=pe_ranges[i],bins=100)
+    plt.xlabel(r'$E_{p}$ [GeV]',fontsize=18)
+    plt.tight_layout()
+
+    name = f"plots/tiny_hydrogen_{i}.png"
+    plt.savefig(name)
+
+
+plt.show()
+
+

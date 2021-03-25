@@ -283,6 +283,8 @@ def make_all_plots(df_plotting_container,specific_plots=[],backend='matplotlib',
             #print(len(backgroundMC['weights']))
 
             # Background
+            #print(backgroundMC['colors'])
+            #print(backgroundMC['labels'])
             plt.hist(backgroundMC['values'],bins=bins,range=plotrange,weights=backgroundMC['weights'],stacked=stacked,alpha=alpha,label=backgroundMC['labels'],color=backgroundMC['colors'],histtype='stepfilled',density=norm_hist)
 
             # Signal

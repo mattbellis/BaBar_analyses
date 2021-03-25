@@ -243,6 +243,7 @@ plot_params = pt.get_variable_parameters_for_plotting()
 # pe and pmu
 if decay=='pmu' or decay=='pe':
     plot_params['bnvbcandDeltaE']['range'] = (-0.6,0.6)
+    plot_params['missingmass2_byhand']['range'] = (-5.0,8.0)
     plot_params['missingmass2']['range'] = (-6.0,1.0)
     plot_params['missingmassES']['range'] = (-6.0,1.0)
     plot_params['bnvbcandMES']['range'] = (5.2,5.34)
@@ -298,9 +299,6 @@ figsize=(15,3)
 #specific_plots = ['bnvbcandmass', 'tagbcandmass']
 #grid_of_plots = (1,2)
 #figsize=(8,3)
-##tag = 'tighterPID_childmomentum_momentumplots_TEST'
-#tag = 'tighterPID_childmomentum_Bmasses'
-
 
 pt.make_all_plots(df_plotting_container,specific_plots=specific_plots,backend='matplotlib',grid_of_plots=grid_of_plots,xlabelfontsize=10,ignorePID=True,plot_params=plot_params,stacked=True,figsize=figsize, decay=decay, tag=tag)
 ################################################################################

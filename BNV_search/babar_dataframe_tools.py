@@ -145,7 +145,8 @@ def decay_specific_cuts(df,decay='pmu'):
                      (df['bnvprotp3']<2.7) & \
                      (df['bnvlepp3']>2.40) & \
                      (df['bnvlepp3']<2.7) & \
-                     (df['missingmass2']>-2.0) & \
+                     (df['missingmass2_byhand']>-1.0) & \
+                     (df['missingmass2_byhand']< 2.0) & \
                      (df['missingmassES']>-2.0) & \
                      (df['r2all']<0.7) & \
                      (df['r2']<0.8) & \
@@ -173,7 +174,8 @@ def decay_specific_cuts(df,decay='pmu'):
                      (df['bnvlepp3']<4.0) & \
                      (df['missingE']>1.0) & \
                      (df['missingE']<5.0) & \
-                     (df['missingmass2']<-3.0) & \
+                     (df['missingmass2_byhand']<14.0) & \
+                     (df['missingmass2_byhand']>-7.0) & \
                      (df['missingmassES']<4.0) & \
                      (df['r2all']<0.6) & \
                      (df['r2']<0.7) & \
@@ -201,6 +203,8 @@ def decay_specific_cuts(df,decay='pmu'):
                      (df['missingE']<5.0) & \
                      (df['missingmom']>0.5) & \
                      (df['missingmom']<4.0) & \
+                     (df['missingmass2_byhand']<15.0) & \
+                     (df['missingmass2_byhand']>-5.0) & \
                      (df['r2all']<0.6) & \
                      (df['r2']<0.7) & \
                      (df['sphericityall']<0.6) & \
@@ -231,6 +235,8 @@ def decay_specific_cuts(df,decay='pmu'):
                      (df['missingE']<5.0) & \
                      (df['missingmom']>0.5) & \
                      (df['missingmom']<4.0) & \
+                     (df['missingmass2_byhand']<15.0) & \
+                     (df['missingmass2_byhand']>-5.0) & \
                      (df['r2all']<0.6) & \
                      (df['r2']<0.7) & \
                      (df['sphericityall']<0.6) & \

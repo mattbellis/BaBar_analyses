@@ -13,7 +13,9 @@ for decay in decays:
     counts[decay] = {}
 
 
-tag = 'tighterPID_childmomentum'
+#tag = 'tighterPID_childmomentum'
+#tag = 'selection_cuts'
+tag = 'selection_cuts_TESTING'
 for infilename in infilenames:
 
     print(infilename)
@@ -26,8 +28,7 @@ for infilename in infilenames:
             decay = d
             break
         
-
-    print(decay,sp)
+    #print(decay,sp)
 
     df = pd.read_hdf(infilename)
     cut0 = len(df)
@@ -74,11 +75,17 @@ for infilename in infilenames:
     cut4 = len(df[pid_mask0 & pid_mask1 & bnv_children_momentum_mask & bnv_children_costh_mask])
     cut5 = len(df[dsc_mask])
 
-    counts[decay][sp[0]] = cut5
+    if sp[0] in list(counts[decay].keys()):
+        #counts[decay][sp[0]] += cut5
+        counts[decay][sp[0]] += cut4
+    else:
+        #counts[decay][sp[0]] = cut5
+        counts[decay][sp[0]] = cut4
+    #counts[decay][sp[0]] = cut5
 
     print(cut0,cut1,cut2,cut3,cut4,cut5)
     if cut0>0:
-        print(cut0/cut0,cut1/cut0,cut2/cut0,cut3/cut0,cut4/cut0,cut5/cut0)
+        print(f"Org: {cut0/cut0:.6f} PID1: {cut1/cut0:.6f} PID_BOTH: {cut2/cut0:.6f} PIDBoth+BNVmom: {cut3/cut0:.6f} PIDBoth+BNVmom+costh: {cut4/cut0:.6f} SELCUTS: {cut5/cut0:.6f}")
 
     #exit()
 
@@ -97,6 +104,6 @@ for decay in decays:
         ##print(decay,sp,)
 print(output)
 
-outfile = open("COUNTS_TEST.py",'w')
+outfile = open(f"COUNTS_TEST_{tag}.py",'w')
 outfile.write(output)
 outfile.close()

@@ -46,6 +46,7 @@ def mergeDataframes(dfs):
     mergedDfs = pd.concat([mergedDfs, df])
     
   return mergedDfs
+################################################################################
 
 
 infilenames = sys.argv[1:]
@@ -73,11 +74,11 @@ toberemoved = []
 #'''
 # Manually remove some of the columns that are about PID
 # BaBar
-'''
+#'''
 for name in list(df0.keys()):
     if name.find('Is')>=0 or name.find('BDT')>=0 or name.find('KM')>=0:
         toberemoved.append(name)
-'''
+#'''
 
 toberemoved.append('ne')
 toberemoved.append('np')
@@ -122,6 +123,9 @@ print()
 # split into input and output columns
 y = df.pop('Class') # all class values become 'y'
 X = df
+
+print(len(X))
+print(len(y))
 
 # ensure all data are floating point values
 X = X.astype('float32')
