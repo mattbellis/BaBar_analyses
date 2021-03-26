@@ -1,0 +1,4 @@
+
+# To dump out the npz file to fit
+python load_in_ML_model.py KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_100000_MC_TRAINING_SP-998_N_40000_pnu.h5 CUT_SUMMARY_SP-998_pnu_SAMPLE_N_20000_OPPOSITE.h5
+
