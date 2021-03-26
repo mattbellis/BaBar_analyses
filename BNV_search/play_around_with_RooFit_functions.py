@@ -21,23 +21,22 @@ def main(argv):
 
     # Declare observable x
     x = ROOT.RooRealVar("x", "x", 0.7, 1.0)
-    x.setBins(50)
+    x.setBins(100)
 
     # Create two Gaussian PDFs g1(x,mean1,sigma) anf g2(x,mean2,sigma) and
     # their parameters
     pars_bkg, argus_bkg = argus_in_x(x,'bkg')
-    pars_bkg[0].setVal(-100.0)
-    #pars_bkg[0].setRange(0.8,1.5)
+    pars_bkg[0].setVal(-100.0) # Negative means peak at high values, positive means peak at low values
     pars_bkg[0].setRange(-100000,100000)
 
-    pars_bkg[1].setVal(1.0)
-    pars_bkg[1].setRange(0.97,1.001)
+    pars_bkg[1].setVal(1.0) # This is the cutoff, how high in x the PDF can go
+    pars_bkg[1].setRange(0.01,100000.001)
 
     pars_sig, argus_sig = argus_in_x(x,'sig')
-    pars_sig[0].setVal(-500)
-    pars_sig[0].setRange(-70000.5,-6.5)
+    pars_sig[0].setVal(-500) # Negative means peak at high values, positive means peak at low values
+    pars_sig[0].setRange(-5000000,5000000)
 
-    pars_sig[1].setVal(1.0)
+    pars_sig[1].setVal(1.0) # This is the cutoff, how high in x the PDF can go
     pars_sig[1].setRange(0.97,1.001)
 
 
@@ -46,8 +45,11 @@ def main(argv):
     
     # Sum the composite signal and background into an extended pdf
     # nsig*sig+nbkg*bkg
-    nsig = ROOT.RooRealVar("nsig", "number of signal events", 100, 0., 1000000)
-    nbkg = ROOT.RooRealVar( "nbkg", "number of background events", 1000, 0, 1000000)
+    #nsig = ROOT.RooRealVar("nsig", "number of signal events", 100000, 0., 1000000)
+    #nbkg = ROOT.RooRealVar( "nbkg", "number of background events", 300, 0, 1000000)
+
+    nsig = ROOT.RooRealVar("nsig", "number of signal events", 30000, 0., 1000000)
+    nbkg = ROOT.RooRealVar( "nbkg", "number of background events", 10000, 0, 1000000)
     model = ROOT.RooAddPdf("model", "a1+a2",
         ROOT.RooArgList( argus_bkg, argus_sig), ROOT.RooArgList( nbkg, nsig))
 
@@ -58,29 +60,6 @@ def main(argv):
     # = model.expectedEvents() = nsig+nbkg
     data = model.generate(ROOT.RooArgSet(x))
     
-    # Or read one in
-    infilename = argv[1]
-    real_data = np.load(infilename)
-    print(real_data)
-    print(f"min/max: {max(real_data)} {min(real_data)}")
-
-    data = ROOT.RooDataSet("data","data",ROOT.RooArgSet(x))
-    xlo = x.getRange()[0]
-    xhi = x.getRange()[1]
-    print(xlo,xhi)
-    for i,d in enumerate(real_data):
-        #print(d)
-        if i%100000==0:
-            print(i,len(real_data))
-        if i>1000000:
-            break
-        if d>xlo and d<xhi:
-            x.setVal(d)
-            data.add(ROOT.RooArgSet(x))
-
-
-    # Fit model to data, ML term automatically included
-    model.fitTo(data)
 
     # Plot data and PDF overlaid, expected number of events for p.d.f projection normalization
     # rather than observed number of events (==data.numEntries())
@@ -106,6 +85,38 @@ def main(argv):
     # Print structure of composite p.d.f.
     model.Print("t")
 
+    bkgvalue0 = pars_bkg[0].getVal()
+    bkgvalue1 = pars_bkg[1].getVal()
+    bkgvalue2 = nbkg.getVal()
+    txt = ROOT.TText(0.5,0.8,f"bkg: {bkgvalue0:0.2f}  {bkgvalue1:0.2f}   {bkgvalue2}") 
+    txt.SetNDC()
+    txt.SetTextSize(0.04)
+    xframe.addObject(txt)
+
+    sigvalue0 = pars_sig[0].getVal()
+    sigvalue1 = pars_sig[1].getVal()
+    sigvalue2 = nsig.getVal()
+    txt = ROOT.TText(0.5,0.7,f"sig: {sigvalue0:0.2f}  {sigvalue1:0.2f}   {sigvalue2}") 
+    txt.SetNDC()
+    txt.SetTextSize(0.04)
+    xframe.addObject(txt)
+
+    #value = pars_bkg[1].getVal()
+    #txt = ROOT.TText(0.6,0.75,f"bkg 1: {value:0.2f}") 
+    #txt.SetNDC()
+    #xframe.addObject(txt)
+#
+    #value = pars_sig[0].getVal()
+    #txt = ROOT.TText(0.6,0.7,f"sig 0: {value:0.2f}") 
+    #txt.SetNDC()
+    #xframe.addObject(txt)
+#
+    #value = pars_sig[1].getVal()
+    #txt = ROOT.TText(0.6,0.65,f"sig 1: {value:0.2f}") 
+    #txt.SetNDC()
+    #xframe.addObject(txt)
+#
+
 
 
     # Method 2 - Construct extended components first
@@ -128,8 +139,8 @@ def main(argv):
     xframe.Draw()
     ROOT.gPad.Update()
 
-
-    c.SaveAs("rf202_extendedmlfit.png")
+    name = f"RooFit_functions_sig_{sigvalue0:0.2f}_{sigvalue1:0.2f}_{sigvalue2:0.2f}_bkg_{bkgvalue0:0.2f}_{bkgvalue1:0.2f}_{bkgvalue2:0.2f}.png"
+    c.SaveAs(name)
 
     rep = ''
     while not rep in [ 'q', 'Q' ]:
