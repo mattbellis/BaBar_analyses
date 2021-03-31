@@ -30,3 +30,19 @@
    5  nbkg         1.07826e+05   3.98248e+02   2.13983e-03  -9.01644e-01
    6  nsig         3.40526e+05   6.25521e+02   2.35643e-03  -3.24619e-01
 
+# Fitting SP-11975 after training with 2 argus + bkg argus - Looks great!
+    EXT PARAMETER                APPROXIMATE     INTERNAL      INTERNAL
+  NO.   NAME      VALUE            ERROR       STEP SIZE       VALUE
+   1  argpar0_sig  -1.19712e+01   1.85431e-01   1.30470e-06   1.57742e+00
+   2  argpar1_sig  -7.18026e+02   7.92330e+00   5.01166e-06   1.51724e+00
+   3  argpar_bkg  -1.01746e+02   4.46876e+00   2.46333e-07  -1.01746e-03
+   4  argus_frac_sig   1.38620e-01   8.12589e-03   1.50836e-04  -8.10286e-01
+   5  cutoff0_sig   9.90041e-01   2.74365e-03   5.00000e-01   2.84426e+00
+   6  cutoff1_sig   1.00100e+00   1.87398e-06   1.20594e-03   1.57077e+00
+                                 WARNING -   - ABOVE PARAMETER IS AT LIMIT.
+   7  cutoff_bkg   1.00100e+00   2.45582e-06   6.96737e-03   1.57084e+00
+                                 WARNING -   - ABOVE PARAMETER IS AT LIMIT.
+   8  nbkg         1.52184e+05   5.48999e+02   9.70891e-05  -7.69298e-01
+   9  nsig         2.96171e+05   6.53849e+02   9.70534e-05  -4.19887e-01
+
+
