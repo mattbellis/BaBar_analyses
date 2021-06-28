@@ -115,6 +115,8 @@ def main():
         ########################################
         #'''
         for d in ['pmu', 'pe', 'pnu', 'nmu', 'ne']:
+        #for d in ['pnu', 'nmu', 'ne']:
+        #for d in ['pmu', 'pe']:
             print(d)
             tag = "{0}_{1}_{2}".format(mastertag,infile_tag,d)
             batchfilename = "hpc_scripts/batch_{0}.sh".format(tag)

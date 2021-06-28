@@ -32,16 +32,21 @@ decay = args.decay
 plotvars = {}
 plotvars["nbnvbcand"] = {"values":[], "xlabel":r"# of BNV B-candidates", "ylabel":r"# E","range":(0,10)} 
 plotvars["bnvbcandmass"] = {"values":[], "xlabel":r"Mass BNV B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
+plotvars["bnvbcandp3"] = {"values":[], "xlabel":r"|p| BNV B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
 plotvars["bnvbcandMES"] = {"values":[], "xlabel":r"BNV M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
 plotvars["bnvbcandDeltaE"] = {"values":[], "xlabel":r"BNV $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
 plotvars["bnvprotp3"] = {"values":[], "xlabel":r"BNV proton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
 plotvars["bnvlepp3"] = {"values":[], "xlabel":r"BNV lepton $|p|$ [GeV/c]", "ylabel":r"# E","range":(0,5)} 
+plotvars["bnvprotcosth"] = {"values":[], "xlabel":r"BNV proton $\cos(\theta)$ ", "ylabel":r"# E","range":(-1,1)} 
+plotvars["bnvlepcosth"] = {"values":[], "xlabel":r"BNV lepton $\cos(\theta)$ ", "ylabel":r"# E","range":(-1,1)} 
 
 plotvars["tagbcandmass"] = {"values":[], "xlabel":r"Mass tag B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
+plotvars["tagbcandp3"] = {"values":[], "xlabel":r"|p| tag B-candidate [GeV/c$^{2}$]", "ylabel":r"# E","range":(0,9)} 
 plotvars["tagbcandMES"] = {"values":[], "xlabel":r"tag M$_{\rm ES}$ [GeV/c$^{2}$]", "ylabel":r"# E","range":(5.1,5.3)} 
 plotvars["tagbcandDeltaE"] = {"values":[], "xlabel":r"tag $\Delta E$ [GeV]", "ylabel":r"# E","range":(-5,5)} 
 plotvars["tagq"] = {"values":[], "xlabel":r"tag charge", "ylabel":r"# E","range":(-5,5)} 
-plotvars["missingmass"] = {"values":[], "xlabel":r"Missing mass [GeV/c$^2$]", "ylabel":r"# E","range":(-10,10)} 
+plotvars["missingmass2"] = {"values":[], "xlabel":r"Missing mass$^2$ [GeV^2/c$^4$]", "ylabel":r"# E","range":(-10,10)} 
+plotvars["missingmassES"] = {"values":[], "xlabel":r"Missing mass$^2$ ES [GeV^2/c$^4$]", "ylabel":r"# E","range":(-10,10)} 
 plotvars["missingmom"] = {"values":[], "xlabel":r"Missing momentum [GeV/c]", "ylabel":r"# E","range":(0,10)} 
 plotvars["missingE"] = {"values":[], "xlabel":r"Missing E [GeV]", "ylabel":r"# E","range":(-2,10)} 
 plotvars["scalarmomsum"] = {"values":[], "xlabel":r"Scalar momentum sum [GeV/c]", "ylabel":r"# E","range":(0,15)} 
@@ -187,7 +192,9 @@ def get_sptag(name):
 
 outfilename = None
 outfilename_df = None
-sptag = None
+sptag = 'SP'
+#sptag = None
+#sptag = 'AllEvents'
 
 if args.outfile is None:
     sptag = get_sptag(args.infiles[0][0]) 
@@ -260,16 +267,22 @@ for i in range(nentries):
 
     nbnvbcand = tree.nbnvbcand
     bnvbcandmass = tree.bcand
+    bnvbcandp3 = tree.bcandp3
     bnvbcandMES = tree.mes
     bnvbcandDeltaE = tree.dE
     bnvprotp3 = tree.bnvprotp3
     bnvlepp3 = tree.bnvlepp3
+    bnvprotcosth = tree.bnvprotcosth
+    bnvlepcosth = tree.bnvlepcosth
+
 
     tagbcandmass = tree.tagbcand
+    tagbcandp3 = tree.tagbcandp3
     tagbcandMES = tree.tagmes
     tagbcandDeltaE = tree.tagdE
     tagq = tree.tagq
-    missingmass = tree.missingmass
+    missingmass2 = tree.missingmass2
+    missingmassES = tree.missingmassES
     missingmom = tree.missingmom
     missingE = tree.missingE
     scalarmomsum = tree.scalarmomsum
@@ -283,6 +296,9 @@ for i in range(nentries):
     pp = tree.protonp3
     mup = tree.mup3
     ep = tree.ep3
+    pcosth = tree.protoncosth
+    mucosth = tree.mucosth
+    ecosth = tree.ecosth
 
 
     protonIsTightKMProton = tree.protonIsTightKMProton
@@ -410,17 +426,23 @@ for i in range(nentries):
             cut3 *= bnvprotp3[0]>lopcut and bnvprotp3[0]<hipcut
             cut3 *= bnvlepp3[0]>lopcut and bnvlepp3[0]<hipcut
     elif decay=='pnu':
+        lopcut = 1.5
+        hipcut = 4.5
         cut3 = nbnvbcand==1 
         if nbnvbcand>0:
             cut3 *= bnvprotp3[0]>lopcut and bnvprotp3[0]<hipcut
             cut3 *= bnvlepp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
     elif decay=='nmu':
+        lopcut = 0.0
+        hipcut = 4.0
         cut3 = nbnvbcand==1 
         if nbnvbcand>0:
             cut3 *= bnvprotp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
             cut3 *= bnvlepp3[0]>lopcut and bnvlepp3[0]<hipcut
     elif decay=='ne':
         cut3 = nbnvbcand==1 
+        lopcut = 0.0
+        hipcut = 4.0
         if nbnvbcand>0:
             cut3 *= bnvprotp3[0]>0.0 # This is missing momentum so we won't cut hard on it right now
             cut3 *= bnvlepp3[0]>lopcut and bnvlepp3[0]<hipcut
@@ -454,16 +476,21 @@ for i in range(nentries):
 
             for k in range(nbnvbcand):
                 plotvars["bnvbcandmass"]["values"][icut].append(bnvbcandmass[k])
+                plotvars["bnvbcandp3"]["values"][icut].append(bnvbcandp3[k])
                 plotvars["bnvbcandMES"]["values"][icut].append(bnvbcandMES[k])
                 plotvars["bnvbcandDeltaE"]["values"][icut].append(bnvbcandDeltaE[k])
                 plotvars["bnvprotp3"]["values"][icut].append(bnvprotp3[k])
                 plotvars["bnvlepp3"]["values"][icut].append(bnvlepp3[k])
+                plotvars["bnvprotcosth"]["values"][icut].append(bnvprotcosth[k])
+                plotvars["bnvlepcosth"]["values"][icut].append(bnvlepcosth[k])
 
                 plotvars["tagbcandmass"]["values"][icut].append(tagbcandmass[k])
+                plotvars["tagbcandp3"]["values"][icut].append(tagbcandp3[k])
                 plotvars["tagbcandMES"]["values"][icut].append(tagbcandMES[k])
                 plotvars["tagbcandDeltaE"]["values"][icut].append(tagbcandDeltaE[k])
                 plotvars["tagq"]["values"][icut].append(tagq[k])
-                plotvars["missingmass"]["values"][icut].append(missingmass[k])
+                plotvars["missingmass2"]["values"][icut].append(missingmass2[k])
+                plotvars["missingmassES"]["values"][icut].append(missingmassES[k])
 
                 # Dump the PID flags for the BNV candidate decay products
                 if not args.dump_all_pid_flags:

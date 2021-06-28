@@ -4,6 +4,12 @@ ssh -L 22000:grawp.siena.edu:22 mbellis@olsen.cs.siena.edu
 #scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/cut_summary_files/SP-980/ .
 
 #scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-9456-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pmu/ .
+scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/AllEvents-Run1-OnPeak-R24/basicPID_pi0_R24/*10*.root" AllEvents-Run1-OnPeak-R24/basicPID_pi0_R24/.
+scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/AllEvents-Run1-OnPeak-R24/basicPID_pi0_R24/PID_assignment/*10*.root" AllEvents-Run1-OnPeak-R24/basicPID_pi0_R24/PID_assignment/.
+scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-9456-R24/basicPID_pi0_R24/*10*.root" SP-9456-R24/basicPID_pi0_R24/.
+scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-9456-R24/basicPID_pi0_R24/PID_assignment/*10*.root" SP-9456-R24/basicPID_pi0_R24/PID_assignment/.
+
+scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-11977-R24/basicPID_pi0_R24/*10*.root" SP-11977-R24/basicPID_pi0_R24/.
 
 #scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles//SP-9456-R24/basicPID_pi0_R24/*.root"
 #scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles//SP-9456-R24/basicPID_pi0_R24/SP-9456-R24-100_SKIMMED.root"
@@ -19,10 +25,19 @@ scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/cut_summ
 scp -r -P 22000 "mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/cut_summary_files_df/SP-998" cut_summary_files_pickle/.
 
 
-#scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-11975-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pnu/ SP-11975-R24/
 scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-998-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pnu/ SP-998-R24/
 scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-998-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_nmu/ SP-998-R24/
 scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-998-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pmu/ SP-998-R24/
+
+scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-11975-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pnu/ SP-11975-R24/
+scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-11976-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_nmu/ SP-11976-R24/
+scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-11977-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_ne/ SP-11977-R24/
+scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-9456-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pmu/ SP-9456-R24/
+scp -r -P 22000 mbellis@localhost:/qnap/mbellis/bellis/BaBar/rootfiles/SP-9457-R24/basicPID_pi0_R24/PID_assignment/kinematic_distributions_pe/ SP-9457-R24/
+
+scp -r -P 22000 "mbellis@localhost:/home/mbellis/BaBar_analyses/BNV_search/plots/before*.png" plots/.
+scp -r -P 22000 "mbellis@localhost:/home/mbellis/BaBar_analyses/BNV_search/log*.dat" .
+
 
 
 

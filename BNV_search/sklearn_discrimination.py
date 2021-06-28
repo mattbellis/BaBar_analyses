@@ -70,6 +70,9 @@ result = sktools.learn(data, hidden_layers=5, iterations=1000)
 sktools.tablesReportFromDict(result)
 sktools.graphicReport(result)
 
+#pickle.dump(result,outfile)
+#outfile.close()
+
 plt.show()
 #exit()
 

@@ -117,14 +117,20 @@ nbnvbcand = array('i', [-1])
 outtree.Branch('nbnvbcand', nbnvbcand, 'nbnvbcand/I')
 bcand = array('f', 64*[-1.0])
 outtree.Branch('bcand', bcand, 'bcand[nbnvbcand]/F')
+bcandp3 = array('f', 64*[-1.0])
+outtree.Branch('bcandp3', bcandp3, 'bcandp3[nbnvbcand]/F')
 dE = array('f', 64*[-1.0])
 outtree.Branch('dE', dE, 'dE[nbnvbcand]/F')
 mes = array('f', 64*[-1.0])
 outtree.Branch('mes', mes, 'mes[nbnvbcand]/F')
 bnvprotp3 = array('f', 64*[-1.0])
 outtree.Branch('bnvprotp3', bnvprotp3, 'bnvprotp3[nbnvbcand]/F')
+bnvprotcosth = array('f', 64*[-1.0])
+outtree.Branch('bnvprotcosth', bnvprotcosth, 'bnvprotcosth[nbnvbcand]/F')
 bnvlepp3 = array('f', 64*[-1.0])
 outtree.Branch('bnvlepp3', bnvlepp3, 'bnvlepp3[nbnvbcand]/F')
+bnvlepcosth = array('f', 64*[-1.0])
+outtree.Branch('bnvlepcosth', bnvlepcosth, 'bnvlepcosth[nbnvbcand]/F')
 bnvprotidx = array('i', 64*[-1])
 outtree.Branch('bnvprotidx', bnvprotidx, 'bnvprotidx[nbnvbcand]/I')
 bnvlepidx = array('i', 64*[-1])
@@ -132,6 +138,8 @@ outtree.Branch('bnvlepidx', bnvlepidx, 'bnvlepidx[nbnvbcand]/I')
 
 tagbcand = array('f', 64*[-1.0])
 outtree.Branch('tagbcand', tagbcand, 'tagbcand[nbnvbcand]/F')
+tagbcandp3 = array('f', 64*[-1.0])
+outtree.Branch('tagbcandp3', tagbcandp3, 'tagbcandp3[nbnvbcand]/F')
 tagdE = array('f', 64*[-1.0])
 outtree.Branch('tagdE', tagdE, 'tagdE[nbnvbcand]/F')
 tagmes = array('f', 64*[-1.0])
@@ -139,8 +147,10 @@ outtree.Branch('tagmes', tagmes, 'tagmes[nbnvbcand]/F')
 tagq = array('f', 64*[-1.0])
 outtree.Branch('tagq', tagq, 'tagq[nbnvbcand]/F')
 
-missingmass = array('f', 64*[-1.])
-outtree.Branch('missingmass', missingmass, 'missingmass[nbnvbcand]/F')
+missingmassES = array('f', 64*[-1.])
+outtree.Branch('missingmassES', missingmassES, 'missingmassES[nbnvbcand]/F')
+missingmass2 = array('f', 64*[-1.])
+outtree.Branch('missingmass2', missingmass2, 'missingmass2[nbnvbcand]/F')
 
 
 r2 = array('f', [-1.])
@@ -171,6 +181,8 @@ protone = array('f', 64*[-1.])
 outtree.Branch('protone', protone, 'protone[nproton]/F')
 protonp3 = array('f', 64*[-1.])
 outtree.Branch('protonp3', protonp3, 'protonp3[nproton]/F')
+protoncosth = array('f', 64*[-1.])
+outtree.Branch('protoncosth', protoncosth, 'protoncosth[nproton]/F')
 protonq = array('f', 64*[-1.])
 outtree.Branch('protonq', protonq, 'protonq[nproton]/F')
 
@@ -224,6 +236,8 @@ ee = array('f', 64*[-1.])
 outtree.Branch('ee', ee, 'ee[ne]/F')
 ep3 = array('f', 64*[-1.])
 outtree.Branch('ep3', ep3, 'ep3[ne]/F')
+ecosth = array('f', 64*[-1.])
+outtree.Branch('ecosth', ecosth, 'ecosth[ne]/F')
 eq = array('f', 64*[-1.])
 outtree.Branch('eq', eq, 'eq[ne]/F')
 
@@ -278,6 +292,8 @@ mue = array('f', 64*[-1.])
 outtree.Branch('mue', mue, 'mue[nmu]/F')
 mup3 = array('f', 64*[-1.])
 outtree.Branch('mup3', mup3, 'mup3[nmu]/F')
+mucosth = array('f', 64*[-1.])
+outtree.Branch('mucosth', mucosth, 'mucosth[nmu]/F')
 muq = array('f', 64*[-1.])
 outtree.Branch('muq', muq, 'muq[nmu]/F')
 
@@ -385,6 +401,7 @@ for i in range(nentries):
         particle = [e,px,py,pz,q,j,211]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
+        costh = particle[3]/p3
         scalarmomsum[0] += p3
 
         if p3>2.0:
@@ -404,6 +421,7 @@ for i in range(nentries):
         particle = [e,px,py,pz,q,j,321]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
+        costh = particle[3]/p3
         scalarmomsum[0] += p3
 
         if p3>2.0:
@@ -452,8 +470,9 @@ for i in range(nentries):
         particle = [e,px,py,pz,q,j,2212]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
+        costh = particle[3]/p3
         scalarmomsum[0] += p3
-        protone[j],protonp3[j],protonq[j] = e,p3,q
+        protone[j],protonp3[j],protoncosth[j],protonq[j] = e,p3,costh,q
 
         if p3>2.0:
             n_high_p += 1
@@ -502,8 +521,9 @@ for i in range(nentries):
         particle = [e,px,py,pz,q,j,13]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
+        costh = particle[3]/p3
         scalarmomsum[0] += p3
-        mue[j],mup3[j],muq[j] = e,p3,q
+        mue[j],mup3[j],mucosth[j],muq[j] = e,p3,costh,q
 
         if p3>2.0:
             n_high_p += 1
@@ -553,8 +573,9 @@ for i in range(nentries):
         particle = [e,px,py,pz,q,j,11]
         myparticles.append(particle)
         p3 = vec_mag(particle[1:4])
+        costh = particle[3]/p3
         scalarmomsum[0] += p3
-        ee[j],ep3[j],eq[j] = e,p3,q
+        ee[j],ep3[j],ecosth[j],eq[j] = e,p3,costh,q
 
         if p3>2.0:
             n_high_p += 1
@@ -600,21 +621,29 @@ for i in range(nentries):
     '''
 
     # Fill the bcandidates
-    nbnvbcand[0],temp_bcand,temp_dE,temp_mes,temp_bnvprotp3,temp_bnvlepp3,temp_bnvprotidx,temp_bnvlepidx, temp_tagbcand,temp_tagdE,temp_tagmes,temp_tagq,missingmom[0],missingE[0],temp_missingmass = calc_B_variables(myparticles,beam,decay)
+    #print("====================")
+    #print("# tracks!: ", ne[0],nmu[0],npi[0],nk[0],nproton[0], ne[0]+nmu[0]+npi[0]+nk[0]+nproton[0])
+    nbnvbcand[0],temp_bcand,temp_dE,temp_mes,temp_bnvprotp3,temp_bnvlepp3,temp_bnvprotcosth,temp_bnvlepcosth,temp_bnvprotidx,temp_bnvlepidx, temp_tagbcand,temp_tagdE,temp_tagmes,temp_tagq,missingmom[0],missingE[0],temp_missingmass2,temp_missingmassES,temp_bcandp3,temp_tagbcandp3  = calc_B_variables(myparticles,beam,decay)
+    #print("nbnvbcand: ",nbnvbcand[0])
     for n in range(nbnvbcand[0]):
         bcand[n] = temp_bcand[n]
+        bcandp3[n] = temp_bcandp3[n]
         dE[n] = temp_dE[n]
         mes[n] = temp_mes[n]
         bnvprotp3[n] = temp_bnvprotp3[n]
         bnvlepp3[n] = temp_bnvlepp3[n]
+        bnvprotcosth[n] = temp_bnvprotcosth[n]
+        bnvlepcosth[n] = temp_bnvlepcosth[n]
         bnvprotidx[n] = int(temp_bnvprotidx[n])
         bnvlepidx[n] = int(temp_bnvlepidx[n])
 
         tagbcand[n] = temp_tagbcand[n]
+        tagbcandp3[n] = temp_tagbcandp3[n]
         tagdE[n] = temp_tagdE[n]
         tagmes[n] = temp_tagmes[n]
         tagq[n] = temp_tagq[n]
-        missingmass[n] = temp_missingmass[n]
+        missingmass2[n] = temp_missingmass2[n]
+        missingmassES[n] = temp_missingmassES[n]
         #bnvlepidx[n] = int(temp_bnvlepidx[n])
         #bnvlepidx[n] = int(temp_bnvlepidx[n])
 

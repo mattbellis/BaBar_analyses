@@ -30,7 +30,7 @@ def read_in_pickle_files(infiles):
 ################################################################################
 def read_in_files_and_return_dataframe(infilenames):
 
-    infilenames = sys.argv[1:]
+    #infilenames = sys.argv[1:]
     if len(infilenames) != 2:
         print("Wrong number of input files!")
         print("Should be 2!")
@@ -78,9 +78,11 @@ def mergeDataframes(dfs):
 
 
 ################################################################################
-def preprocess(df, xCols, test_size=0.20):
-  X = df.iloc[:, 0:xCols] # all features except label
-  y = df.iloc[:, xCols+1:xCols+2] # column with label
+def preprocess(df, class_string='Class', test_size=0.20):
+  #X = df.iloc[:, 0:xCols] # all features except label
+  #y = df.iloc[:, xCols+1:xCols+2] # column with label
+  X = df.drop(class_string,axis=1) # all features except label
+  y = df[[class_string]] # column with label
 
   # convert categories into numerical labels
   le = preprocessing.LabelEncoder()
@@ -210,7 +212,7 @@ def graphROCfromDict(myDict, ax):
 ################################################################################
 
 ################################################################################
-def compare_train_test(model, X_train, y_train, X_test, y_test, bins=30):
+def compare_train_test(model, X_train, y_train, X_test, y_test, bins=30,tag='default'):
     decisions = []
 
     mask0, mask1, mask2, mask3 = None, None, None, None
@@ -242,11 +244,11 @@ def compare_train_test(model, X_train, y_train, X_test, y_test, bins=30):
     plt.hist(decisions[0],
              color='r', alpha=0.5, range=low_high, bins=bins,
              histtype='stepfilled', density=True,
-             label='Not Protons (train)')
+             label='Background (train)')
     plt.hist(decisions[1],
              color='b', alpha=0.5, range=low_high, bins=bins,
              histtype='stepfilled', density=True,
-             label='Protons (train)')
+             label='Signal (train)')
 
     hist, bins = np.histogram(decisions[2],
                               bins=bins, range=low_high, density=True)
@@ -255,14 +257,14 @@ def compare_train_test(model, X_train, y_train, X_test, y_test, bins=30):
     
     width = (bins[1] - bins[0])
     center = (bins[:-1] + bins[1:]) / 2
-    plt.errorbar(center, hist, yerr=err, fmt='o', c='r', label='Not protons (test)')
+    plt.errorbar(center, hist, yerr=err, fmt='o', c='r', label='Background (test)')
     
     hist, bins = np.histogram(decisions[3],
                               bins=bins, range=low_high, normed=True)
     scale = len(decisions[2]) / sum(hist)
     err = np.sqrt(hist * scale) / scale
 
-    plt.errorbar(center, hist, yerr=err, fmt='o', c='b', label='Protons (test)')
+    plt.errorbar(center, hist, yerr=err, fmt='o', c='b', label='Signal (test)')
 
     plt.xlabel("Model output", color = 'k')
     plt.ylabel("Arbitrary units", color = 'k')
@@ -270,6 +272,9 @@ def compare_train_test(model, X_train, y_train, X_test, y_test, bins=30):
     plt.title('Compare Train Test', color = 'k')
     plt.tick_params(axis='x', colors='k')
     plt.tick_params(axis='y', colors='k')
+
+    filename = 'compare_train_test_{0}.png'.format(tag)
+    plt.savefig(filename)
     
 def graphOvertrainingCheckFromDict(myDict, ax, bins = 30):
     y_test = myDict['y_test']

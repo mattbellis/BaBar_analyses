@@ -19,7 +19,7 @@ for i,name in enumerate(names):
     if name.find('cos')>=0:
         df[name].hist(bins=100,range=(-1,1),label=name)
     elif name.find('3')>=0:
-        df[name].hist(bins=100,range=(2,3.0),label=name)
+        df[name].hist(bins=100,range=(0,10.0),label=name)
     elif name.find('Is')>=0:
         df[name].hist(bins=2,range=(0,1),label=name)
     else:
