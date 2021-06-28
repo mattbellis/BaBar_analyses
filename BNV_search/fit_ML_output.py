@@ -9,7 +9,7 @@
 ## \author Clemens Lange, Wouter Verkerke (C++ version)
 
 import ROOT
-from pdf_definitions import argus_in_x,read_in_ML_output,two_argus_in_x
+from pdf_definitions import argus_in_x,read_in_ML_output,two_argus_in_x,three_argus_in_x
 import numpy as np
 
 import sys
@@ -28,12 +28,13 @@ def main(argv):
 
     # Declare observable x
     x = ROOT.RooRealVar("x", "x", 0.7, 1.0)
-    #x.setBins(50)
-    x.setBins(500)
+    x.setBins(50)
+    #x.setBins(500)
 
     # Read in the data
     infilename = argv[1]
-    data = read_in_ML_output(infilename,x,max_vals=None)
+    #data = read_in_ML_output(infilename,x,max_vals=None)
+    data = read_in_ML_output(infilename,x,max_vals=10000)
 
 
     ############################################################################
@@ -136,6 +137,7 @@ def main(argv):
     ROOT.gPad.SetLeftMargin(0.15)
     xframe.GetYaxis().SetTitleOffset(1.4)
     xframe.Draw()
+    xframe.SetMaximum(10000)
     ROOT.gPad.Update()
 
     c.SaveAs("fit_to_data.png")

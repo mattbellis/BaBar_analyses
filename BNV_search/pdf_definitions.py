@@ -90,7 +90,7 @@ def three_argus_in_x(x,tag='default'):
 
     argpar2 = ROOT.RooRealVar("argpar2_"+tag,"Argus shape par "+tag,-20.0,-1000,10000)
     cutoff2 = ROOT.RooRealVar("cutoff2_"+tag,"Argus cutoff "+tag,1.00,-1000,1000)
-    argus2 = ROOT.RooArgusBG("argus2_"+tag,"Argus PDF "+tag,x,cutoff1,argpar1)
+    argus2 = ROOT.RooArgusBG("argus2_"+tag,"Argus PDF "+tag,x,cutoff2,argpar2)
 
     frac_three_argus0 = ROOT.RooRealVar("argus_frac0_"+tag,"Two Argus fraction "+tag,0.50,0,1.0)
     frac_three_argus1 = ROOT.RooRealVar("argus_frac1_"+tag,"Two Argus fraction "+tag,0.50,0,1.0)
