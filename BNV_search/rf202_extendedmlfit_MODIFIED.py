@@ -35,8 +35,8 @@ def main():
     
     # Sum the composite signal and background into an extended pdf
     # nsig*sig+nbkg*bkg
-    nsig = ROOT.RooRealVar("nsig", "number of signal events", 100, 0., 10000)
-    nbkg = ROOT.RooRealVar( "nbkg", "number of background events", 300, 0, 10000)
+    nsig = ROOT.RooRealVar("nsig", "number of signal events", 20, 0., 10000)
+    nbkg = ROOT.RooRealVar( "nbkg", "number of background events", 100, 0, 10000)
     model = ROOT.RooAddPdf("model", "a1+a2",
         ROOT.RooArgList( argus_bkg, argus_sig), ROOT.RooArgList( nbkg, nsig))
 
