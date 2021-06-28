@@ -15,14 +15,21 @@ import numpy as np
 import sys
 
 def main(argv):
+
+    # Set up a workspace to store everything
+    workspace_filename = "testworkspace.root"
+    workspace_file = ROOT.TFile(workspace_filename, "RECREATE")
+
+    workspace_name = "workspace_test"
+    w = ROOT.RooWorkspace(workspace_name,"My workspace")
+
     # Set up component pdfs
     # ---------------------------------------
-
 
     # Declare observable x
     x = ROOT.RooRealVar("x", "x", 0.7, 1.0)
     #x.setBins(50)
-    x.setBins(50)
+    x.setBins(500)
 
     # Read in the data
     infilename = argv[1]
@@ -76,7 +83,7 @@ def main(argv):
     # Sample, fit and plot extended model
 
     # Fit model to data, ML term automatically included
-    model.fitTo(data)
+    results = model.fitTo(data,ROOT.RooFit.Save(ROOT.kTRUE))
 
     # Plot data and PDF overlaid, expected number of events for p.d.f projection normalization
     # rather than observed number of events (==data.numEntries())
@@ -131,8 +138,31 @@ def main(argv):
     xframe.Draw()
     ROOT.gPad.Update()
 
-
     c.SaveAs("fit_to_data.png")
+
+    print("Print the results -------------------------")
+    results.Print("v")
+
+    ############################################################################
+    # Save the workspace
+    # This needs to be first, before its subcomponent PDF's
+    getattr(w,'import')(model)
+    getattr(w,'import')(twoArgus_sig)
+    getattr(w,'import')(data)
+
+    # Save the fit results.
+    results.SetName("testname_results")
+    getattr(w,'import')(results)
+
+    print("Print the contents of the workspace -------------------------")
+    w.Print()
+
+    workspace_file.cd()
+    w.Write()
+    workspace_file.Close()
+    ############################################################################
+
+
 
     rep = ''
     while not rep in [ 'q', 'Q' ]:
