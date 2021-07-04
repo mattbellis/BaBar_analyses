@@ -45,4 +45,33 @@
    8  nbkg         1.52184e+05   5.48999e+02   9.70891e-05  -7.69298e-01
    9  nsig         2.96171e+05   6.53849e+02   9.70534e-05  -4.19887e-01
 
+# Fitting SP-11975 after training with 3 argus - Looks great!
+    Floating Parameter  InitialValue    FinalValue +/-  Error     GblCorr.
+    --------------------  ------------  --------------------------  --------
+    argpar0_sig   -1.2000e+01   -1.2084e+01 +/-  4.82e-01  <none>
+    argpar1_sig   -7.2000e+02   -6.8361e+02 +/-  1.59e+01  <none>
+    argpar2_sig   -1.0000e+02   -1.0012e+02 +/-  3.88e+00  <none>
+    argus_frac0_sig    5.0000e-02    9.0208e-02 +/-  4.11e-03  <none>
+    argus_frac1_sig    6.0000e-01    6.0839e-01 +/-  9.15e-03  <none>
+    cutoff0_sig    1.0000e+00    9.8997e-01 +/-  6.08e-04  <none>
+    cutoff1_sig    1.0000e+00    1.0010e+00 +/-  8.31e-05  <none>
+    cutoff2_sig    1.0000e+00    9.9997e-01 +/-  3.03e-05  <none>
+    nsig    1.0000e+04    9.9020e+03 +/-  9.95e+01  <none>
+
+     COVARIANCE MATRIX CALCULATED SUCCESSFULLY
+    FCN=-124962 FROM HESSE     STATUS=OK             87 CALLS         696 TOTAL
+    EDM=0.00702567    STRATEGY= 1      ERROR MATRIX ACCURATE
+    EXT PARAMETER                                INTERNAL      INTERNAL
+    NO.   NAME      VALUE            ERROR       STEP SIZE       VALUE
+    1  argpar0_sig  -1.20844e+01   4.82483e-01   9.60196e-07  -1.20844e-04
+    2  argpar1_sig  -6.83610e+02   1.59008e+01   9.93420e-05   1.51854e+00
+    3  argpar2_sig  -1.00118e+02   3.88161e+00   5.63672e-05   1.55088e+00
+    4  argus_frac0_sig   9.02079e-02   4.10854e-03   1.03321e-02   1.98726e-01
+    5  argus_frac1_sig   6.08394e-01   9.15013e-03   4.89171e-03  -3.10311e-01
+    6  cutoff0_sig   9.89966e-01   6.08013e-04   9.60651e-03   2.92275e-01
+    7  cutoff1_sig   1.00100e+00   8.30801e-05   2.49986e-02   1.57187e+00
+    8  cutoff2_sig   9.99968e-01   3.03154e-05   1.30247e-03   1.20389e+00
+    9  nsig         9.90201e+03   9.95089e+01   2.45321e-04  -1.37145e+00
+
+
 

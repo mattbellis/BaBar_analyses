@@ -28,8 +28,8 @@ def main(argv):
 
     # Declare observable x
     x = ROOT.RooRealVar("x", "x", 0.7, 1.0)
-    x.setBins(50)
-    #x.setBins(500)
+    #x.setBins(50)
+    x.setBins(500)
 
     # Read in the data
     infilename = argv[1]
@@ -40,34 +40,29 @@ def main(argv):
     ############################################################################
     # Create two Argus for bkg and signal
     # their parameters
-    pars_bkg, argus_bkg = argus_in_x(x,'bkg')
-    pars_bkg[0].setVal(-100.0)
-    #pars_bkg[0].setRange(0.8,1.5)
-    pars_bkg[0].setRange(-100000,100000)
+    pars_sig, argus_sig, argus_sig0, argus_sig1, argus_sig2 = three_argus_in_x(x,'sig')
+    pars_sig[0].setVal(-12.0)
+    #pars_sig[0].setRange(0.8,1.5)
+    pars_sig[0].setRange(-100000,100000)
 
-    pars_bkg[1].setVal(1.0)
-    pars_bkg[1].setRange(0.97,1.001)
-
-    #pars_sig, argus_sig = argus_in_x(x,'sig')
-    #pars_sig[0].setVal(-500)
-    #pars_sig[0].setRange(-70000.5,-6.5)
-
-    #pars_sig[1].setVal(1.0)
-    #pars_sig[1].setRange(0.97,1.001)
-    ############################################################################
-    pars_sig, twoArgus_sig, argus0_sig, argus1_sig = two_argus_in_x(x,'sig')
-    pars_sig[0].setVal(-100)             # par
-    pars_sig[0].setRange(-1000000,-1)
-    pars_sig[1].setVal(1.0)              # cutoff
+    pars_sig[1].setVal(1.0)
     pars_sig[1].setRange(0.97,1.001)
 
-    pars_sig[2].setVal(-500)             # par
+    pars_sig[2].setVal(-720)             # par
     pars_sig[2].setRange(-1000000,-1)
     pars_sig[3].setVal(1.0)              # cutoff
     pars_sig[3].setRange(0.97,1.001)
 
-    pars_sig[4].setVal(0.3)
-    pars_sig[4].setRange(0.001,1.0)
+    pars_sig[4].setVal(-100)             # par
+    pars_sig[4].setRange(-1000000,-1)
+    pars_sig[5].setVal(1.0)              # cutoff
+    pars_sig[5].setRange(0.97,1.001)
+
+    # Fractions
+    pars_sig[6].setVal(0.05)
+    pars_sig[6].setRange(0.001,0.15)
+    pars_sig[7].setVal(0.6)
+    pars_sig[7].setRange(0.400001,1.0)
 
     # Method 1 - Construct extended composite model
     # -------------------------------------------------------------------
@@ -75,11 +70,12 @@ def main(argv):
     # Sum the composite signal and background into an extended pdf
     # nsig*sig+nbkg*bkg
     nsig = ROOT.RooRealVar("nsig", "number of signal events", 10000, 0., 1000000)
-    nbkg = ROOT.RooRealVar( "nbkg", "number of background events", 10000, 0, 1000000)
+    #nbkg = ROOT.RooRealVar( "nbkg", "number of background events", 10000, 0, 1000000)
     # One argus for signal
     #model = ROOT.RooAddPdf("model", "a1+a2", ROOT.RooArgList( argus_bkg, argus_sig), ROOT.RooArgList( nbkg, nsig))
     # Two argus for signal
-    model = ROOT.RooAddPdf("model", "a1+a2", ROOT.RooArgList( argus_bkg, twoArgus_sig), ROOT.RooArgList( nbkg, nsig))
+    #model = ROOT.RooAddPdf("model", "a1+a2", ROOT.RooArgList( argus_bkg, twoArgus_sig), ROOT.RooArgList( nbkg, nsig))
+    model = ROOT.RooAddPdf("model", "a1", ROOT.RooArgList( argus_sig), ROOT.RooArgList( nsig))
 
     # Sample, fit and plot extended model
 
@@ -93,13 +89,35 @@ def main(argv):
     model.plotOn(xframe, ROOT.RooFit.Normalization( 1.0, ROOT.RooAbsReal.RelativeExpected))
 
     # Overlay the background component of model with a dashed line
+    '''
     ras_bkg = ROOT.RooArgSet(argus_bkg)
     model.plotOn(
         xframe, ROOT.RooFit.Components(ras_bkg), ROOT.RooFit.LineStyle(
             ROOT.kDashed), ROOT.RooFit.Normalization(
                 1.0, ROOT.RooAbsReal.RelativeExpected))
+    '''
 
     # Overlay the background+sig2 components of model with a dotted line
+    ras_sig0 = ROOT.RooArgSet(argus_sig0)
+    model.plotOn(xframe, ROOT.RooFit.Components(ras_sig0), 
+                         ROOT.RooFit.LineStyle(ROOT.kDotted), 
+                         ROOT.RooFit.LineColor(ROOT.kBlue), 
+                         ROOT.RooFit.Normalization(1.0, ROOT.RooAbsReal.RelativeExpected)
+                         ) 
+
+    ras_sig1 = ROOT.RooArgSet(argus_sig1)
+    model.plotOn(xframe, ROOT.RooFit.Components(ras_sig1), 
+                         ROOT.RooFit.LineStyle(ROOT.kDotted), 
+                         ROOT.RooFit.LineColor(ROOT.kBlue), 
+                         ROOT.RooFit.Normalization(1.0, ROOT.RooAbsReal.RelativeExpected)
+                         ) 
+
+    ras_sig2 = ROOT.RooArgSet(argus_sig2)
+    model.plotOn(xframe, ROOT.RooFit.Components(ras_sig2), 
+                         ROOT.RooFit.LineStyle(ROOT.kDotted), 
+                         ROOT.RooFit.LineColor(ROOT.kBlue), 
+                         ROOT.RooFit.Normalization(1.0, ROOT.RooAbsReal.RelativeExpected)
+                         ) 
     '''
     # One argus for sig
     ras_bkg_sig2 = ROOT.RooArgSet(argus_sig)
@@ -107,6 +125,8 @@ def main(argv):
                 xframe, ROOT.RooFit.Components(ras_bkg_sig2), ROOT.RooFit.LineStyle(
                             ROOT.kDotted), ROOT.RooFit.LineColor(ROOT.kRed), ROOT.RooFit.Normalization(
                                             1.0, ROOT.RooAbsReal.RelativeExpected))
+    '''
+
     '''
     # Two argus for sig
     ras_sig2 = ROOT.RooArgSet(twoArgus_sig,argus0_sig,argus1_sig)
@@ -128,19 +148,29 @@ def main(argv):
                          ROOT.RooFit.Normalization(1.0, ROOT.RooAbsReal.RelativeExpected)
                          )
 
+    '''
     # Print structure of composite p.d.f.
     model.Print("t")
 
-
     # Draw the frame on the canvas
-    c = ROOT.TCanvas("fit", "fit", 600, 600)
+    c = ROOT.TCanvas("fit", "fit", 900, 500)
     ROOT.gPad.SetLeftMargin(0.15)
     xframe.GetYaxis().SetTitleOffset(1.4)
+    #xframe.SetAxisRange(0.98,1.0,"X")
     xframe.Draw()
-    xframe.SetMaximum(10000)
+    #xframe.SetMaximum(10000)
     ROOT.gPad.Update()
-
     c.SaveAs("fit_to_data.png")
+
+    # Draw the frame on the canvas
+    c1 = ROOT.TCanvas("fit1", "fit1", 900, 500)
+    ROOT.gPad.SetLeftMargin(0.15)
+    xframe.GetYaxis().SetTitleOffset(1.4)
+    xframe.SetAxisRange(0.98,1.0,"X")
+    xframe.Draw()
+    #xframe.SetMaximum(10000)
+    ROOT.gPad.Update()
+    c1.SaveAs("fit_to_data1.png")
 
     print("Print the results -------------------------")
     results.Print("v")
@@ -149,7 +179,7 @@ def main(argv):
     # Save the workspace
     # This needs to be first, before its subcomponent PDF's
     getattr(w,'import')(model)
-    getattr(w,'import')(twoArgus_sig)
+    #getattr(w,'import')(twoArgus_sig)
     getattr(w,'import')(data)
 
     # Save the fit results.
