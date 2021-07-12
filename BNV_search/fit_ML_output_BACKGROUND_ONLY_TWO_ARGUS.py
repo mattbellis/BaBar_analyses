@@ -17,7 +17,7 @@ import sys
 def main(argv):
 
     # Set up a workspace to store everything
-    workspace_filename = "testworkspace.root"
+    workspace_filename = "testworkspacebkg.root"
     workspace_file = ROOT.TFile(workspace_filename, "RECREATE")
 
     workspace_name = "workspace_test"
@@ -67,7 +67,7 @@ def main(argv):
     #model = ROOT.RooAddPdf("model", "a1+a2", ROOT.RooArgList( argus_bkg, argus_bkg), ROOT.RooArgList( nbkg, nbkg))
     # Two argus for bkgnal
     #model = ROOT.RooAddPdf("model", "a1+a2", ROOT.RooArgList( argus_bkg, twoArgus_bkg), ROOT.RooArgList( nbkg, nbkg))
-    model = ROOT.RooAddPdf("model", "a1", ROOT.RooArgList( argus_bkg), ROOT.RooArgList( nbkg))
+    model = ROOT.RooAddPdf("model_bkg", "a1", ROOT.RooArgList( argus_bkg), ROOT.RooArgList( nbkg))
 
     # Sample, fit and plot extended model
 
