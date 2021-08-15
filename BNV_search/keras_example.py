@@ -23,7 +23,8 @@ from matplotlib import pyplot
 #           column
 # **********************************************
 def format(df, columnsToDrop, rowsToDrop, className=None):
-  df = df.drop(columns=columnsToDrop) # remove specified columns
+  # The errors='ignore' means that if the column is not there, no error is thrown
+  df = df.drop(columns=columnsToDrop, errors='ignore') # remove specified columns
   #print(rowsToDrop)
   #df = df.drop(rowsToDrop) # remove specified rows
 
@@ -59,6 +60,7 @@ print()
 print(df1.columns)
 cols = df1.columns
 
+print("Size of files!")
 print(len(df0),infilenames[0])
 print(len(df1),infilenames[1])
 
@@ -80,6 +82,10 @@ for name in list(df0.keys()):
         toberemoved.append(name)
 #'''
 
+################################################################################
+# For SP-11975, pnu
+################################################################################
+'''
 toberemoved.append('ne')
 toberemoved.append('np')
 toberemoved.append('nmu')
@@ -94,6 +100,32 @@ toberemoved.append('bnvprotp3')
 toberemoved.append('pp')
 #toberemoved.append('ep')
 #toberemoved.append('mup')
+'''
+
+################################################################################
+# For SP-11976, nmu
+################################################################################
+toberemoved.append('ne')
+toberemoved.append('np')
+toberemoved.append('nmu')
+#toberemoved.append('bnvbcandMES')
+#toberemoved.append('bnvbcandDeltaE')
+toberemoved.append('missingmass') # NEED TO CHECK
+toberemoved.append('missingmassES') # NEED TO CHECK
+toberemoved.append('missingmass2') # NEED TO CHECK
+toberemoved.append('bnvbcandp3') # NEED TO CHECK
+toberemoved.append('bnvprotcosth') # NEED TO CHECK
+toberemoved.append('bnvlepcosth') # NEED TO CHECK
+toberemoved.append('tagbcandp3') # NEED TO CHECK
+toberemoved.append('bnvbcandmass')
+toberemoved.append('nbnvbcand')
+#toberemoved.append('tagbcandmass')
+toberemoved.append('nhighmom')
+toberemoved.append('bnvlepp3')
+toberemoved.append('bnvprotp3')
+#toberemoved.append('pp')
+#toberemoved.append('ep')
+toberemoved.append('mup')
 #'''
 
 for tbr in toberemoved:
@@ -109,12 +141,14 @@ for tbr in toberemoved:
 df0 = format(df0, toberemoved, 0, 'positive')
 df1 = format(df1, toberemoved, 0, 'negative')
 #df = mergeDataframes([df0[0:100000], df1[0:100000]])
+df = mergeDataframes([df0[0:50000], df1[0:50000]])
 #df = mergeDataframes([df0[100000:200000], df1[100000:200000]])
-df = mergeDataframes([df0, df1])
+#df = mergeDataframes([df0, df1])
 
 # Get rid of nans
 df.dropna(0,inplace=True)
 
+print("Merged and dropped columns!")
 print(df.columns)
 print()
 #exit()
@@ -124,6 +158,7 @@ print()
 y = df.pop('Class') # all class values become 'y'
 X = df
 
+print("Lenth of X and y!")
 print(len(X))
 print(len(y))
 
