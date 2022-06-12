@@ -12,12 +12,12 @@ def main(argv):
     workspace_file = ROOT.TFile(workspace_filename)
     workspace_file.Print()
     workspace_file.ls()
-    w = workspace_file.Get("workspace_test")
+    w = workspace_file.Get("workspace")
     w.Print()
     #print(w)
 
     x = w.var("x");
-    x.setBins(100)
+    x.setBins(50)
     model_sig = w.pdf("model_sig");
     nsig = w.var("nsig");
 
@@ -26,15 +26,15 @@ def main(argv):
     workspace_file = ROOT.TFile(workspace_filename)
     workspace_file.Print()
     workspace_file.ls()
-    w = workspace_file.Get("workspace_test")
+    w = workspace_file.Get("workspace")
     w.Print()
     #print(w)
 
     model_bkg = w.pdf("model_bkg");
     nbkg = w.var("nbkg");
 
-    nsig.setVal(100)
-    nbkg.setVal(440)
+    nsig.setVal(2000)
+    nbkg.setVal(100)
 
 
     model = ROOT.RooAddPdf("model","n1*a1 + n2*a2",ROOT.RooArgList(model_sig, model_bkg), ROOT.RooArgList(nsig, nbkg))
@@ -57,9 +57,18 @@ def main(argv):
     xframe.Draw()
     ROOT.gPad.Update()
     '''
-    mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Silence(), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
+    #mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Silence(), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
+    mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
 
-    mcstudy.generateAndFit(1000);
+    genData = model.generate(x,2100) 
+    genData.Print()
+    xframe = x.frame()
+    genData.plotOn(xframe)
+    xframe.Draw()
+    exit()
+
+    # A trials of B events each trial
+    mcstudy.generateAndFit(1,2100)
 
     # Make plots of the distributions of nsig, the error on nsig and the pull of nsig
     frame1 = mcstudy.plotParam(nsig, ROOT.RooFit.Bins(40));
