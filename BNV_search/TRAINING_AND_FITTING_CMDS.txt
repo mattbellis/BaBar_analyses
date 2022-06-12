@@ -1,0 +1,63 @@
+# To dump out the npz file to fit
+#python load_in_ML_model.py KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_100000_MC_TRAINING_SP-998_N_40000_pnu.h5 CUT_SUMMARY_SP-998_pnu_SAMPLE_N_20000_OPPOSITE.h5
+
+# Fit
+#python fit_ML_output.py PREDICTIONS_CUT_SUMMARY_SP-998_pnu_SAMPLE_N_20000_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_100000_MC_TRAINING_SP-998_N_40000_pnu.npy
+#python fit_ML_output.py PREDICTIONS_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_20000_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_100000_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_20000.npy
+#python fit_ML_output.py PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_100000_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_100000_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_20000.npy
+#
+#
+#ipython -i keras_example.py CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_100000.h5 CUT_SUMMARY_SP-998_nmu_B_B_B_B.h5
+#python keras_example.py CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_100000.h5 CUT_SUMMARY_SP-1005_nmu_SAMPLE_N_100000.h5 
+#python keras_example.py CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_100000.h5 CUT_SUMMARY_SP-998_nmu_SAMPLE_N_100000.h5 
+#
+#python random_sample_from_dataframe.py CUT_SUMMARY_SP-1005_nmu.h5 100000
+#python random_sample_from_dataframe.py CUT_SUMMARY_SP-998_nmu.h5 100000
+#
+#python keras_example.py CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_100000.h5 MC_TRAINING_SP-998_N_100000_nmu_SP-1005_nmu_SAMPLE_N_50000.h5 
+#python keras_example.py CUT_SUMMARY_SP-11977_ne_SAMPLE_N_100000.h5 MC_TRAINING_SP-998_N_50000_ne_SP-1005_ne_SAMPLE_N_25000.h5 
+#python keras_example.py CUT_SUMMARY_SP-11977_ne_SAMPLE_N_100000.h5 CUT_SUMMARY_SP-1005_ne_SAMPLE_N_100000.h5 
+#python keras_example.py CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_100000.h5 MC_TRAINING_SP-998_N_100000_nmu_SP-1005_nmu_SAMPLE_N_100000.h5 
+
+
+################################################################################
+# pnu mode
+# Mostly uds
+################################################################################
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-998_pnu.h5 15000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-998_pnu_B.h5 15000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-998_pnu_B_B.h5 15000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-998_pnu_B_B_B.h5 15000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-998_pnu_B_B_B_B.h5 15000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-998_pnu_B_B_B_B_B.h5 15000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-998_pnu_B_B_B_B_B_B.h5 15000
+
+python merge_training_samples.py CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.h5   CUT_SUMMARY_SP-998_pnu*SAMPLE_N*[0-9].h5
+
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-11975_pnu.h5 100000
+
+python keras_example.py CUT_SUMMARY_SP-11975_pnu.h5 CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.h5
+
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-1005_pnu.h5 100000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-1235_pnu.h5 100000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-1237_pnu.h5 100000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-3429_pnu.h5 100000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-3981_pnu.h5 100000
+time python random_sample_from_dataframe.py CUT_SUMMARY_SP-2400_pnu.h5 100000
+
+python load_in_ML_model.py KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.h5 CUT_SUMMARY_SP-998_pnu_SAMPLE_OPPOSITE_MERGED.h5
+python load_in_ML_model.py KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.h5 CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_445315_OPPOSITE.h5
+python load_in_ML_model.py KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.h5 CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_34854.h5
+python load_in_ML_model.py KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.h5 CUT_SUMMARY_SP-1235_pnu_SAMPLE_N_994.h5
+python load_in_ML_model.py KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.h5 CUT_SUMMARY_SP-1237_pnu_SAMPLE_N_1015.h5
+python load_in_ML_model.py KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.h5 CUT_SUMMARY_SP-3429_pnu_SAMPLE_N_3733.h5
+
+python fit_ML_output_SIGNAL_ONLY_THREE_ARGUS.py PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_445315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.npy
+python fit_ML_output_BACKGROUND_ONLY_TWO_ARGUS.py PREDICTIONS_CUT_SUMMARY_SP-998_pnu_SAMPLE_OPPOSITE_MERGED_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.npy
+python fit_ML_output_BACKGROUND_ONLY_TWO_ARGUS.py PREDICTIONS_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_34854_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.npy
+python fit_ML_output_BACKGROUND_ONLY_TWO_ARGUS.py PREDICTIONS_CUT_SUMMARY_SP-1237_pnu_SAMPLE_N_1015_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.npy
+python fit_ML_output_BACKGROUND_ONLY_TWO_ARGUS.py PREDICTIONS_CUT_SUMMARY_SP-1235_pnu_SAMPLE_N_994_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.npy
+python fit_ML_output_BACKGROUND_ONLY_TWO_ARGUS.py PREDICTIONS_CUT_SUMMARY_SP-3429_pnu_SAMPLE_N_3733_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_CUT_SUMMARY_SP-998_pnu_SAMPLE_MERGED.npy
+
+
+

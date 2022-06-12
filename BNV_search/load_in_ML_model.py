@@ -32,6 +32,7 @@ toberemoved = []
 for name in list(df.keys()):
     if name.find('Is')>=0 or name.find('BDT')>=0 or name.find('KM')>=0:
         toberemoved.append(name)
+'''
 toberemoved.append('ne')
 toberemoved.append('np')
 toberemoved.append('nmu')
@@ -46,6 +47,43 @@ toberemoved.append('bnvprotp3')
 toberemoved.append('pp')
 #toberemoved.append('ep')
 #toberemoved.append('mup')
+'''
+# pnu
+'''
+toberemoved.append('bnvbcandmass')
+toberemoved.append('nbnvbcand')
+#toberemoved.append('tagbcandmass')
+toberemoved.append('nhighmom')
+toberemoved.append('bnvlepp3')
+#toberemoved.append('bnvprotp3')
+toberemoved.append('pp')
+#toberemoved.append('ep')
+#toberemoved.append('mup')
+'''
+
+# nmu
+toberemoved.append('bnvbcandmass')
+toberemoved.append('nbnvbcand')
+toberemoved.append('nhighmom')
+toberemoved.append('bnvlepp3')
+#toberemoved.append('pp')
+#toberemoved.append('ep')
+toberemoved.append('mup')
+
+
+# ne
+'''
+toberemoved.append('bnvbcandmass')
+toberemoved.append('nbnvbcand')
+#toberemoved.append('tagbcandmass')
+toberemoved.append('nhighmom')
+toberemoved.append('bnvlepp3')
+#toberemoved.append('bnvprotp3')
+#toberemoved.append('pp')
+toberemoved.append('ep')
+#toberemoved.append('mup')
+'''
+
 #'''
 df = sktools.format(df, className='positive', columns_to_drop=toberemoved)
 print(df.columns)

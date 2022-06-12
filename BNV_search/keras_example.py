@@ -105,26 +105,26 @@ toberemoved.append('pp')
 ################################################################################
 # For SP-11976, nmu
 ################################################################################
-toberemoved.append('ne')
-toberemoved.append('np')
-toberemoved.append('nmu')
+#toberemoved.append('ne')
+#toberemoved.append('np')
+#toberemoved.append('nmu')
 #toberemoved.append('bnvbcandMES')
 #toberemoved.append('bnvbcandDeltaE')
-toberemoved.append('missingmass') # NEED TO CHECK
-toberemoved.append('missingmassES') # NEED TO CHECK
-toberemoved.append('missingmass2') # NEED TO CHECK
-toberemoved.append('bnvbcandp3') # NEED TO CHECK
-toberemoved.append('bnvprotcosth') # NEED TO CHECK
-toberemoved.append('bnvlepcosth') # NEED TO CHECK
-toberemoved.append('tagbcandp3') # NEED TO CHECK
+#toberemoved.append('missingmass') # NEED TO CHECK
+#toberemoved.append('missingmassES') # NEED TO CHECK
+#toberemoved.append('missingmass2') # NEED TO CHECK
+#toberemoved.append('bnvbcandp3') # NEED TO CHECK
+#toberemoved.append('bnvprotcosth') # NEED TO CHECK
+#toberemoved.append('bnvlepcosth') # NEED TO CHECK
+#toberemoved.append('tagbcandp3') # NEED TO CHECK
 toberemoved.append('bnvbcandmass')
 toberemoved.append('nbnvbcand')
 #toberemoved.append('tagbcandmass')
 toberemoved.append('nhighmom')
 toberemoved.append('bnvlepp3')
-toberemoved.append('bnvprotp3')
-#toberemoved.append('pp')
-#toberemoved.append('ep')
+#toberemoved.append('bnvprotp3')
+toberemoved.append('pp')
+toberemoved.append('ep')
 toberemoved.append('mup')
 #'''
 
@@ -141,9 +141,9 @@ for tbr in toberemoved:
 df0 = format(df0, toberemoved, 0, 'positive')
 df1 = format(df1, toberemoved, 0, 'negative')
 #df = mergeDataframes([df0[0:100000], df1[0:100000]])
-df = mergeDataframes([df0[0:50000], df1[0:50000]])
+#df = mergeDataframes([df0[0:50000], df1[0:50000]])
 #df = mergeDataframes([df0[100000:200000], df1[100000:200000]])
-#df = mergeDataframes([df0, df1])
+df = mergeDataframes([df0, df1])
 
 # Get rid of nans
 df.dropna(0,inplace=True)

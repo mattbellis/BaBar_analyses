@@ -16,11 +16,14 @@ import sys
 
 def main(argv):
 
+    infilename = argv[1]
+
     # Set up a workspace to store everything
-    workspace_filename = "testworkspace.root"
+    #workspace_filename = "testworkspace.root"
+    workspace_filename = f"workspace_{infilename}.root"
     workspace_file = ROOT.TFile(workspace_filename, "RECREATE")
 
-    workspace_name = "workspace_test"
+    workspace_name = "workspace"
     w = ROOT.RooWorkspace(workspace_name,"My workspace")
 
     # Set up component pdfs
@@ -32,7 +35,6 @@ def main(argv):
     x.setBins(500)
 
     # Read in the data
-    infilename = argv[1]
     #data = read_in_ML_output(infilename,x,max_vals=None)
     data = read_in_ML_output(infilename,x,max_vals=10000)
 
@@ -160,7 +162,9 @@ def main(argv):
     xframe.Draw()
     #xframe.SetMaximum(10000)
     ROOT.gPad.Update()
-    c.SaveAs("fit_to_data.png")
+    #c.SaveAs("fit_to_data.png")
+    c.SaveAs(f"fit_to_data_{infilename}.png")
+
 
     # Draw the frame on the canvas
     c1 = ROOT.TCanvas("fit1", "fit1", 900, 500)
@@ -170,7 +174,9 @@ def main(argv):
     xframe.Draw()
     #xframe.SetMaximum(10000)
     ROOT.gPad.Update()
-    c1.SaveAs("fit_to_data1.png")
+    #c1.SaveAs("fit_to_data1.png")
+    c1.SaveAs(f"fit_to_data_ZOOM_{infilename}.png")
+
 
     print("Print the results -------------------------")
     results.Print("v")
