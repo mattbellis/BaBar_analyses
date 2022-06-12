@@ -9,7 +9,7 @@
 ## \author Clemens Lange, Wouter Verkerke (C++ version)
 
 import ROOT
-from pdf_definitions import argus_in_x,read_in_ML_output,two_argus_in_x,three_argus_in_x
+from pdf_definitions import argus_in_x,read_in_ML_output,two_argus_in_x,three_argus_in_x,two_argus_plus_expon_in_x
 import numpy as np
 
 import sys
@@ -37,27 +37,37 @@ def main(argv):
 
     # Read in the data
     #data = read_in_ML_output(infilename,x,max_vals=None)
-    data = read_in_ML_output(infilename,x,max_vals=10000)
+    #data = read_in_ML_output(infilename,x,max_vals=10000)
+    data = read_in_ML_output(infilename,x,max_vals=20000)
 
 
     ############################################################################
     # Create two Argus for bkg and signal
     # their parameters
-    pars_bkg, argus_bkg, argus_bkg0, argus_bkg1, = two_argus_in_x(x,'bkg')
-    pars_bkg[0].setVal(-3.7)
+    #pars_bkg, argus_bkg, argus_bkg0, argus_bkg1, = two_argus_in_x(x,'bkg')
+    pars_bkg, twoArgusPlusExp, argus_bkg0, argus_bkg1, expon = two_argus_plus_expon_in_x(x,'bkg')
+    pars_bkg[0].setVal(-3.7) # par
     pars_bkg[0].setRange(-100000,100000)
 
-    pars_bkg[1].setVal(1.0)
+    pars_bkg[1].setVal(1.0) # cutoff
     pars_bkg[1].setRange(0.97,1.001)
 
     pars_bkg[2].setVal(-73)             # par
     pars_bkg[2].setRange(-1000000,-1)
+
     pars_bkg[3].setVal(1.0)              # cutoff
     pars_bkg[3].setRange(0.97,1.001)
 
+    pars_bkg[4].setVal(-2.0)              # exp slope
+    pars_bkg[4].setRange(-10,-0.1)
+
     # Fractions
-    pars_bkg[4].setVal(0.7)
-    pars_bkg[4].setRange(0.001,0.99)
+    pars_bkg[5].setVal(0.3)
+    pars_bkg[5].setRange(0.001,0.99)
+
+    pars_bkg[5].setVal(0.4)
+    pars_bkg[5].setRange(0.001,0.99)
+
 
     # Method 1 - Construct extended composite model
     # -------------------------------------------------------------------
@@ -70,7 +80,7 @@ def main(argv):
     #model = ROOT.RooAddPdf("model", "a1+a2", ROOT.RooArgList( argus_bkg, argus_bkg), ROOT.RooArgList( nbkg, nbkg))
     # Two argus for bkgnal
     #model = ROOT.RooAddPdf("model", "a1+a2", ROOT.RooArgList( argus_bkg, twoArgus_bkg), ROOT.RooArgList( nbkg, nbkg))
-    model = ROOT.RooAddPdf("model_bkg", "a1", ROOT.RooArgList( argus_bkg), ROOT.RooArgList( nbkg))
+    model = ROOT.RooAddPdf("model_bkg", "a1", ROOT.RooArgList( twoArgusPlusExp), ROOT.RooArgList( nbkg))
 
     # Sample, fit and plot extended model
 
@@ -102,6 +112,13 @@ def main(argv):
 
     ras_bkg1 = ROOT.RooArgSet(argus_bkg1)
     model.plotOn(xframe, ROOT.RooFit.Components(ras_bkg1), 
+                         ROOT.RooFit.LineStyle(ROOT.kDotted), 
+                         ROOT.RooFit.LineColor(ROOT.kRed), 
+                         ROOT.RooFit.Normalization(1.0, ROOT.RooAbsReal.RelativeExpected)
+                         ) 
+
+    ras_bkg2 = ROOT.RooArgSet(expon)
+    model.plotOn(xframe, ROOT.RooFit.Components(ras_bkg2), 
                          ROOT.RooFit.LineStyle(ROOT.kDotted), 
                          ROOT.RooFit.LineColor(ROOT.kRed), 
                          ROOT.RooFit.Normalization(1.0, ROOT.RooAbsReal.RelativeExpected)

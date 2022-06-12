@@ -30,9 +30,10 @@ def main(argv):
     # ---------------------------------------
 
     # Declare observable x
-    x = ROOT.RooRealVar("x", "x", 0.7, 1.0)
+    #x = ROOT.RooRealVar("x", "x", 0.7, 1.0)
+    x = ROOT.RooRealVar("x", "x", 0.5, 1.0)
     #x.setBins(50)
-    x.setBins(500)
+    x.setBins(200)
 
     # Read in the data
     #data = read_in_ML_output(infilename,x,max_vals=None)
@@ -170,7 +171,8 @@ def main(argv):
     c1 = ROOT.TCanvas("fit1", "fit1", 900, 500)
     ROOT.gPad.SetLeftMargin(0.15)
     xframe.GetYaxis().SetTitleOffset(1.4)
-    xframe.SetAxisRange(0.98,1.0,"X")
+    #xframe.SetAxisRange(0.98,1.0,"X")
+    xframe.SetAxisRange(0.90,1.0,"X")
     xframe.Draw()
     #xframe.SetMaximum(10000)
     ROOT.gPad.Update()

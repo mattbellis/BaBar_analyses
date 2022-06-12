@@ -92,8 +92,8 @@ def three_argus_in_x(x,tag='default'):
     cutoff2 = ROOT.RooRealVar("cutoff2_"+tag,"Argus cutoff "+tag,1.00,-1000,1000)
     argus2 = ROOT.RooArgusBG("argus2_"+tag,"Argus PDF "+tag,x,cutoff2,argpar2)
 
-    frac_three_argus0 = ROOT.RooRealVar("argus_frac0_"+tag,"Two Argus fraction "+tag,0.50,0,1.0)
-    frac_three_argus1 = ROOT.RooRealVar("argus_frac1_"+tag,"Two Argus fraction "+tag,0.50,0,1.0)
+    frac_three_argus0 = ROOT.RooRealVar("argus_frac0_"+tag,"Two Argus fraction 0 "+tag,0.50,0,1.0)
+    frac_three_argus1 = ROOT.RooRealVar("argus_frac1_"+tag,"Two Argus fraction 1 "+tag,0.50,0,1.0)
 
     threeArgus = ROOT.RooAddPdf(
     "threeArgus_"+tag, "Three Argus functions "+tag, ROOT.RooArgList(argus0, argus1, argus2), ROOT.RooArgList(frac_three_argus0,frac_three_argus1))
@@ -101,5 +101,31 @@ def three_argus_in_x(x,tag='default'):
     pars = [argpar0, cutoff0, argpar1, cutoff1, argpar2, cutoff2, frac_three_argus0, frac_three_argus1]
 
     return pars, threeArgus, argus0, argus1, argus2
+################################################################################
+
+################################################################################
+# Two Argus + exponential
+################################################################################
+def two_argus_plus_expon_in_x(x,tag='default'):
+    argpar0 = ROOT.RooRealVar("argpar0_"+tag,"Argus shape par "+tag,-20.0,-1000,10000)
+    cutoff0 = ROOT.RooRealVar("cutoff0_"+tag,"Argus cutoff "+tag,1.00,-1000,1000)
+    argus0 = ROOT.RooArgusBG("argus0_"+tag,"Argus PDF "+tag,x,cutoff0,argpar0)
+
+    argpar1 = ROOT.RooRealVar("argpar1_"+tag,"Argus shape par "+tag,-20.0,-1000,10000)
+    cutoff1 = ROOT.RooRealVar("cutoff1_"+tag,"Argus cutoff "+tag,1.00,-1000,1000)
+    argus1 = ROOT.RooArgusBG("argus1_"+tag,"Argus PDF "+tag,x,cutoff1,argpar1)
+
+    expslope = ROOT.RooRealVar("expslope_"+tag,"Exponential slope "+tag,-10.0,-100,-0.1)
+    expon = ROOT.RooExponential("expon_"+tag,"Exponential PDF "+tag,x,expslope)
+
+    frac_two_argus_plus_expon0 = ROOT.RooRealVar("argus_frac_plus_expon0_"+tag,"Two Argus + expon fraction 0 "+tag,0.50,0,1.0)
+    frac_two_argus_plus_expon1 = ROOT.RooRealVar("argus_frac_plus_expon1_"+tag,"Two Argus + expon fraction 1 "+tag,0.50,0,1.0)
+
+    twoArgusPlusExp = ROOT.RooAddPdf(
+    "twoArgusPlusExp_"+tag, "Two Argus functions + exponential "+tag, ROOT.RooArgList(argus0, argus1, expon), ROOT.RooArgList(frac_two_argus_plus_expon0, frac_two_argus_plus_expon1))
+
+    pars = [argpar0, cutoff0, argpar1, cutoff1, expslope, frac_two_argus_plus_expon0, frac_two_argus_plus_expon1 ]
+
+    return pars, twoArgusPlusExp, argus0, argus1, expon
 ################################################################################
 
