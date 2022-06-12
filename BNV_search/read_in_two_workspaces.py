@@ -14,7 +14,18 @@ def main(argv):
     workspace_file.ls()
     w = workspace_file.Get("workspace")
     w.Print()
+    variable_dict = {}
     #print(w)
+    for v in w.allVars():
+        print(v)
+        name = v.GetName()
+        val = v.getVal()
+        err = v.getError()
+        variable_dict[name] = [val,err]
+        if name is not 'x' and name[0]!='n':
+            #v.setConstant(ROOT.kTRUE)
+            # Or
+            v.setRange(val-(2*err),val+(2*err))
 
     x = w.var("x");
     x.setBins(50)
@@ -29,6 +40,19 @@ def main(argv):
     w = workspace_file.Get("workspace")
     w.Print()
     #print(w)
+    for v in w.allVars():
+        print(v)
+        name = v.GetName()
+        val = v.getVal()
+        err = v.getError()
+        variable_dict[name] = [val,err]
+        if name is not 'x' and name[0]!='n':
+            #v.setConstant(ROOT.kTRUE)
+            # Or
+            v.setRange(val-(2*err),val+(2*err))
+    print(variable_dict)
+
+    #exit()
 
     model_bkg = w.pdf("model_bkg");
     nbkg = w.var("nbkg");
@@ -65,10 +89,10 @@ def main(argv):
     xframe = x.frame()
     genData.plotOn(xframe)
     xframe.Draw()
-    exit()
+    #exit()
 
     # A trials of B events each trial
-    mcstudy.generateAndFit(1,2100)
+    mcstudy.generateAndFit(10,2100)
 
     # Make plots of the distributions of nsig, the error on nsig and the pull of nsig
     frame1 = mcstudy.plotParam(nsig, ROOT.RooFit.Bins(40));
