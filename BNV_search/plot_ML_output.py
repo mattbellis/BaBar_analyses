@@ -10,7 +10,7 @@ infilename = sys.argv[1]
 data = np.load(infilename)
 
 
-plt.hist(data,bins=200)
+plt.hist(data,bins=50)
 
 
 plt.show()

@@ -5,6 +5,8 @@ import sys
 
 def main(argv):
 
+    constraint_multiplier = 0.2
+
     # Set up a workspace to store everything
     #workspace_filename = "testworkspace.root"
     print("Read in signal.............")
@@ -25,9 +27,10 @@ def main(argv):
         if name is not 'x' and name[0]!='n':
             #v.setConstant(ROOT.kTRUE)
             # Or
-            v.setRange(val-(2*err),val+(2*err))
+            v.setRange(val-(constraint_multiplier*err),val+(constraint_multiplier*err))
 
     x = w.var("x");
+    x.setRange(0.2,1.0) # Just for nmu for now
     x.setBins(50)
     model_sig = w.pdf("model_sig");
     nsig = w.var("nsig");
@@ -49,7 +52,7 @@ def main(argv):
         if name is not 'x' and name[0]!='n':
             #v.setConstant(ROOT.kTRUE)
             # Or
-            v.setRange(val-(2*err),val+(2*err))
+            v.setRange(val-(constraint_multiplier*err),val+(constraint_multiplier*err))
     print(variable_dict)
 
     #exit()
@@ -57,8 +60,8 @@ def main(argv):
     model_bkg = w.pdf("model_bkg");
     nbkg = w.var("nbkg");
 
-    nsig.setVal(2000)
-    nbkg.setVal(100)
+    nsig.setVal(1000)
+    nbkg.setVal(29000)
 
 
     model = ROOT.RooAddPdf("model","n1*a1 + n2*a2",ROOT.RooArgList(model_sig, model_bkg), ROOT.RooArgList(nsig, nbkg))
@@ -82,22 +85,27 @@ def main(argv):
     ROOT.gPad.Update()
     '''
     #mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Silence(), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
-    mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
+    mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Verbose(ROOT.kTRUE) , ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(1), ROOT.RooFit.Verbose(ROOT.kTRUE)));
+    #mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
 
-    genData = model.generate(x,2100) 
+    genData = model.generate(x,30000) 
     genData.Print()
+    model.fitTo(genData, ROOT.RooFit.FitOptions(ROOT.RooFit.Binned(ROOT.kTRUE)))
     xframe = x.frame()
     genData.plotOn(xframe)
+    model.plotOn(xframe, ROOT.RooFit.Normalization( 1.0, ROOT.RooAbsReal.RelativeExpected))
     xframe.Draw()
     #exit()
 
     # A trials of B events each trial
-    mcstudy.generateAndFit(10,2100)
+    mcstudy.generateAndFit(1000,30000)
 
     # Make plots of the distributions of nsig, the error on nsig and the pull of nsig
     frame1 = mcstudy.plotParam(nsig, ROOT.RooFit.Bins(40));
     frame2 = mcstudy.plotError(nsig, ROOT.RooFit.Bins(40));
     frame3 = mcstudy.plotPull(nsig, ROOT.RooFit.Bins(40), ROOT.RooFit.FitGauss(ROOT.kTRUE));
+
+    frame5 = mcstudy.plotParam(nbkg, ROOT.RooFit.Bins(40));
 
     # Plot distribution of minimized likelihood
     frame4 = mcstudy.plotNLL(ROOT.RooFit.Bins(40));
@@ -124,10 +132,12 @@ def main(argv):
     ROOT.gPad.SetLeftMargin(0.15);
     frame2.GetYaxis().SetTitleOffset(1.4);
     frame2.Draw();
+
     c.cd(3);
     ROOT.gPad.SetLeftMargin(0.15);
     frame3.GetYaxis().SetTitleOffset(1.4);
     frame3.Draw();
+
     c.cd(4);
     ROOT.gPad.SetLeftMargin(0.15);
     frame4.GetYaxis().SetTitleOffset(1.4);
@@ -144,6 +154,11 @@ def main(argv):
     ROOT.gPad.SetLeftMargin(0.15);
     corrHist000.GetYaxis().SetTitleOffset(1.4);
     corrHist000.Draw("colz");
+
+    c.cd(9);
+    ROOT.gPad.SetLeftMargin(0.15);
+    frame5.GetYaxis().SetTitleOffset(1.4);
+    frame5.Draw();
     '''
     c.cd(8);
     ROOT.gPad.SetLeftMargin(0.15);
