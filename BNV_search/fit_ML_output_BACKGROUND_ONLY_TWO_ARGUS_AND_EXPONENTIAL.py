@@ -92,7 +92,6 @@ def main(argv):
     xframe = x.frame(ROOT.RooFit.Title("extended ML fit example"))
     data.plotOn(xframe)
     model.plotOn(xframe, ROOT.RooFit.Normalization( 1.0, ROOT.RooAbsReal.RelativeExpected))
-
     # Overlay the background component of model with a dashed line
     '''
     ras_bkg = ROOT.RooArgSet(argus_bkg)

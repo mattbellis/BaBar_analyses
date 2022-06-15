@@ -6,6 +6,9 @@ import sys
 def main(argv):
 
     constraint_multiplier = 0.2
+    nentries = 30000
+    nsiginit = 500
+    ntrials = 1000
 
     # Set up a workspace to store everything
     #workspace_filename = "testworkspace.root"
@@ -60,8 +63,10 @@ def main(argv):
     model_bkg = w.pdf("model_bkg");
     nbkg = w.var("nbkg");
 
-    nsig.setVal(1000)
-    nbkg.setVal(29000)
+    nsig.setVal(nsiginit)
+    nsig.setRange(1,nentries)
+    nbkg.setVal(nentries-nsiginit)
+    nbkg.setRange(0,nentries)
 
 
     model = ROOT.RooAddPdf("model","n1*a1 + n2*a2",ROOT.RooArgList(model_sig, model_bkg), ROOT.RooArgList(nsig, nbkg))
@@ -84,11 +89,13 @@ def main(argv):
     xframe.Draw()
     ROOT.gPad.Update()
     '''
+    
     #mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Silence(), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
     mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Verbose(ROOT.kTRUE) , ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(1), ROOT.RooFit.Verbose(ROOT.kTRUE)));
     #mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
 
-    genData = model.generate(x,30000) 
+    '''
+    genData = model.generate(x,nentries) 
     genData.Print()
     model.fitTo(genData, ROOT.RooFit.FitOptions(ROOT.RooFit.Binned(ROOT.kTRUE)))
     xframe = x.frame()
@@ -96,9 +103,40 @@ def main(argv):
     model.plotOn(xframe, ROOT.RooFit.Normalization( 1.0, ROOT.RooAbsReal.RelativeExpected))
     xframe.Draw()
     #exit()
+    '''
 
     # A trials of B events each trial
-    mcstudy.generateAndFit(1000,30000)
+    mcstudy.generateAndFit(ntrials,nentries)
+
+    # More info on how the number of generated events varies
+    # https://root-forum.cern.ch/t/roomcstudy-pull-calculation-and-getting-generated-values-of-parameters/37359
+
+    ############################################################################
+    # Dump the results
+    # https://root.cern/doc/v606/classRooMCStudy.html
+    #status = 0    : OK
+    #status = 1    : Covariance was mad  epos defined
+    #status = 2    : Hesse is invalid
+    #status = 3    : Edm is above max
+    #status = 4    : Reached call limit
+    #status = 5    : Any other failure
+    # https://root-forum.cern.ch/t/meaning-of-values-returned-by-roofitresult-status/16355
+    #
+    # Some of these are failing because they reach the call limit. However, we don't seem to be able to
+    # access that direcly in MCStudy
+    # We can change this by using fitTo()
+    # https://root-forum.cern.ch/t/changing-minimizer-options-in-rooabspdf-fitto/18358
+    for i in range(ntrials):
+        result = mcstudy.fitResult(i)
+        print(result.status(), result.numInvalidNLL())
+        # These are the final fit parameters
+        '''
+        params = mcstudy.fitParams(0)
+        for p in params:
+            print(p)
+        '''
+
+    ############################################################################
 
     # Make plots of the distributions of nsig, the error on nsig and the pull of nsig
     frame1 = mcstudy.plotParam(nsig, ROOT.RooFit.Bins(40));
@@ -181,10 +219,11 @@ def main(argv):
         if 1 < len(rep):
             rep = rep[0]
 
+    return mcstudy
 
 ################################################################################
 if __name__ == '__main__':
-    main(sys.argv)
+    m = main(sys.argv)
 
 
 
