@@ -2,19 +2,34 @@ import ROOT
 import numpy as np
 
 import sys
+import os
 
 def main(argv):
 
     constraint_multiplier = 0.2
     nentries = 30000
-    nsiginit = 500
-    ntrials = 1000
+    nsiginit = 1000
+    ntrials = 100
+
+    workspace_filename1 = argv[1]
+    workspace_filename2 = argv[2]
+
+    ############################################################################
+    # Set up a workspace to store everything
+    #workspace_filename = "testworkspacebkg.root"
+    #workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{n1}_{n2}.root"
+    workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{np.random.randint(1,1000000000):010d}.root"
+    workspace_outfile = ROOT.TFile(workspace_outfilename, "RECREATE")
+
+    workspace_outname = "workspace_trials"
+    wout = ROOT.RooWorkspace(workspace_outname,"My workspace")
+    ############################################################################
+
 
     # Set up a workspace to store everything
     #workspace_filename = "testworkspace.root"
     print("Read in signal.............")
-    workspace_filename = argv[1]
-    workspace_file = ROOT.TFile(workspace_filename)
+    workspace_file = ROOT.TFile(workspace_filename1)
     workspace_file.Print()
     workspace_file.ls()
     w = workspace_file.Get("workspace")
@@ -39,8 +54,7 @@ def main(argv):
     nsig = w.var("nsig");
 
     print("Read in background.............")
-    workspace_filename = argv[2]
-    workspace_file = ROOT.TFile(workspace_filename)
+    workspace_file = ROOT.TFile(workspace_filename2)
     workspace_file.Print()
     workspace_file.ls()
     w = workspace_file.Get("workspace")
@@ -208,6 +222,31 @@ def main(argv):
     corrHist953.Draw("colz");
     '''
     ROOT.gPad.Update()
+
+
+    ############################################################################
+    # Save the workspace
+    # This needs to be first, before its subcomponent PDF's
+    getattr(wout,'import')(model)
+
+    for i in range(ntrials):
+        result = mcstudy.fitResult(i)
+        result.SetName(f'result_{i:05}')
+        wout.Import(result)
+
+    n1 = ROOT.TNamed("workspace_filename1",workspace_filename1)
+    n2 = ROOT.TNamed("workspace_filename2",workspace_filename2)
+
+    print("Print the contents of the workspace -------------------------")
+    wout.Print()
+
+    workspace_outfile.cd()
+    n1.Write()
+    n2.Write()
+    wout.Write()
+    workspace_outfile.Close()
+
+    ############################################################################
 
 
 
