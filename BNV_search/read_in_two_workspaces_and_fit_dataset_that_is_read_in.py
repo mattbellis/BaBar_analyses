@@ -185,7 +185,7 @@ def main(argv):
     framescan = nsig.frame(ROOT.RooFit.Bins(10),ROOT.RooFit.Range(1,200),ROOT.RooFit.Title("LL and profileLL in nsig"))
     nll.plotOn(framescan,ROOT.RooFit.ShiftToZero()) 
 
-    pll_frac = nll.createProfile(nsig) ;
+    pll_frac = nll.createProfile(ROOT.RooArgSet(nsig)) ;
     # Plot the profile likelihood in frac
     pll_frac.plotOn(framescan,ROOT.RooFit.LineColor(ROOT.kRed)) ;
 

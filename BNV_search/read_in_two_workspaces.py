@@ -7,9 +7,9 @@ import os
 def main(argv):
 
     constraint_multiplier = 0.2
-    nentries = 30000
-    nsiginit = 1000
-    ntrials = 100
+    nentries = 80000 # nmu
+    nsiginit = 4000
+    ntrials = 1000
 
     workspace_filename1 = argv[1]
     workspace_filename2 = argv[2]
@@ -223,6 +223,28 @@ def main(argv):
     '''
     ROOT.gPad.Update()
 
+    # Draw all plots on a canvas
+    #gStyle->SetOptStat(0);
+    c1 = ROOT.TCanvas("c1", "c1", 900, 300);
+    c1.Divide(3, 1);
+    c1.cd(1);
+    ROOT.gPad.SetLeftMargin(0.15);
+    frame1.GetYaxis().SetTitleOffset(1.4);
+    frame1.Draw();
+
+    c1.cd(2);
+    ROOT.gPad.SetLeftMargin(0.15);
+    frame2.GetYaxis().SetTitleOffset(1.4);
+    frame2.Draw();
+
+    c1.cd(3);
+    ROOT.gPad.SetLeftMargin(0.15);
+    frame3.GetYaxis().SetTitleOffset(1.4);
+    frame3.Draw();
+
+    ROOT.gPad.Update()
+    c1.SaveAs('mc_study.png')
+
 
     ############################################################################
     # Save the workspace
@@ -232,7 +254,8 @@ def main(argv):
     for i in range(ntrials):
         result = mcstudy.fitResult(i)
         result.SetName(f'result_{i:05}')
-        wout.Import(result)
+        getattr(wout,'import')(result)
+        #wout.Import(result)
 
     n1 = ROOT.TNamed("workspace_filename1",workspace_filename1)
     n2 = ROOT.TNamed("workspace_filename2",workspace_filename2)
