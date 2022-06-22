@@ -6,13 +6,14 @@ import os
 
 def main(argv):
 
-    constraint_multiplier = 0.2
-    nentries = 80000 # nmu
-    nsiginit = 4000
-    ntrials = 1000
-
     workspace_filename1 = argv[1]
     workspace_filename2 = argv[2]
+
+    constraint_multiplier = 0.2
+    nentries = 80000 # nmu
+    nsiginit = int(argv[3])
+    ntrials = int(argv[4])
+
 
     ############################################################################
     # Set up a workspace to store everything

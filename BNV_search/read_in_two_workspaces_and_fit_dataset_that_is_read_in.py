@@ -174,6 +174,7 @@ def main(argv):
     xframe.GetYaxis().SetTitleOffset(1.4)
     #xframe.SetAxisRange(0.98,1.0,"X")
     xframe.SetAxisRange(0.90,1.0,"X")
+    #xframe.SetAxisRange(0.0,10.0,"Y")
     xframe.Draw()
     #xframe.SetMaximum(10000)
     ROOT.gPad.Update()
@@ -182,6 +183,7 @@ def main(argv):
 
 
     # NLL scan
+    #'''
     framescan = nsig.frame(ROOT.RooFit.Bins(10),ROOT.RooFit.Range(1,200),ROOT.RooFit.Title("LL and profileLL in nsig"))
     nll.plotOn(framescan,ROOT.RooFit.ShiftToZero()) 
 
@@ -198,6 +200,7 @@ def main(argv):
     #framescan.SetMaximum(10000)
     ROOT.gPad.Update()
     c2.SaveAs(f"fit_to_data_NLL_scan_{infilename}.png")
+    #'''
 
 
     ROOT.gPad.Update()
@@ -214,7 +217,7 @@ def main(argv):
         if 1 < len(rep):
             rep = rep[0]
 
-    return results
+    return results,framescan,pll_frac
 
 ################################################################################
 if __name__ == '__main__':
