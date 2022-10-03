@@ -62,17 +62,17 @@ toberemoved.append('pp')
 '''
 
 # nmu
-toberemoved.append('bnvbcandmass')
-toberemoved.append('nbnvbcand')
-toberemoved.append('nhighmom')
-toberemoved.append('bnvlepp3')
-#toberemoved.append('pp')
-#toberemoved.append('ep')
-toberemoved.append('mup')
+#toberemoved.append('bnvbcandmass')
+#toberemoved.append('nbnvbcand')
+#toberemoved.append('nhighmom')
+#toberemoved.append('bnvlepp3')
+##toberemoved.append('pp')
+##toberemoved.append('ep')
+#toberemoved.append('mup')
 
 
 # ne
-'''
+#'''
 toberemoved.append('bnvbcandmass')
 toberemoved.append('nbnvbcand')
 #toberemoved.append('tagbcandmass')
@@ -82,7 +82,7 @@ toberemoved.append('bnvlepp3')
 #toberemoved.append('pp')
 toberemoved.append('ep')
 #toberemoved.append('mup')
-'''
+#'''
 
 #'''
 df = sktools.format(df, className='positive', columns_to_drop=toberemoved)
