@@ -25,6 +25,8 @@ model = keras.models.load_model(modelfilename)
 
 df,df = sktools.read_in_files_and_return_dataframe([datafilename,datafilename])
 
+print(df.columns)
+
 #'''
 # Manually remove some of the columns that are about PID
 # BaBar
