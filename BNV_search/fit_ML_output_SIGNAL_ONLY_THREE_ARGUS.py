@@ -11,12 +11,20 @@
 import ROOT
 from pdf_definitions import argus_in_x,read_in_ML_output,two_argus_in_x,three_argus_in_x
 import numpy as np
+import plotting_tools as pt
 
 import sys
+import os
 
 def main(argv):
 
     infilename = argv[1]
+    print(f"Processing file...{infilename}")
+    tag,label,decay = pt.get_sptag(infilename)
+    # Decay probably is something like _ne_ so remove the underscores
+    decay = decay[1:-1]
+    print(tag,label,decay)
+
 
     # Set up a workspace to store everything
     #workspace_filename = "testworkspace.root"
@@ -163,8 +171,12 @@ def main(argv):
     xframe.Draw()
     #xframe.SetMaximum(10000)
     ROOT.gPad.Update()
-    #c.SaveAs("fit_to_data.png")
-    c.SaveAs(f"fit_to_data_{infilename}.png")
+
+    outdir = f'plots_{decay}'
+    if not os.path.exists(outdir):
+       os.makedirs(outdir)
+
+    c.SaveAs(f"{outdir}/fit_to_data_{infilename}.png")
 
 
     # Draw the frame on the canvas
@@ -177,7 +189,7 @@ def main(argv):
     #xframe.SetMaximum(10000)
     ROOT.gPad.Update()
     #c1.SaveAs("fit_to_data1.png")
-    c1.SaveAs(f"fit_to_data_ZOOM_{infilename}.png")
+    c1.SaveAs(f"{outdir}/fit_to_data_ZOOM_{infilename}.png")
 
 
     print("Print the results -------------------------")
@@ -204,11 +216,12 @@ def main(argv):
 
 
 
-    rep = ''
-    while not rep in [ 'q', 'Q' ]:
-        rep = input( 'enter "q" to quit: ' )
-        if 1 < len(rep):
-            rep = rep[0]
+    if len(argv)<=2 or argv[2].find('batch')<0:
+        rep = ''
+        while not rep in [ 'q', 'Q' ]:
+            rep = input( 'enter "q" to quit: ' )
+            if 1 < len(rep):
+                rep = rep[0]
 
 ################################################################################
 if __name__ == '__main__':

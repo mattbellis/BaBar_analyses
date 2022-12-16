@@ -485,6 +485,7 @@ def return_dataset_information(verbose=False):
 def get_sptag(name):
 
     decays = ['/pmu/','/pe/','/pnu/','/nmu/','/ne/']
+    decays += ['_pmu_','_pe_','_pnu_','_nmu_','_ne_']
 
     labels = {}
     labels['1235'] = r'$B^+B^-$'

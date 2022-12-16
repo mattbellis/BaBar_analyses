@@ -44,3 +44,8 @@ Get a list of the numbers of events in each file with
 
  bash summarize_events_in_files.sh
 
+
+
+ Comment from Betrand about fits:
+
+ For the fit, the trick is the following. Fix the signal to some small negative value, then perform the fit with the bkg parameters free. Then scan the likelihood function in the vicinity of the signal. if it is negative somewhere, you need to increase the signal fraction. If it is positive everywhere, you need to decrease it. If it is zero at some point, then Bob is your uncle.

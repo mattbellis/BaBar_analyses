@@ -2,12 +2,13 @@ import ROOT
 import numpy as np
 
 import sys
+import os
 
 from pdf_definitions import read_in_ML_output
 from pdf_definitions import argus_in_x,read_in_ML_output,two_argus_in_x,three_argus_in_x
 from pdf_definitions import argus_in_x,read_in_ML_output,two_argus_in_x,three_argus_in_x,two_argus_plus_expon_in_x
 
-
+import plotting_tools as pt
 
 def main(argv):
 
@@ -20,6 +21,12 @@ def main(argv):
     #workspace_filename = "testworkspace.root"
     print("Read in signal.............")
     workspace_filename = argv[1]
+
+    tag,label,decay = pt.get_sptag(workspace_filename)
+    # Decay probably is something like _ne_ so remove the underscores
+    decay = decay[1:-1]
+    print(tag,label,decay)
+
     workspace_file = ROOT.TFile(workspace_filename)
     workspace_file.Print()
     workspace_file.ls()
@@ -33,7 +40,7 @@ def main(argv):
         val = v.getVal()
         err = v.getError()
         variable_dict[name] = [val,err]
-        if name is not 'x' and name[0]!='n':
+        if name != 'x' and name[0]!='n':
             #v.setConstant(ROOT.kTRUE)
             # Or
             v.setRange(val-(constraint_multiplier*err),val+(constraint_multiplier*err))
@@ -58,7 +65,7 @@ def main(argv):
         val = v.getVal()
         err = v.getError()
         variable_dict[name] = [val,err]
-        if name is not 'x' and name[0]!='n':
+        if name != 'x' and name[0]!='n':
             #v.setConstant(ROOT.kTRUE)
             # Or
             v.setRange(val-(constraint_multiplier*err),val+(constraint_multiplier*err))
@@ -163,9 +170,14 @@ def main(argv):
     #xframe.SetAxisRange(0.98,1.0,"X")
     xframe.Draw()
     #xframe.SetMaximum(10000)
+
+    outdir = f'plots_{decay}'
+    if not os.path.exists(outdir):
+       os.makedirs(outdir)
+
     ROOT.gPad.Update()
     #c.SaveAs("fit_to_data.png")
-    c.SaveAs(f"fit_to_data_{infilename}.png")
+    c.SaveAs(f"{outdir}/fit_to_data_{infilename}.png")
 
 
     # Draw the frame on the canvas
@@ -179,27 +191,36 @@ def main(argv):
     #xframe.SetMaximum(10000)
     ROOT.gPad.Update()
     #c1.SaveAs("fit_to_data1.png")
-    c1.SaveAs(f"fit_to_data_ZOOM_{infilename}.png")
+    c1.SaveAs(f"{outdir}/fit_to_data_ZOOM_{infilename}.png")
 
 
     # NLL scan
     #'''
-    framescan = nsig.frame(ROOT.RooFit.Bins(10),ROOT.RooFit.Range(1,200),ROOT.RooFit.Title("LL and profileLL in nsig"))
-    nll.plotOn(framescan,ROOT.RooFit.ShiftToZero()) 
-
-    pll_frac = nll.createProfile(ROOT.RooArgSet(nsig)) ;
-    # Plot the profile likelihood in frac
-    pll_frac.plotOn(framescan,ROOT.RooFit.LineColor(ROOT.kRed)) ;
-
     c2 = ROOT.TCanvas("scan", "scan", 900, 500)
     ROOT.gPad.SetLeftMargin(0.15)
+
+    lo = 0
+    hi = nsig.getVal() + 4*nsig.getError()
+    print(lo,hi)
+    #exit()
+    #framescan = nsig.frame(ROOT.RooFit.Bins(10),ROOT.RooFit.Range(1,200),ROOT.RooFit.Title("LL and profileLL in nsig"))
+    framescan = nsig.frame(ROOT.RooFit.Bins(10),ROOT.RooFit.Range(lo,hi),ROOT.RooFit.Title("LL and profileLL in nsig"))
+    nll.plotOn(framescan,ROOT.RooFit.ShiftToZero()) 
+
+    # The profile likelihood estimator on nll for frac will minimize nll w.r.t
+    # all floating parameters except nsig for each evaluation
+    pll_frac = nll.createProfile(ROOT.RooArgSet(nsig)) ;
+    # Plot the profile likelihood in frac
+    pll_frac.plotOn(framescan,ROOT.RooFit.LineColor(ROOT.kRed), ROOT.RooFit.ShiftToZero()) ;
+
     framescan.GetYaxis().SetTitleOffset(1.4)
-    #framescan.SetAxisRange(0.98,1.0,"X")
-    #framescan.SetAxisRange(0.90,1.0,"X")
+    #framescan.SetAxisRange(0.0,1.0,"Y")
+    #framescan.SetAxisRange(0.0,nsig.getVal() + 3* nsig.getError(),"X")
     framescan.Draw()
-    #framescan.SetMaximum(10000)
+    framescan.SetMaximum(100)
+    framescan.SetMinimum(0)
     ROOT.gPad.Update()
-    c2.SaveAs(f"fit_to_data_NLL_scan_{infilename}.png")
+    c2.SaveAs(f"{outdir}/fit_to_data_NLL_scan_{infilename}.png")
     #'''
 
 
@@ -211,17 +232,18 @@ def main(argv):
 
 
     ########################;
-    rep = ''
-    while not rep in [ 'q', 'Q' ]:
-        rep = input( 'enter "q" to quit: ' )
-        if 1 < len(rep):
-            rep = rep[0]
+    if len(argv)<=2 or argv[2].find('batch')<0:
+        rep = ''
+        while not rep in [ 'q', 'Q' ]:
+            rep = input( 'enter "q" to quit: ' )
+            if 1 < len(rep):
+                rep = rep[0]
 
-    return results,framescan,pll_frac
+    return results,framescan,pll_frac,nll
 
 ################################################################################
 if __name__ == '__main__':
-    results = main(sys.argv)
+    results, framescan, pll_frac, nll = results = main(sys.argv)
 
 
 

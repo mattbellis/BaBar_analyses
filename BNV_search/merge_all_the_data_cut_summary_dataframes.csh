@@ -1,0 +1,5 @@
+python merge_a_bunch_of_dataframes.py CUT_SUMMARY_AllEvents-Run*pe.h5
+python merge_a_bunch_of_dataframes.py CUT_SUMMARY_AllEvents-Run*pmu.h5
+python merge_a_bunch_of_dataframes.py CUT_SUMMARY_AllEvents-Run*ne.h5
+python merge_a_bunch_of_dataframes.py CUT_SUMMARY_AllEvents-Run*nmu.h5
+python merge_a_bunch_of_dataframes.py CUT_SUMMARY_AllEvents-Run*pnu.h5
