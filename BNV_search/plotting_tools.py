@@ -122,20 +122,39 @@ def plot_mes_vs_de(dfs,specific_plots=['bnvbcandMES','bnvbcandDeltaE'],plot_para
         ranges.append(plotvars[specific_plots[0]]['range'])
         ranges.append(plotvars[specific_plots[1]]['range'])
 
-    plt.figure(figsize=figsize)
-    plt.subplot(1,1,1)
+    #plt.figure(figsize=figsize)
+    #plt.subplot(1,1,1)
 
     for df in dfs:
+        # Need this as per
+        # https://stackoverflow.com/questions/51953869/convenient-way-to-deal-with-valueerror-cannot-reindex-from-a-duplicate-axis
+        df = df.reset_index()
+
         x = df[specific_plots[0]]
         y = df[specific_plots[1]]
 
-        #plt.plot(x,y,'.',markersize=markersize,color
+        print(df.columns)
+
+        #plt.plot(x,y,'.',markersize=markersize)
+        #'''
         print("LABELS: ",labels)
-        sns.histplot(df,x=specific_plots[0],y=specific_plots[1],binrange=(ranges[0],ranges[1]),bins=bins,cbar=True)#,ax=plt.gca())
+        print(df[specific_plots[0]].values)
+        print(df[specific_plots[1]].values)
+        print(len(df[specific_plots[0]].values))
+        print(len(df[specific_plots[1]].values))
+        print(ranges[0], ranges[1])
+        print(bins)
+        #sns.histplot(df,x=specific_plots[0],y=specific_plots[1],binrange=(ranges[0],ranges[1]),bins=bins,cbar=True)#,ax=plt.gca())
+        #sns.jointplot(data=df,x=specific_plots[0],y=specific_plots[1],kind="hist",marginal_kws={"bins":25})#,ax=plt.gca())
+        #sns.jointplot(data=df,x=specific_plots[0],y=specific_plots[1],marginal_kws={"bins":25})#,ax=plt.gca())
+        #sns.jointplot(data=df,x=specific_plots[0],y=specific_plots[1],kind="hist",joint_kws={"bins":100},marginal_kws={"bins":25})#,ax=plt.gca())
+        sns.jointplot(data=df,x=specific_plots[0],y=specific_plots[1],joint_kws={"alpha":0.05})#, "size":1},marginal_kws={"bins":25})#,ax=plt.gca())
         plt.xlabel(axeslabels[0],fontsize=xlabelfontsize)
         plt.ylabel(axeslabels[1],fontsize=xlabelfontsize)
         plt.title(label=labels[0])
+        #'''
 
+    print("HER---------------------------------")
     plt.tight_layout()
 
     # MC
