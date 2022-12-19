@@ -148,10 +148,14 @@ def plot_mes_vs_de(dfs,specific_plots=['bnvbcandMES','bnvbcandDeltaE'],plot_para
         #sns.jointplot(data=df,x=specific_plots[0],y=specific_plots[1],kind="hist",marginal_kws={"bins":25})#,ax=plt.gca())
         #sns.jointplot(data=df,x=specific_plots[0],y=specific_plots[1],marginal_kws={"bins":25})#,ax=plt.gca())
         #sns.jointplot(data=df,x=specific_plots[0],y=specific_plots[1],kind="hist",joint_kws={"bins":100},marginal_kws={"bins":25})#,ax=plt.gca())
-        sns.jointplot(data=df,x=specific_plots[0],y=specific_plots[1],joint_kws={"alpha":0.05})#, "size":1},marginal_kws={"bins":25})#,ax=plt.gca())
+        #sns.jointplot(data=df,x=specific_plots[0],y=specific_plots[1],joint_kws={"alpha":0.05})#, "size":1},marginal_kws={"bins":25})#,ax=plt.gca())
+        sns.jointplot(data=df,x=specific_plots[0],y=specific_plots[1], xlim=ranges[0],joint_kws={"alpha":0.25})#, "size":1},marginal_kws={"bins":25})#,ax=plt.gca())
         plt.xlabel(axeslabels[0],fontsize=xlabelfontsize)
         plt.ylabel(axeslabels[1],fontsize=xlabelfontsize)
         plt.title(label=labels[0])
+        # LET's WRITE OUT MES
+        mask = (df['bnvbcandDeltaE']>-0.1) & (df['bnvbcandDeltaE']<0.1)
+        np.save(f'PREDICTIONS_MES_{tag}_{decay}',df['bnvbcandMES'][mask].values)
         #'''
 
     print("HER---------------------------------")
@@ -160,7 +164,7 @@ def plot_mes_vs_de(dfs,specific_plots=['bnvbcandMES','bnvbcandDeltaE'],plot_para
     # MC
     filename = 'plots/de_vs_mes_cut_summary_files_SP-{0}_{1}_{2}.png'.format(sps[0],decay,tag)
     # Data
-    if sps[0].find('runs')>=0:
+    if sps[0] is not None and sps[0].find('runs')>=0:
         filename = 'plots/de_vs_mes_cut_summary_files_{0}_{1}_{2}.png'.format(labels[0],decay,tag)
     print(filename)
     plt.savefig(filename)

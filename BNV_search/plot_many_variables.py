@@ -224,9 +224,10 @@ for icount,infilename in enumerate(infilenames):
 
     wt = 1.0
     print(sp)
-    if sp.find('Run')<0 and sp.find('runs')<0:
-        if 'weight' in list(raw['MC'][sp].keys()):
-            wt = raw['MC'][sp]['weight']
+    if sp is not None:
+        if sp.find('Run')<0 and sp.find('runs')<0:
+            if 'weight' in list(raw['MC'][sp].keys()):
+                wt = raw['MC'][sp]['weight']
     print(wt)
     weights.append(wt)
     #weights.append(wt)
@@ -310,6 +311,8 @@ figsize=(15,3)
 
 ################################################################################
 # MES vs DeltaE
+#tag = "SP-9456"
+tag = "MC-bkg"
 pt.plot_mes_vs_de(dfs,bins=100,ranges=((5.2,5.3),(-0.5,0.5)),decay=decay,labels=labels,sps=sps, tag=tag)#,xlabelfontsize=12,alpha=0.5,color='k', markersize=1, decay=None, tag='default'):
 ################################################################################
 

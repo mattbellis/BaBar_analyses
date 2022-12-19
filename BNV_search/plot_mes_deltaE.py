@@ -16,6 +16,7 @@ print(tag,label,decay)
 
 
 data = np.load(infilename)
+print(data)
 
 lo = 0.2
 hi = 1.0
@@ -26,11 +27,11 @@ print(f"full dataset between {lo:3.1f} and {hi:3.1f}: {20*len(data[(data>=lo)&(d
 
 
 # For unblinding
-plt.hist(data,bins=400, range=(0.0,1.0))
+plt.hist(data,bins=100, range=(5.2,5.3))
 # Blinded
 #plt.hist(data,bins=60, range=(0.2,0.80))
 
-plt.xlim(0.0, 1.0)
+#plt.xlim(0.0, 1.0)
 
 plt.xlabel('Tensorflow output')
 

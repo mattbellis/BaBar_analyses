@@ -371,4 +371,95 @@ then
 
     fi
 
+################################################################################
+elif [[ $channel = "pmu" ]] 
+then
+    echo $channel
+    echo $step
+
+    if [[ $step = "prepare_samples" ]] 
+    then
+
+    ################################################################################
+    # For ne
+    ################################################################################
+    #   ????
+    python random_sample_from_dataframe.py CUT_SUMMARY_SP-1005_pmu.h5     30000 #
+    python random_sample_from_dataframe.py CUT_SUMMARY_SP-1235_pmu.h5     20000 #   ???
+    python random_sample_from_dataframe.py CUT_SUMMARY_SP-1237_pmu.h5     20000 #   ???
+    python random_sample_from_dataframe.py CUT_SUMMARY_SP-2400_pmu.h5     50000 #   ???
+    python random_sample_from_dataframe.py CUT_SUMMARY_SP-3429_pmu.h5     50000 #   ???
+    python random_sample_from_dataframe.py CUT_SUMMARY_SP-3981_pmu.h5     50000 #   ???
+    python random_sample_from_dataframe.py CUT_SUMMARY_SP-980_pmu.h5      50000 #   ???
+    python random_sample_from_dataframe.py CUT_SUMMARY_SP-998_pmu.h5      15000 #   ???
+
+
+    # There are ???? entries in the signal
+    python random_sample_from_dataframe.py CUT_SUMMARY_SP-9456_pmu.h5 50000
+
+
+    # Do this for data for Run 1 to apply the cuts
+    python random_sample_from_dataframe.py CUT_SUMMARY_AllEvents-Run1_pmu.h5 100000000
+
+    # Now merge them
+    python merge_training_samples.py MC_TRAINING_WEIGHTED_1005_1235_1237_998_pmu.h5  CUT_SUMMARY_SP-1005_pmu_SAMPLE_N_231.h5 CUT_SUMMARY_SP-998_pmu_SAMPLE_N_2103.h5
+
+    elif [[ $step = "plot_after_training" ]] 
+    then
+        # Plot them
+        python plot_ML_output.py PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy
+
+        python plot_ML_output.py PREDICTIONS_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_4854_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy
+        python plot_ML_output.py PREDICTIONS_CUT_SUMMARY_SP-998_pnu_SAMPLE_N_8265_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy
+
+        # Data
+        # Need to change, do we????
+        python plot_ML_output.py PREDICTIONS_CUT_SUMMARY_AllEvents-Run1_pnu_SAMPLE_N_3289_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy
+
+
+    elif [[ $step = "determine_parameters" ]]
+    then
+        # Fit the signal and background separately
+        # Signal
+        python fit_ML_output_SIGNAL_ONLY_THREE_ARGUS.py PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy batch
+
+        # Background
+        python fit_ML_output_BACKGROUND_ONLY_TWO_ARGUS_AND_EXPONENTIAL.py PREDICTIONS_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_4854_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy batch
+        python fit_ML_output_BACKGROUND_ONLY_TWO_ARGUS_AND_EXPONENTIAL.py PREDICTIONS_CUT_SUMMARY_SP-998_pnu_SAMPLE_N_8265_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy batch
+
+
+
+
+    elif [[ $step = "toy_study" ]]
+    then
+        # Do some sample studies
+        # Estimate 3000 events between 0.2 and 1 for Run 1
+        # Run 2-6 has ~20x Run 1?
+        python read_in_two_workspaces.py \
+            workspace_PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
+            workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_4854_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
+            100 100 # nsig ntrials
+
+
+
+        # Trying to fit the Run 1 data
+    elif [[ $step = "fit_run1" ]]
+    then
+        echo
+        # 998 background shape
+        #python read_in_two_workspaces_and_fit_dataset_that_is_read_in.py workspace_PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root workspace_PREDICTIONS_CUT_SUMMARY_SP-998_pnu_SAMPLE_N_8265_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root PREDICTIONS_CUT_SUMMARY_AllEvents-Run1_pnu_SAMPLE_N_3289_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy
+        # 1005 background shape
+        python read_in_two_workspaces_and_fit_dataset_that_is_read_in.py workspace_PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_4854_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root PREDICTIONS_CUT_SUMMARY_AllEvents-Run1_pnu_SAMPLE_N_3289_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy
+
+        
+
+    elif [[ $step = "gen_random_embedded" ]]
+    then
+        echo
+        # For some embedded tests
+        python random_sample_from_dataframe.py CUT_SUMMARY_SP-11975_pnu.h5 500
+
+
+
+    fi
 fi
