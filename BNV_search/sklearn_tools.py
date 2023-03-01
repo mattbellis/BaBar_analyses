@@ -48,10 +48,11 @@ def read_in_files_and_return_dataframe(infilenames):
 
 ################################################################################
 def format(df, className, columns_to_drop=None):
-  df = df.drop([0]) # drop feature (column) labels
+    #df = df.drop([0]) # drop feature (column) labels
   if columns_to_drop is not None:
-	  #df = df.drop(columns=['cos(theta)', 'p3']) # drop correct columns
-	  df = df.drop(columns=columns_to_drop) # drop correct columns
+    #df = df.drop(columns=['cos(theta)', 'p3']) # drop correct columns
+    print(columns_to_drop)
+    df = df.drop(columns=columns_to_drop) # drop correct columns
 
   # add column with class name
   labels = [className] * len(df) #list of labels is the length of the df

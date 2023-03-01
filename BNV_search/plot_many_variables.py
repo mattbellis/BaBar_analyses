@@ -41,10 +41,13 @@ raw = raw_event_numbers
 ####################
 ################################################################################
 #specific_plots = ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES']
+#specific_plots = ['bnvbcandDeltaE','bnvbcandMES']
 # Shape
 #specific_plots = ['thrustmag','thrustcosth','thrustmagall','thrustcosthall', 'sphericityall','r2','r2all','nphot','ncharged','missingE','missingmom','missingmass','scalarmomsum','bnvprotp3','bnvlepp3', 'ne','nmu','np','nbnvbcand']
 #specific_plots += ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES']
+
 # For documentation
+#'''
 specific_plots = ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES', \
                   'thrustmag','thrustcosth','thrustmagall','thrustcosthall', \
                   'sphericityall','r2','r2all','scalarmomsum', \
@@ -52,6 +55,7 @@ specific_plots = ['bnvbcandDeltaE','bnvbcandMES','tagbcandDeltaE','tagbcandMES',
 specific_plots += ['nphot','ncharged','bnvprotp3','bnvlepp3', 'ne','nmu','np','nbnvbcand']
 specific_plots += ['bnvlepcosth','bnvprotcosth','bnvbcandp3','tagbcandp3']
 specific_plots += ['bnvbcandmass','tagbcandmass']
+#'''
 ################################################################################
 
 infilenames = sys.argv[1:]
@@ -220,9 +224,10 @@ for icount,infilename in enumerate(infilenames):
 
     wt = 1.0
     print(sp)
-    if sp.find('Run')<0 and sp.find('runs')<0:
-        if 'weight' in list(raw['MC'][sp].keys()):
-            wt = raw['MC'][sp]['weight']
+    if sp is not None:
+        if sp.find('Run')<0 and sp.find('runs')<0:
+            if 'weight' in list(raw['MC'][sp].keys()):
+                wt = raw['MC'][sp]['weight']
     print(wt)
     weights.append(wt)
     #weights.append(wt)
@@ -300,12 +305,15 @@ figsize=(15,3)
 #grid_of_plots = (1,2)
 #figsize=(8,3)
 
-pt.make_all_plots(df_plotting_container,specific_plots=specific_plots,backend='matplotlib',grid_of_plots=grid_of_plots,xlabelfontsize=10,ignorePID=True,plot_params=plot_params,stacked=True,figsize=figsize, decay=decay, tag=tag)
+# Make all the stacked plots for documentation
+#pt.make_all_plots(df_plotting_container,specific_plots=specific_plots,backend='matplotlib',grid_of_plots=grid_of_plots,xlabelfontsize=10,ignorePID=True,plot_params=plot_params,stacked=True,figsize=figsize, decay=decay, tag=tag)
 ################################################################################
 
 ################################################################################
 # MES vs DeltaE
-#pt.plot_mes_vs_de(dfs,bins=100,ranges=((5.2,5.3),(-0.5,0.5)),decay=decay,labels=labels,sps=sps, tag=tag)#,xlabelfontsize=12,alpha=0.5,color='k', markersize=1, decay=None, tag='default'):
+#tag = "SP-9456"
+tag = "MC-bkg"
+pt.plot_mes_vs_de(dfs,bins=100,ranges=((5.2,5.3),(-0.5,0.5)),decay=decay,labels=labels,sps=sps, tag=tag)#,xlabelfontsize=12,alpha=0.5,color='k', markersize=1, decay=None, tag='default'):
 ################################################################################
 
 # For comparing cuts

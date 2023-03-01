@@ -25,6 +25,8 @@ model = keras.models.load_model(modelfilename)
 
 df,df = sktools.read_in_files_and_return_dataframe([datafilename,datafilename])
 
+print(df.columns)
+
 #'''
 # Manually remove some of the columns that are about PID
 # BaBar
@@ -49,26 +51,31 @@ toberemoved.append('pp')
 #toberemoved.append('mup')
 '''
 # pnu
-'''
+#'''
+toberemoved.append('ne')
+toberemoved.append('np')
+toberemoved.append('nmu')
+#toberemoved.append('bnvbcandMES')
+#toberemoved.append('bnvbcandDeltaE')
 toberemoved.append('bnvbcandmass')
 toberemoved.append('nbnvbcand')
 #toberemoved.append('tagbcandmass')
 toberemoved.append('nhighmom')
 toberemoved.append('bnvlepp3')
-#toberemoved.append('bnvprotp3')
+toberemoved.append('bnvprotp3')
 toberemoved.append('pp')
 #toberemoved.append('ep')
 #toberemoved.append('mup')
-'''
+#'''
 
 # nmu
-toberemoved.append('bnvbcandmass')
-toberemoved.append('nbnvbcand')
-toberemoved.append('nhighmom')
-toberemoved.append('bnvlepp3')
-#toberemoved.append('pp')
-#toberemoved.append('ep')
-toberemoved.append('mup')
+#toberemoved.append('bnvbcandmass')
+#toberemoved.append('nbnvbcand')
+#toberemoved.append('nhighmom')
+#toberemoved.append('bnvlepp3')
+##toberemoved.append('pp')
+##toberemoved.append('ep')
+#toberemoved.append('mup')
 
 
 # ne

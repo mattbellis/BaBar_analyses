@@ -4,13 +4,30 @@ import numpy as np
 import sys
 import os
 
+import plotting_tools as pt
+
 def main(argv):
 
     workspace_filename1 = argv[1]
     workspace_filename2 = argv[2]
 
+    print(f"Processing files...{workspace_filename1}")
+    print(f"Processing files...{workspace_filename2}")
+    tag,label,decay = pt.get_sptag(workspace_filename2)
+    # Decay probably is something like _ne_ so remove the underscores
+    decay = decay[1:-1]
+    print(tag,label,decay)
+
+
     constraint_multiplier = 0.2
     nentries = 80000 # nmu
+    if decay=='nmu':
+        nentries = 80000 # nmu
+    elif decay=='ne':
+        nentries = 30000 # ne
+    elif decay=='pnu':
+        nentries = 30000 # pnu
+
     nsiginit = int(argv[3])
     ntrials = int(argv[4])
 
@@ -43,7 +60,7 @@ def main(argv):
         val = v.getVal()
         err = v.getError()
         variable_dict[name] = [val,err]
-        if name is not 'x' and name[0]!='n':
+        if name != 'x' and name[0]!='n':
             #v.setConstant(ROOT.kTRUE)
             # Or
             v.setRange(val-(constraint_multiplier*err),val+(constraint_multiplier*err))
@@ -67,7 +84,7 @@ def main(argv):
         val = v.getVal()
         err = v.getError()
         variable_dict[name] = [val,err]
-        if name is not 'x' and name[0]!='n':
+        if name != 'x' and name[0]!='n':
             #v.setConstant(ROOT.kTRUE)
             # Or
             v.setRange(val-(constraint_multiplier*err),val+(constraint_multiplier*err))
@@ -141,16 +158,18 @@ def main(argv):
     # access that direcly in MCStudy
     # We can change this by using fitTo()
     # https://root-forum.cern.ch/t/changing-minimizer-options-in-rooabspdf-fitto/18358
+    nsuccessful_fits = 0
     for i in range(ntrials):
         result = mcstudy.fitResult(i)
         print(result.status(), result.numInvalidNLL())
+        if result.status()==0:
+            nsuccessful_fits += 1
         # These are the final fit parameters
         '''
         params = mcstudy.fitParams(0)
         for p in params:
             print(p)
         '''
-
     ############################################################################
 
     # Make plots of the distributions of nsig, the error on nsig and the pull of nsig
@@ -243,9 +262,14 @@ def main(argv):
     frame3.GetYaxis().SetTitleOffset(1.4);
     frame3.Draw();
 
-    ROOT.gPad.Update()
-    c1.SaveAs('mc_study.png')
+    outdir = f'plots_{decay}'
+    if not os.path.exists(outdir):
+       os.makedirs(outdir)
 
+    print("Saving image!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    print(f"as {outdir}/mc_study.png")
+    ROOT.gPad.Update()
+    c1.SaveAs(f'{outdir}/mc_study.png')
 
     ############################################################################
     # Save the workspace
@@ -270,17 +294,18 @@ def main(argv):
     wout.Write()
     workspace_outfile.Close()
 
+    print(f"# successful fits: {nsuccessful_fits} out of {ntrials}")
+
     ############################################################################
 
 
-
-
     ########################;
-    rep = ''
-    while not rep in [ 'q', 'Q' ]:
-        rep = input( 'enter "q" to quit: ' )
-        if 1 < len(rep):
-            rep = rep[0]
+    if len(argv)<=2 or argv[2].find('batch')<0:
+        rep = ''
+        while not rep in [ 'q', 'Q' ]:
+            rep = input( 'enter "q" to quit: ' )
+            if 1 < len(rep):
+                rep = rep[0]
 
     return mcstudy
 

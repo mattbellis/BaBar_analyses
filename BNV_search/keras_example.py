@@ -85,7 +85,8 @@ for name in list(df0.keys()):
 ################################################################################
 # For SP-11975, pnu
 ################################################################################
-'''
+#'''
+# MAYBE???
 toberemoved.append('ne')
 toberemoved.append('np')
 toberemoved.append('nmu')
@@ -98,13 +99,15 @@ toberemoved.append('nhighmom')
 toberemoved.append('bnvlepp3')
 toberemoved.append('bnvprotp3')
 toberemoved.append('pp')
-#toberemoved.append('ep')
-#toberemoved.append('mup')
-'''
+toberemoved.append('ep')
+toberemoved.append('mup')
+#'''
 
 ################################################################################
 # For SP-11976, nmu
+# For SP-11977, ne
 ################################################################################
+'''
 #toberemoved.append('ne')
 #toberemoved.append('np')
 #toberemoved.append('nmu')
@@ -126,7 +129,7 @@ toberemoved.append('bnvlepp3')
 toberemoved.append('pp')
 toberemoved.append('ep')
 toberemoved.append('mup')
-#'''
+'''
 
 for tbr in toberemoved:
     if tbr in cols:
