@@ -273,7 +273,7 @@ def compare_train_test(model, X_train, y_train, X_test, y_test, bins=30,tag='def
     plt.tick_params(axis='x', colors='k')
     plt.tick_params(axis='y', colors='k')
 
-    filename = 'compare_train_test_{0}.png'.format(tag)
+    filename = f'models/COMPARE_TRAIN_TEST_{tag}.png'
     plt.savefig(filename)
     
 def graphOvertrainingCheckFromDict(myDict, ax, bins = 30):
