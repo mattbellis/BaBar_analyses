@@ -15,9 +15,16 @@ def main(argv):
     print(f"Processing files...{workspace_filename2}")
     tag,label,decay = pt.get_sptag(workspace_filename2)
     # Decay probably is something like _ne_ so remove the underscores
-    decay = decay[1:-1]
-    print(tag,label,decay)
+    #decay = decay[1:-1]
+    #
+    if decay is None and workspace_filename1.find('pmu')>=0:
+        decay = 'pmu'
+    elif decay is None and workspace_filename1.find('pe')>=0:
+        decay = 'pe'
+    else:
+        decay = "DEFAULT"
 
+    print(tag,label,decay)
 
     constraint_multiplier = 0.2
     nentries = 80000 # nmu
@@ -27,6 +34,8 @@ def main(argv):
         nentries = 30000 # ne
     elif decay=='pnu':
         nentries = 30000 # pnu
+    elif decay=='pmu':
+        nentries = 400 # pnu
 
     nsiginit = int(argv[3])
     ntrials = int(argv[4])
@@ -66,7 +75,8 @@ def main(argv):
             v.setRange(val-(constraint_multiplier*err),val+(constraint_multiplier*err))
 
     x = w.var("x");
-    x.setRange(0.2,1.0) # Just for nmu for now
+    #x.setRange(0.2,1.0) # For the neural net fits
+    x.setRange(5.2,5.3) # For the mES fits
     x.setBins(50)
     model_sig = w.pdf("model_sig");
     nsig = w.var("nsig");
@@ -125,6 +135,7 @@ def main(argv):
     #mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Silence(), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
     mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Verbose(ROOT.kTRUE) , ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(1), ROOT.RooFit.Verbose(ROOT.kTRUE)));
     #mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
+    print("\nInitialized the RooMCStudy object....\n")
 
     '''
     genData = model.generate(x,nentries) 

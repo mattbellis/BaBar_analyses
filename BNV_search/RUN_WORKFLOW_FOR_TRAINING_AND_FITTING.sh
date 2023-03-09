@@ -400,9 +400,30 @@ then
 
     # Do this for data for Run 1 to apply the cuts
     python random_sample_from_dataframe.py CUT_SUMMARY_AllEvents-Run1_pmu.h5 100000000
+    python random_sample_from_dataframe.py CUT_SUMMARY_AllEvents-Run2_pmu.h5 100000000
+    python random_sample_from_dataframe.py CUT_SUMMARY_AllEvents-Run3_pmu.h5 100000000
+    python random_sample_from_dataframe.py CUT_SUMMARY_AllEvents-Run4_pmu.h5 100000000
+    python random_sample_from_dataframe.py CUT_SUMMARY_AllEvents-Run5_pmu.h5 100000000
+    python random_sample_from_dataframe.py CUT_SUMMARY_AllEvents-Run6_pmu.h5 100000000
 
     # Now merge them
     python merge_training_samples.py MC_TRAINING_WEIGHTED_1005_1235_1237_998_pmu.h5  CUT_SUMMARY_SP-1005_pmu_SAMPLE_N_231.h5 CUT_SUMMARY_SP-998_pmu_SAMPLE_N_2103.h5
+
+    # Dump mES but edit plot_many_variables_to give it the correct tag
+    python plot_many_variables.py CUT_SUMMARY_AllEvents-Run1_pmu.h5
+
+    python plot_mes_deltaE.py PREDICTIONS_MES_Run_1_pmu.npy
+    python plot_mes_deltaE.py PREDICTIONS_MES_SP-9456_pmu.npy # Signal
+    python plot_mes_deltaE.py PREDICTIONS_MES_MC-bkg_pmu.npy # MC bkg from cocktail
+
+    # Fit the terms to determine parameters
+    python fit_MES_output_SIGNAL_CRYSTAL_BALL.py PREDICTIONS_MES_SP-9456_pmu.npy
+    python fit_MES_output_BACKGROUND_TWO_ARGUS.py PREDICTIONS_MES_MC-bkg_pmu.npy # This is probably a bit better
+    #python fit_MES_output_BACKGROUND_ARGUS.py PREDICTIONS_MES_MC-bkg_pmu.npy
+
+    # Trying some toy fits
+    python read_in_two_workspaces.py workspace_PREDICTIONS_MES_SP-9456_pmu.root workspace_PREDICTIONS_MES_MC-bkg_pmu.root 20 1000
+
 
     elif [[ $step = "plot_after_training" ]] 
     then

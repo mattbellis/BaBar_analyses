@@ -29,17 +29,19 @@ print(f"full dataset between {lo:3.1f} and {hi:3.1f}: {20*len(data[(data>=lo)&(d
 # For unblinding
 plt.hist(data,bins=100, range=(5.2,5.3))
 # Blinded
-#plt.hist(data,bins=60, range=(0.2,0.80))
+if infilename == 'PREDICTIONS_MES_Run_1_pmu.npy':
+    plt.hist(data,bins=60, range=(5.2,5.266))
+    print("Displaying only blinded region")
 
 #plt.xlim(0.0, 1.0)
 
-plt.xlabel('Tensorflow output')
+plt.xlabel(r'M$_{ES}$ (GeV/c$^2$)')
 
 outdir = f'plots_{decay}'
 if not os.path.exists(outdir):
    os.makedirs(outdir)
 
-name = 'tensorflow_output_variable_' + infilename.split('.')[0] + ".png"
+name = 'mes_delta_e_variable_' + infilename.split('.')[0] + ".png"
 #plt.savefig('plots_nmu/' + name)
 plt.savefig(f'{outdir}/{name}')
 
