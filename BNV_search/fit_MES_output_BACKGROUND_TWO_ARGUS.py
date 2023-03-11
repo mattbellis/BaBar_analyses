@@ -48,7 +48,8 @@ def main(argv):
     # Declare observable x
     #x = ROOT.RooRealVar("x", "x", 0.7, 1.0)
     x = ROOT.RooRealVar("x", "x", 5.2, 5.3)
-    x.setBins(50)
+    x.setBins(10)
+    #x.setBins(50)
     #x.setBins(200)
 
     # Read in the data
