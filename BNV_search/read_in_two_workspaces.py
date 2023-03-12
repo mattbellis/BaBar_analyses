@@ -47,7 +47,11 @@ def main(argv):
     # Set up a workspace to store everything
     #workspace_filename = "testworkspacebkg.root"
     #workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{n1}_{n2}.root"
-    workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{decay}_nsig_{nsiginit}_ntrials_{ntrials}_{np.random.randint(1,1000000000):010d}.root"
+    #binned_tag = "BINNED"
+    binned_tag = "NOTBINNED"
+    tag = f"{decay}_{binned_tag}_nsig_{nsiginit}_ntrials_{ntrials}_{np.random.randint(1,1000000000):010d}"
+    #workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{decay}_{binned_tag}_nsig_{nsiginit}_ntrials_{ntrials}_{np.random.randint(1,1000000000):010d}.root"
+    workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{tag}.root"
     workspace_outfile = ROOT.TFile(workspace_outfilename, "RECREATE")
 
     workspace_outname = "workspace_trials"
@@ -135,7 +139,13 @@ def main(argv):
     '''
     
     #mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Silence(), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
-    mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Verbose(ROOT.kTRUE) , ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(1), ROOT.RooFit.Verbose(ROOT.kTRUE)));
+
+    # Binned to make it faster
+    if binned_tag == "BINNED":
+        mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Verbose(ROOT.kTRUE) , ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(1), ROOT.RooFit.Verbose(ROOT.kTRUE)));
+    else:
+        # Not binned
+        mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Verbose(ROOT.kTRUE) , ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(1), ROOT.RooFit.Verbose(ROOT.kTRUE)));
     #mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
     print("\nInitialized the RooMCStudy object....\n")
 
@@ -151,7 +161,10 @@ def main(argv):
     '''
 
     # A trials of B events each trial
-    mcstudy.generateAndFit(ntrials,nentries)
+    mcstudy.generateAndFit(ntrials,nentries)#, ROOT.kTRUE)
+
+    print("mcstudy.genParDataSet()")
+    print(mcstudy.genParDataSet())
 
     # More info on how the number of generated events varies
     # https://root-forum.cern.ch/t/roomcstudy-pull-calculation-and-getting-generated-values-of-parameters/37359
@@ -282,7 +295,7 @@ def main(argv):
     print("Saving image!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
     print(f"as {outdir}/mc_study.png")
     ROOT.gPad.Update()
-    c1.SaveAs(f'{outdir}/mc_study.png')
+    c1.SaveAs(f'{outdir}/mc_study_{tag}.png')
 
     ############################################################################
     # Save the workspace
@@ -294,6 +307,10 @@ def main(argv):
         result.SetName(f'result_{i:05}')
         getattr(wout,'import')(result)
         #wout.Import(result)
+
+    #mcstudy.SetName('mcstudy')
+    getattr(wout,'import')(mcstudy)
+
 
     n1 = ROOT.TNamed("workspace_filename1",workspace_filename1)
     n2 = ROOT.TNamed("workspace_filename2",workspace_filename2)
