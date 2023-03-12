@@ -36,6 +36,8 @@ def main(argv):
         nentries = 30000 # pnu
     elif decay=='pmu':
         nentries = 400 # pnu
+    elif decay=='pe':
+        nentries = 120 # pnu
 
     nsiginit = int(argv[3])
     ntrials = int(argv[4])
@@ -45,7 +47,7 @@ def main(argv):
     # Set up a workspace to store everything
     #workspace_filename = "testworkspacebkg.root"
     #workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{n1}_{n2}.root"
-    workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{np.random.randint(1,1000000000):010d}.root"
+    workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{decay}_nsig_{nsiginit}_ntrials_{ntrials}_{np.random.randint(1,1000000000):010d}.root"
     workspace_outfile = ROOT.TFile(workspace_outfilename, "RECREATE")
 
     workspace_outname = "workspace_trials"
@@ -311,7 +313,7 @@ def main(argv):
 
 
     ########################;
-    if len(argv)<=2 or argv[2].find('batch')<0:
+    if len(argv)<=2 or argv[5].find('batch')<0:
         rep = ''
         while not rep in [ 'q', 'Q' ]:
             rep = input( 'enter "q" to quit: ' )
