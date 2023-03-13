@@ -99,11 +99,18 @@ then
         # Do some sample studies
         # Estimate 3000 events between 0.2 and 1 for Run 1
         # Run 2-6 has ~20x Run 1?
+        #python read_in_two_workspaces.py \
+            #workspace_PREDICTIONS_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_653139_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
+            #workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_nmu_SAMPLE_N_266178_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
+                    #500 1000 # nsig ntrials 
+
+        for nsig in 500 600 700 800 900 1000
+        do
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_653139_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_nmu_SAMPLE_N_266178_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
-                    500 1000 # nsig ntrials 
-
+                    $nsig 1000 batch # nsig ntrials 
+        done
 
         # Trying to fit the Run 1 data
     elif [[ $step = "fit_run1" ]]
@@ -343,11 +350,18 @@ then
         # Do some sample studies
         # Estimate 3000 events between 0.2 and 1 for Run 1
         # Run 2-6 has ~20x Run 1?
+        #python read_in_two_workspaces.py \
+            #workspace_PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
+            #workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_4854_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
+            #100 100 # nsig ntrials
+
+        for nsig in 500 600 700 800 900 1000
+        do
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_4854_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
-            100 100 # nsig ntrials
-
+            $nsig 10 batch # nsig ntrials
+        done
 
 
         # Trying to fit the Run 1 data

@@ -14,17 +14,25 @@ def main(argv):
     print(f"Processing files...{workspace_filename1}")
     print(f"Processing files...{workspace_filename2}")
     tag,label,decay = pt.get_sptag(workspace_filename2)
+    print(tag,label,decay)
     # Decay probably is something like _ne_ so remove the underscores
     #decay = decay[1:-1]
     #
-    if decay is None and workspace_filename1.find('pmu')>=0:
+    if workspace_filename1.find('pmu')>=0:
         decay = 'pmu'
-    elif decay is None and workspace_filename1.find('pe')>=0:
+    elif workspace_filename1.find('pe')>=0:
         decay = 'pe'
+    elif workspace_filename1.find('pnu')>=0:
+        decay = 'pnu'
+    elif workspace_filename1.find('_ne')>=0:
+        decay = 'ne'
+    elif workspace_filename1.find('nmu')>=0:
+        decay = 'nmu'
     else:
         decay = "DEFAULT"
 
     print(tag,label,decay)
+    #exit()
 
     constraint_multiplier = 0.2
     nentries = 80000 # nmu
@@ -35,9 +43,9 @@ def main(argv):
     elif decay=='pnu':
         nentries = 30000 # pnu
     elif decay=='pmu':
-        nentries = 400 # pnu
+        nentries = 400 # pmu
     elif decay=='pe':
-        nentries = 120 # pnu
+        nentries = 120 # pe
 
     nsiginit = int(argv[3])
     ntrials = int(argv[4])
@@ -47,8 +55,8 @@ def main(argv):
     # Set up a workspace to store everything
     #workspace_filename = "testworkspacebkg.root"
     #workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{n1}_{n2}.root"
-    #binned_tag = "BINNED"
-    binned_tag = "NOTBINNED"
+    binned_tag = "BINNED"
+    #binned_tag = "NOTBINNED"
     tag = f"{decay}_{binned_tag}_nsig_{nsiginit}_ntrials_{ntrials}_{np.random.randint(1,1000000000):010d}"
     #workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{decay}_{binned_tag}_nsig_{nsiginit}_ntrials_{ntrials}_{np.random.randint(1,1000000000):010d}.root"
     workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{tag}.root"
@@ -81,8 +89,11 @@ def main(argv):
             v.setRange(val-(constraint_multiplier*err),val+(constraint_multiplier*err))
 
     x = w.var("x");
-    #x.setRange(0.2,1.0) # For the neural net fits
-    x.setRange(5.2,5.3) # For the mES fits
+    if decay=='pmu' or decay=='pe':
+        x.setRange(5.2,5.3) # For the mES fits
+    else:
+        x.setRange(0.2,1.0) # For the neural net fits
+
     x.setBins(50)
     model_sig = w.pdf("model_sig");
     nsig = w.var("nsig");
