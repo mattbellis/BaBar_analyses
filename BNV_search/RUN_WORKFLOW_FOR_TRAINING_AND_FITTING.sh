@@ -1,3 +1,8 @@
+# Might have to
+#
+# conda activate pyhep
+#
+
 channel=$1
 step=$2
 
@@ -96,6 +101,12 @@ then
 
     elif [[ $step = "toy_study" ]]
     then
+        # Can just do single toy studies with the following, for example
+        #python read_in_two_workspaces.py \
+        #       workspace_PREDICTIONS_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_653139_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
+        #       workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_nmu_SAMPLE_N_266178_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
+        #       10000 -1 SINGLEFIT_SP1005TRAINED NO
+
         # Do some sample studies
         # Estimate 3000 events between 0.2 and 1 for Run 1
         # Run 2-6 has ~20x Run 1?
@@ -104,18 +115,32 @@ then
             #workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_nmu_SAMPLE_N_266178_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
                     #500 1000 # nsig ntrials 
 
-        for nsig in 500 600 700 800 900 1000
+        #for nsig in 500 600 700 800 900 1000
+        #for nsig in 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000
+        for nsig in 0 100 500 600 700 800 900 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000 15000 20000 30000
+        #for nsig in 0 
         do
+        #python read_in_two_workspaces.py \
+            #workspace_PREDICTIONS_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_653139_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
+            #workspace_PREDICTIONS_CUT_SUMMARY_SP-998_nmu_SAMPLE_N_106200_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
+                    #$nsig 1000 SP998TRAINED batch # nsig ntrials 
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_653139_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_nmu_SAMPLE_N_266178_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
-                    $nsig 1000 batch # nsig ntrials 
+                    $nsig 1000 SP1005TRAINED batch # nsig ntrials 
+
         done
+        
+        # TO SUMMARIZE TOY RESULTS
+        # python summarize_results_from_mcstudy.py workspace_TRIALS_FROM_TWO_WORKSPACES_nmu_BINNED_nsig_*_ntrials_1000*.root
 
         # Trying to fit the Run 1 data
     elif [[ $step = "fit_run1" ]]
     then
-        python read_in_two_workspaces_and_fit_dataset_that_is_read_in.py workspace_PREDICTIONS_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_653139_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root workspace_PREDICTIONS_CUT_SUMMARY_SP-998_nmu_SAMPLE_N_106200_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root PREDICTIONS_CUT_SUMMARY_AllEvents-Run1_nmu_SAMPLE_N_11131_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy
+        # Fit with the 998 trained data
+        #python read_in_two_workspaces_and_fit_dataset_that_is_read_in.py workspace_PREDICTIONS_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_653139_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root workspace_PREDICTIONS_CUT_SUMMARY_SP-998_nmu_SAMPLE_N_106200_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root PREDICTIONS_CUT_SUMMARY_AllEvents-Run1_nmu_SAMPLE_N_11131_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy
+        # Fit with the 1005
+        python read_in_two_workspaces_and_fit_dataset_that_is_read_in.py workspace_PREDICTIONS_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_653139_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_nmu_SAMPLE_N_266178_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root PREDICTIONS_CUT_SUMMARY_AllEvents-Run1_nmu_SAMPLE_N_11131_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy
         
 
     elif [[ $step = "gen_random_embedded" ]]
@@ -227,10 +252,13 @@ then
         # Do some sample studies
         # Estimate 3000 events between 0.2 and 1 for Run 1
         # Run 2-6 has ~20x Run 1?
+        for nsig in 0 100 500 600 700 800 900 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000 15000 20000 30000
+        do
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11977_ne_SAMPLE_N_481991_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11977_ne_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_ne.npy.root \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_ne_SAMPLE_N_83676_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11977_ne_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_ne.npy.root \
-            100 1000 # nsig ntrials
+            $nsig 1000 SP1005TRAINED  batch # nsig ntrials
+        done
 
 
         # Trying to fit the Run 1 data
@@ -355,7 +383,7 @@ then
             #workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_4854_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
             #100 100 # nsig ntrials
 
-        for nsig in 500 600 700 800 900 1000
+        for nsig in 0 100 500 600 700 800 900 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000 15000 20000 30000
         do
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
@@ -445,7 +473,7 @@ then
         # Estimate 400 events for full dataset
         #python read_in_two_workspaces.py workspace_PREDICTIONS_MES_SP-9456_pmu.root workspace_PREDICTIONS_MES_MC-bkg_pmu.root 20 1000
 
-        for nsig in 5 10 15 20 25 30 35 40 45 50 55 60 
+        for nsig in 0 100 500 600 700 800 900 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000 15000 20000 30000
         do
             python read_in_two_workspaces.py workspace_PREDICTIONS_MES_SP-9456_pmu.root workspace_PREDICTIONS_MES_MC-bkg_pmu.root $nsig 1000 batch
         done
@@ -538,7 +566,7 @@ then
 
         #python read_in_two_workspaces.py workspace_PREDICTIONS_MES_SP-9457_pe.root workspace_PREDICTIONS_MES_MC-bkg_pe.root 10 100 # nsig ntrials
 
-        for nsig in 5 10 15 20 25 30 35 40 45 50 55 60 
+        for nsig in 0 100 500 600 700 800 900 1000 2000 3000 4000 5000 6000 7000 8000 9000 10000 15000 20000 30000
         do
             python read_in_two_workspaces.py workspace_PREDICTIONS_MES_SP-9457_pe.root workspace_PREDICTIONS_MES_MC-bkg_pe.root $nsig 1000 batch # nsig ntrials
         done

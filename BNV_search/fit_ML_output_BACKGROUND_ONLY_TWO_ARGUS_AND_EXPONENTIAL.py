@@ -141,12 +141,12 @@ def main(argv):
     #xframe.SetAxisRange(0.98,1.0,"X")
     xframe.Draw()
     #xframe.SetMaximum(10000)
+    ROOT.gPad.Update()
 
     outdir = f'plots_{decay}'
     if not os.path.exists(outdir):
        os.makedirs(outdir)
 
-    ROOT.gPad.Update()
     c.SaveAs(f"{outdir}/fit_to_data_{infilename}.png")
 
     # Draw the frame on the canvas
@@ -155,6 +155,7 @@ def main(argv):
     xframe.GetYaxis().SetTitleOffset(1.4)
     #xframe.SetAxisRange(0.98,1.0,"X")
     xframe.SetAxisRange(0.90,1.0,"X")
+    xframe.SetAxisRange(0.00,70.0,"Y")
     xframe.Draw()
     #xframe.SetMaximum(10000)
     ROOT.gPad.Update()
@@ -183,7 +184,6 @@ def main(argv):
     ############################################################################
 
 
-
     if len(argv)<=2 or argv[2].find('batch')<0:
         rep = ''
         while not rep in [ 'q', 'Q' ]:
@@ -191,8 +191,10 @@ def main(argv):
             if 1 < len(rep):
                 rep = rep[0]
 
+    return 1
+
 ################################################################################
 if __name__ == '__main__':
-    main(sys.argv)
+    ret = main(sys.argv)
 
 

@@ -12,7 +12,7 @@ import plotting_tools as pt
 
 def main(argv):
 
-    constraint_multiplier = 0.2
+    constraint_multiplier = 0.02
     nentries = 30000
     nsiginit = 1000
     ntrials = 20
@@ -69,14 +69,19 @@ def main(argv):
             #v.setConstant(ROOT.kTRUE)
             # Or
             v.setRange(val-(constraint_multiplier*err),val+(constraint_multiplier*err))
+
+        # Lock down the shape parameters for the signal
+        if name[0]!='n' and name.find('sig'):
+            v.setRange(val-(0.001*err),val+(0.001*err))
+
     print(variable_dict)
 
     ############################################################################
     infilename = argv[3]
 
     x = ROOT.RooRealVar("x", "x", 0.2, 1.0)
-    #x.setBins(50)
-    x.setBins(200)
+    x.setBins(50)
+    #x.setBins(200)
 
     # Read in the data
     #data = read_in_ML_output(infilename,x,max_vals=None)
@@ -186,7 +191,7 @@ def main(argv):
     xframe.GetYaxis().SetTitleOffset(1.4)
     #xframe.SetAxisRange(0.98,1.0,"X")
     xframe.SetAxisRange(0.90,1.0,"X")
-    #xframe.SetAxisRange(0.0,10.0,"Y")
+    xframe.SetAxisRange(0.0,20.0,"Y") # nmu, fit Run 1
     xframe.Draw()
     #xframe.SetMaximum(10000)
     ROOT.gPad.Update()
