@@ -86,7 +86,7 @@ def main(argv):
     #model = ROOT.RooAddPdf("model", "a1+a2", ROOT.RooArgList( argus_bkg, argus_sig), ROOT.RooArgList( nbkg, nsig))
     # Two argus for signal
     #model = ROOT.RooAddPdf("model", "a1+a2", ROOT.RooArgList( argus_bkg, twoArgus_sig), ROOT.RooArgList( nbkg, nsig))
-    model = ROOT.RooAddPdf("model_sig", "a1", ROOT.RooArgList( argus_sig), ROOT.RooArgList( nsig))
+    model = ROOT.RooAddPdf("model_sig", "a1", ROOT.RooArgList(argus_sig), ROOT.RooArgList( nsig))
 
     # Sample, fit and plot extended model
 

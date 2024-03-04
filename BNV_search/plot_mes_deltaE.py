@@ -18,8 +18,8 @@ print(tag,label,decay)
 data = np.load(infilename)
 print(data)
 
-lo = 0.2
-hi = 1.0
+lo = 0.0
+hi = 5.5
 
 print(f"nentries:                     {len(data)}")
 print(f"nentries between {lo:3.1f} and {hi:3.1f}: {len(data[(data>=lo)&(data<=hi)])}")

@@ -14,6 +14,23 @@ sigmas = []
 import seaborn as sns
 import pandas as pd
 
+decay = None
+decays = ['pnu','pe','pmu','ne','nmu']
+for d in decays:
+    if infilenames[0].find(f'_{d}_')>=0:
+        decay = d
+        break
+
+sptrain = None
+sptrains = ['SP998', 'SP1005']
+for s in sptrains:
+    if infilenames[0].find(f'_{s}')>=0:
+        sptrain = s
+        break
+
+
+
+
 all_nsigs = []
 all_nsigs_for_scatter = []
 all_fitsigs = []
@@ -94,6 +111,7 @@ for infilename in infilenames:
 print(nsigs)
 print(means)
 
+################################################################################
 plt.figure()
 plt.errorbar(nsigs, means, yerr=sigmas,fmt='o',markersize=5)
 lo = min(nsigs)
@@ -102,9 +120,15 @@ print(lo,hi)
 plt.plot([lo,hi],[lo,hi],'k--')
 plt.xlabel('True # of signal events',fontsize=14)
 plt.ylabel('Fit # of signal events',fontsize=14)
+#plt.xlim(-500,12000)
+#plt.ylim(-100,12000)
+#plt.xlim(-50,1200) # pnu
+#plt.ylim(-10,1200)
 plt.xlim(-500,12000)
-plt.ylim(-100,12000)
+plt.ylim(-500,12000)
 plt.tight_layout()
+
+plt.savefig(f"plots_{decay}/mcstudy_summaries_{decay}_{sptrain}_00.png")
 
 print(f"ntests: {ntests}")
 width = (hi-lo)
@@ -131,17 +155,26 @@ plt.plot([min(all_nsigs_for_scatter),max(all_nsigs_for_scatter)],[0,0],'k--')
 plt.xlabel('True # of signal events',fontsize=14)
 plt.ylabel('Fit # of signal events',fontsize=14)
 plt.plot([lo,hi],[lo,hi],'k--')
-plt.xlim(-500,12000)
-plt.ylim(-12000,12000)
+#plt.xlim(-500,12000)
+#plt.ylim(-12000,12000)
+#plt.xlim(-50,1200)   # pnu
+plt.xlim(-500,10000)
 plt.tight_layout()
+plt.savefig(f"plots_{decay}/mcstudy_summaries_{decay}_{sptrain}_01.png")
+
 
 plt.figure()
 plt.plot(nsigs,pct_significant,'o', markersize=10)
 plt.xlabel('True # of signal events',fontsize=14)
 plt.ylabel('% of toy studies with significant signal',fontsize=14)
-plt.xlim(-500,12000) 
-plt.ylim(0)
+#plt.xlim(-500,12000) 
+#plt.ylim(0)
+#plt.xlim(-50,1200) # pnu
+#plt.ylim(0)
+plt.xlim(-500,10000)
 plt.tight_layout()
+plt.savefig(f"plots_{decay}/mcstudy_summaries_{decay}_{sptrain}_02.png")
+
 
 
 plt.show()

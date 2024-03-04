@@ -154,8 +154,10 @@ def plot_mes_vs_de(dfs,specific_plots=['bnvbcandMES','bnvbcandDeltaE'],plot_para
         plt.ylabel(axeslabels[1],fontsize=xlabelfontsize)
         plt.title(label=labels[0])
         # LET's WRITE OUT MES
-        mask = (df['bnvbcandDeltaE']>-0.1) & (df['bnvbcandDeltaE']<0.1)
-        np.save(f'PREDICTIONS_MES_{tag}_{decay}',df['bnvbcandMES'][mask].values)
+        #mask = (df['bnvbcandDeltaE']>-0.1) & (df['bnvbcandDeltaE']<0.1)
+        mask = (df['bnvbcandDeltaE']>-10000.1) & (df['bnvbcandDeltaE']<10000.1) # For testing
+        np.save(f'DUMP_MES_{tag}_{decay}',df['bnvbcandMES'][mask].values)
+        #np.save(f'DUMP_MES_{decay}',df['bnvbcandMES'][mask].values)
         #'''
 
     print("HER---------------------------------")
@@ -509,6 +511,7 @@ def get_sptag(name):
 
     decays = ['/pmu/','/pe/','/pnu/','/nmu/','/ne/']
     decays += ['_pmu_','_pe_','_pnu_','_nmu_','_ne_']
+    decays += ['_pmu.','_pe.','_pnu.','_nmu.','_ne.']
 
     labels = {}
     labels['1235'] = r'$B^+B^-$'
@@ -604,3 +607,24 @@ def create_df_plotting_containers(dfs,sps,labels,weights,colors):
 
     #print(list(df_plotting_container.keys()))
     return df_plotting_container
+
+################################################################################
+def get_tags(filename,ftype='workspace'):
+
+    if ftype=='workspace':
+        #PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root
+        a = filename.split('PREDICTIONS_CUT_SUMMARY_')[1].split('_OPPOSITE_KERAS')[0]
+        b = filename.split('MC_TRAINING_WEIGHTED')[1].split('npy.root')[0]
+        tag = f'{a}_MC_TRAINING_WEIGHTED_{b}'
+    elif ftype=='infile':
+        # PREDICTIONS_CUT_SUMMARY_AllEvents-Run1_pnu_SAMPLE_N_3289_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy
+        a = filename.split('PREDICTIONS_CUT_SUMMARY_')[1].split('KERAS')[0]
+        tag = f'{a}'
+
+    return tag
+
+
+
+
+
+

@@ -49,6 +49,7 @@ def main(argv):
         decay = "DEFAULT"
 
     print(tag,label,decay)
+    outdir = f"plots_{decay}"
     #exit()
 
     constraint_multiplier = 0.2
@@ -197,6 +198,11 @@ def main(argv):
 
         #exit()
 
+        c1 = ROOT.TCanvas("c1", "c1", 900, 500);
+        c1.Divide(1, 1);
+        c1.cd(1);
+        ROOT.gPad.SetLeftMargin(0.15);
+
         xframe = x.frame()
 
         genData.plotOn(xframe)
@@ -259,6 +265,7 @@ def main(argv):
 
         xframe.Draw()
         ROOT.gPad.Update()
+        c1.SaveAs(f'{outdir}/mc_study_fit_once_{tag}.png')
         #exit()
 
     else:
