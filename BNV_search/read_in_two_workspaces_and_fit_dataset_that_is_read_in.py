@@ -12,10 +12,12 @@ import plotting_tools as pt
 
 def main(argv):
 
-    constraint_multiplier = 0.6
+    constraint_multiplier = 2.0
     nentries = 30000
     nsiginit = 1000
     ntrials = 20
+    lo_data_range = 0.2
+    hi_data_range = 1.0
 
     # Set up a workspace to store everything
     #workspace_filename = "testworkspace.root"
@@ -32,6 +34,7 @@ def main(argv):
     print(tag,label,decay)
     outdir = f'plots_{decay}'
 
+    # Signal
     workspace_file = ROOT.TFile(workspace_filename)
     workspace_file.Print()
     workspace_file.ls()
@@ -53,6 +56,9 @@ def main(argv):
             # Or
             v.setRange(val-(constraint_multiplier*err),val+(constraint_multiplier*err))
 
+            # Set constant the shape variables for the signal
+            variable_dict[name].setConstant(True)
+
             variables_to_constrain.append(name)
             
             # Make terms for the gaussian constraints
@@ -61,16 +67,18 @@ def main(argv):
             variable_dict[newname].setConstant(True)
 
             newname = f'{name}_err'
-            variable_dict[newname] = ROOT.RooRealVar(newname,newname,err)
+            # Should the signal be constrained much more
+            #variable_dict[newname] = ROOT.RooRealVar(newname,newname,0.001*err)
+            variable_dict[newname] = ROOT.RooRealVar(newname,newname,0.001*err)
             variable_dict[newname].setConstant(True)
 
 
     x = w.var("x");
-    x.setRange(0.2,1.0) # Just for nmu for now
+    x.setRange(lo_data_range , hi_data_range) # Just for nmu for now
     if decay=='pmu':
         x.setRange(5.2,5.3) # Just for nmu for now
     elif decay=='nmu':
-        x.setRange(0.2,1.0) # Just for nmu for now
+        x.setRange(lo_data_range, hi_data_range) # Just for nmu for now
 
     x.setBins(50)
 
@@ -128,7 +136,8 @@ def main(argv):
 
     savefile_tag = f'{infilename_tag}_SIG_{workspace_filename_tag_SIG}_BKG_{workspace_filename_tag_BKG}'
 
-    x = ROOT.RooRealVar("x", "x", 0.2, 1.0)
+    #x = ROOT.RooRealVar("x", "x", 0.2, 1.0)
+    x = ROOT.RooRealVar("x", "x", lo_data_range, hi_data_range)
     if decay=='pmu':
         x = ROOT.RooRealVar("x", "x", 5.2, 5.3)
     x.setBins(50)
@@ -139,98 +148,152 @@ def main(argv):
     data = read_in_ML_output(infilename,x,max_vals=1000000)
     ############################################################################
 
+    for passes in [1,2]:
+        ############################################################################
+        # Try fitting to a reduced range first. 
+        fitrange_name = f"first_pass" 
+        reduced_data = None
+        if passes == 1:
+            x.setRange(fitrange_name,lo_data_range, 0.4)
+            reduced_data = data.reduce(ROOT.RooFit.CutRange(fitrange_name))
+        else:
+            x.setRange(fitrange_name,lo_data_range, hi_data_range)
+        ############################################################################
 
-    #exit()
+        #exit()
 
-    # Get the background model
-    model_bkg = w.pdf("model_bkg");
-    nbkg = w.var("nbkg");
+        # Get the background model
+        model_bkg = w.pdf("model_bkg");
+        nbkg = w.var("nbkg");
 
-    nsig.setVal(nsiginit)
-    nsig.setRange(1,nentries)
-    nbkg.setVal(nentries-nsiginit)
-    nbkg.setRange(0,nentries)
+        nsig.setVal(nsiginit)
+        nsig.setRange(1,nentries)
+        if passes==1:
+            nsig.setVal(1)
+            nsig.setConstant(True)
+        else:
+            nsig.setVal(nsiginit)
+            nsig.setRange(1,nentries)
+            nsig.setConstant(False)
 
-    model = ROOT.RooAddPdf("model","n1*a1 + n2*a2",ROOT.RooArgList(model_sig, model_bkg), ROOT.RooArgList(nsig, nbkg))
-    nll = model.createNLL(data);
-    nll.SetName('nll')
-    
-    ####################################################################################################################
-    # From LambdaC analysis
-    # cutoff0_bkg
-    #'''
-    #cutoff0_bkg_nominal = ROOT.RooRealVar("cutoff0_bkg_nominal","cutoff0_bkg_nominal",0.993608)
-    #cutoff0_bkg_nominal.setConstant(True)
-    #cutoff0_bkg_err = ROOT.RooRealVar("cutoff0_bkg_err","cutoff0_bkg_err",0.0054205)
-    #cutoff0_bkg_err.setConstant(True)
 
-    ''' This works
-    log_gc = ROOT.RooFormulaVar("log_gc","(cutoff0_bkg_nominal-cutoff0_bkg)*(cutoff0_bkg_nominal-cutoff0_bkg)/(2.0*cutoff0_bkg_err*cutoff0_bkg_err)", \
-            #ROOT.RooArgList(variable_dict['cutoff0_bkg_nominal'],variable_dict['cutoff0_bkg'],variable_dict['cutoff0_bkg_nominal'],variable_dict['cutoff0_bkg'],variable_dict['cutoff0_bkg_err'],variable_dict['cutoff0_bkg_err']))
-        ROOT.RooArgList(variable_dict['cutoff0_bkg_nominal'],variable_dict['cutoff0_bkg'],variable_dict['cutoff0_bkg_err'])) # Just list the variables once
+        nbkg.setVal(nentries-nsiginit)
+        nbkg.setRange(0,nentries)
+
+        model = ROOT.RooAddPdf("model","n1*a1 + n2*a2",ROOT.RooArgList(model_sig, model_bkg), ROOT.RooArgList(nsig, nbkg))
+        #nll = model.createNLL(data);
+        
+        nll = None
+        if passes == 1:
+            nll = model.createNLL(reduced_data);
+        else:
+            nll = model.createNLL(data);
+        nll.SetName('nll')
+        
+        ####################################################################################################################
+        # From LambdaC analysis
+        # cutoff0_bkg
+        #'''
+        #cutoff0_bkg_nominal = ROOT.RooRealVar("cutoff0_bkg_nominal","cutoff0_bkg_nominal",0.993608)
+        #cutoff0_bkg_nominal.setConstant(True)
+        #cutoff0_bkg_err = ROOT.RooRealVar("cutoff0_bkg_err","cutoff0_bkg_err",0.0054205)
+        #cutoff0_bkg_err.setConstant(True)
+
+        ''' This works
+        log_gc = ROOT.RooFormulaVar("log_gc","(cutoff0_bkg_nominal-cutoff0_bkg)*(cutoff0_bkg_nominal-cutoff0_bkg)/(2.0*cutoff0_bkg_err*cutoff0_bkg_err)", \
+                #ROOT.RooArgList(variable_dict['cutoff0_bkg_nominal'],variable_dict['cutoff0_bkg'],variable_dict['cutoff0_bkg_nominal'],variable_dict['cutoff0_bkg'],variable_dict['cutoff0_bkg_err'],variable_dict['cutoff0_bkg_err']))
+            ROOT.RooArgList(variable_dict['cutoff0_bkg_nominal'],variable_dict['cutoff0_bkg'],variable_dict['cutoff0_bkg_err'])) # Just list the variables once
+        '''
+        #exit()
+
+        #'''
+        gc_funcs = {}
+        for name in variables_to_constrain:
+            nom_name = f'{name}_nominal'
+            err_name = f'{name}_err'
+            eqn_name = f"({nom_name} - {name})*({nom_name} - {name})/(2.0*{err_name}*{err_name})"
+            print(eqn_name)
+            formula_name = f'log_gc_{name}'
+            log_gc = ROOT.RooFormulaVar(formula_name,eqn_name,ROOT.RooArgList( \
+                    variable_dict[nom_name], \
+                    variable_dict[name], \
+                    #variable_dict[nom_name], \
+                    #variable_dict[name], \
+                    #variable_dict[err_name], \
+                    variable_dict[err_name] \
+                    ))
+            gc_funcs[formula_name] = log_gc
+         #'''
+
+        #results = model.fitTo(data,ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.RooCmdArg(SetMaxCalls))
+
+        # Create the NLL for the fit
+        #nll = RooNLLVar("nll","nll",total,reduced_data,RooFit.Extended(kTRUE))
+        # This works
+        #fit_func = ROOT.RooFormulaVar("fit_func","nll + log_gc",ROOT.RooArgList(nll,log_gc))
+
+        func_string = "nll "
+        arglist = ROOT.RooArgList(nll)
+        for name in gc_funcs.keys():
+            func_string += f" + {name}"
+            arglist.add(gc_funcs[name])
+
+        print("hhhhhhhhhhhhhhhhhhh")
+        print(func_string)
+        print()
+
+        fit_func = ROOT.RooFormulaVar("fit_func",func_string,arglist)
+
+
+        #m = ROOT.RooMinuit(fit_func)
+        m = ROOT.RooMinimizer(fit_func)
+        m.setVerbose(ROOT.kFALSE)
+        m.migrad()
+        #m.hesse()
+
+        print("Got to this point!!!!!")
+        print("Print the results -------------------------")
+        results = m.save();
+        results.Print("v")
+        #exit()
+        #'''
+
+        # At the end of the first pass, set some of the variables
+        # based on where the fit wound up.
+        # 
+        # Reset the constraints to be what the first pass wound up at
+        if passes==1:
+            for name in variables_to_constrain:
+                if name.find('bkg'):
+                    val = variable_dict[name].getVal()
+                    err = variable_dict[name].getError()
+                    # Make terms for the gaussian constraints
+                    newname = f'{name}_nominal'
+                    variable_dict[newname].setVal(val)
+                    variable_dict[newname].setConstant(True)
+
+                    newname = f'{name}_err'
+                    variable_dict[newname].setVal(err)
+                    variable_dict[newname].setConstant(True)
+
+
+
+        ####################################################################################################################
+
+
+
     '''
-    #exit()
-
-    #'''
-    gc_funcs = {}
-    for name in variables_to_constrain:
-        nom_name = f'{name}_nominal'
-        err_name = f'{name}_err'
-        eqn_name = f"({nom_name} - {name})*({nom_name} - {name})/(2.0*{err_name}*{err_name})"
-        print(eqn_name)
-        formula_name = f'log_gc_{name}'
-        log_gc = ROOT.RooFormulaVar(formula_name,eqn_name,ROOT.RooArgList( \
-                variable_dict[nom_name], \
-                variable_dict[name], \
-                #variable_dict[nom_name], \
-                #variable_dict[name], \
-                #variable_dict[err_name], \
-                variable_dict[err_name] \
-                ))
-        gc_funcs[formula_name] = log_gc
-     #'''
-
-    #results = model.fitTo(data,ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.RooCmdArg(SetMaxCalls))
-
-    # Create the NLL for the fit
-    #nll = RooNLLVar("nll","nll",total,reduced_data,RooFit.Extended(kTRUE))
-    # This works
-    #fit_func = ROOT.RooFormulaVar("fit_func","nll + log_gc",ROOT.RooArgList(nll,log_gc))
-
-    func_string = "nll "
-    arglist = ROOT.RooArgList(nll)
-    for name in gc_funcs.keys():
-        func_string += f" + {name}"
-        arglist.add(gc_funcs[name])
-
-    print("hhhhhhhhhhhhhhhhhhh")
-    print(func_string)
-    print()
-
-    fit_func = ROOT.RooFormulaVar("fit_func",func_string,arglist)
-
-    #m = ROOT.RooMinuit(fit_func)
-    m = ROOT.RooMinimizer(fit_func)
-    m.setVerbose(ROOT.kFALSE)
-    m.migrad()
-    #m.hesse()
-
-    print("Got to this point!!!!!")
-    exit()
-    #'''
-    ####################################################################################################################
-
-
-
+    # Old way
     m = ROOT.RooMinimizer(nll)
 
     # Activate verbose logging of MINUIT parameter space stepping
     m.setVerbose(ROOT.kTRUE);
     # Call MIGRAD to minimize the likelihood
     m.migrad();
+    '''
     results = m.save();
 
-    exit()
+    #exit()
     
     ############################################################################
     # Plot things
@@ -404,7 +467,11 @@ def main(argv):
 
 
     print(argv)
-    print(argv[4])
+    print()
+    for arg in argv:
+        print(arg)
+        print()
+    #print(argv[4])
     ########################;
     if len(argv)<=4 or argv[4].find('batch')<0:
         rep = ''

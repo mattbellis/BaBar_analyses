@@ -70,8 +70,8 @@ def main(argv):
     # Set up a workspace to store everything
     #workspace_filename = "testworkspacebkg.root"
     #workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{n1}_{n2}.root"
-    binned_tag = "BINNED"
-    #binned_tag = "NOTBINNED"
+    #binned_tag = "BINNED"
+    binned_tag = "NOTBINNED"
     tag = f"{decay}_{usertag}_{binned_tag}_nsig_{nsiginit}_ntrials_{ntrials}_{np.random.randint(1,1000000000):010d}"
     #workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{decay}_{binned_tag}_nsig_{nsiginit}_ntrials_{ntrials}_{np.random.randint(1,1000000000):010d}.root"
     workspace_outfilename = f"workspace_TRIALS_FROM_TWO_WORKSPACES_{tag}.root"
@@ -175,7 +175,7 @@ def main(argv):
         mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Binned(ROOT.kTRUE), ROOT.RooFit.Verbose(ROOT.kTRUE) , ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(1), ROOT.RooFit.Verbose(ROOT.kTRUE)));
     else:
         # Not binned
-        mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Verbose(ROOT.kTRUE) , ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(1), ROOT.RooFit.Verbose(ROOT.kTRUE)));
+        mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x),                                 ROOT.RooFit.Verbose(ROOT.kTRUE) , ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(1), ROOT.RooFit.Verbose(ROOT.kTRUE)));
     #mcstudy = ROOT.RooMCStudy(model, ROOT.RooArgSet(x), ROOT.RooFit.Extended(), ROOT.RooFit.FitOptions(ROOT.RooFit.Save(ROOT.kTRUE), ROOT.RooFit.PrintEvalErrors(0)));
     print("\nInitialized the RooMCStudy object....\n")
 
