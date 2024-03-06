@@ -106,6 +106,8 @@ for icount,infilename in enumerate(infilenames):
     #proton_mask = bd.pid_mask(df,particle='muon')
     #proton_mask = bd.pid_mask(df,particle='electron')
 
+    print(f"decay: {decay}")
+
 	
     #'''
     if decay=='pmu':
@@ -182,9 +184,15 @@ for icount,infilename in enumerate(infilenames):
     #if infilenames[0].find('AllEvents')>=0:
 
     #tag = 'tighterPID_childmomentum_TEST'
-    #tag = 'tighterPID_childmomentum'
-    tag = 'selection_cuts'
+    ########################################
+    # This is what we are using
+    ########################################
+    # Before tightest cuts.
+    tag = 'tighterPID_childmomentum'
+    # The tighest cuts before we fit
+    #tag = 'selection_cuts'
 
+    # For no cuts
     if infilename.find('AllEvents')>=0:
         #print("DATA!!!!!!!!!!!!!!")
         #dftmp = df[pid_mask & bnv_children_momentum_mask & ~blinding_mask ]
@@ -196,12 +204,14 @@ for icount,infilename in enumerate(infilenames):
             elif tag=='selection_cuts':
                 dsc_mask = bd.decay_specific_cuts(df,decay=decay)
                 dftmp = df[dsc_mask & ~blinding_mask ]
+                #dftmp = df[dsc_mask] # JUST TO DUMP OUT
         else:
             if tag=='tighterPID_childmomentum':
                 dftmp = df[pid_mask & bnv_children_momentum_mask & bnv_children_costh_mask]
             elif tag=='selection_cuts':
                 dsc_mask = bd.decay_specific_cuts(df,decay=decay)
-                dftmp = df[dsc_mask & ~blinding_mask ]
+                #dftmp = df[dsc_mask & ~blinding_mask ]
+                dftmp = df[dsc_mask]
     else:
         #if decay=='pmu' or decay=='pe' or decay=='pnu':
         if 1:
@@ -239,6 +249,9 @@ for icount,infilename in enumerate(infilenames):
 #weights = [1.0, 1.0]
 #colors = ['k','g']
 
+#######################################################################################
+# This makes the containers to plot
+#######################################################################################
 df_plotting_container = pt.create_df_plotting_containers(dfs,sps,labels,weights,colors)
 #print(df_plotting_container)
 #exit()
@@ -306,13 +319,17 @@ figsize=(15,3)
 #figsize=(8,3)
 
 # Make all the stacked plots for documentation
-#pt.make_all_plots(df_plotting_container,specific_plots=specific_plots,backend='matplotlib',grid_of_plots=grid_of_plots,xlabelfontsize=10,ignorePID=True,plot_params=plot_params,stacked=True,figsize=figsize, decay=decay, tag=tag)
+pt.make_all_plots(df_plotting_container,specific_plots=specific_plots,backend='matplotlib',grid_of_plots=grid_of_plots,xlabelfontsize=10,ignorePID=True,plot_params=plot_params,stacked=True,figsize=figsize, decay=decay, tag=tag)
 ################################################################################
 
 ################################################################################
 # MES vs DeltaE
+tag = None
 #tag = "SP-9456"
-tag = "MC-bkg"
+#tag = "SP-9457"
+#tag = "MC-bkg"
+if infilename.find('Run1')>=0:
+    tag = "Run1"
 pt.plot_mes_vs_de(dfs,bins=100,ranges=((5.2,5.3),(-0.5,0.5)),decay=decay,labels=labels,sps=sps, tag=tag)#,xlabelfontsize=12,alpha=0.5,color='k', markersize=1, decay=None, tag='default'):
 ################################################################################
 

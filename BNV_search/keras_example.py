@@ -6,6 +6,8 @@ import pandas as pd
 
 import sklearn_tools as sktools
 
+import plotting_tools as pt
+
 from pandas import read_csv
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -204,8 +206,15 @@ print('Predicted: %.3f' % yhat) # 1 = proton, 0 = not proton
 
 model.summary()
 #model.save('keras_model')
+
+# EDIT SO PLOTS ARE SAVED IN COMMON LOCATION
+#t,l,d = pt.get_sptag(infilenames[0])
+#print(d)
+#exit()
+
 tag = '{0}_{1}'.format(infilenames[0].split('.h5')[0],infilenames[1].split('.h5')[0])
 modelfilename = 'KERAS_TRAINING_{0}.h5'.format(tag)
+
 #model.save('TT_keras_model.h5')
 model.save(modelfilename)
 

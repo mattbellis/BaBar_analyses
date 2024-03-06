@@ -129,3 +129,18 @@ def two_argus_plus_expon_in_x(x,tag='default'):
     return pars, twoArgusPlusExp, argus0, argus1, expon
 ################################################################################
 
+################################################################################
+# Crystal Barrel function: (mES)
+################################################################################
+def crystal_barrel_x(x,tag="default"):
+    meanCB = ROOT.RooRealVar("meanCB","Gaussian #mu (CB) m_{ES}", 5.279, 5.27, 5.29)
+    sigmaCB = ROOT.RooRealVar("sigmaCB_"+tag," Gaussian #sigma (CB) m_{ES} "+tag, 0.0028, 0.002, 0.004)
+    alphaCB = ROOT.RooRealVar("alphaCB_"+tag, "#alpha (CB) m_{ES} "+tag, 2.0, 1.5, 3.0)
+    nCB = ROOT.RooRealVar("nCB","n of CB", 1.0, 0.0, 3.0)
+
+    cb =     ROOT.RooCBShape("CB", "Crystal Barrel Shape PDF "+tag, x, meanCB, sigmaCB, alphaCB, nCB)
+
+    pars = [meanCB,  sigmaCB, alphaCB, nCB]
+
+    return pars, cb
+

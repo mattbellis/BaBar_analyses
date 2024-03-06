@@ -59,8 +59,6 @@ for infilename in infilenames:
         bnv_children_momentum_mask = bd.bnv_children_momentum_mask(df,child='neutron') & bd.bnv_children_momentum_mask(df,child='electron')
         bnv_children_costh_mask = bd.bnv_children_costh_mask(df,child='electron')
 
-
-
     #cut1 = len(df[pid_mask0])
     #cut2 = len(df[pid_mask1])
     #cut3 = len(df[pid_mask0 & pid_mask1])
@@ -85,7 +83,7 @@ for infilename in infilenames:
 
     print(cut0,cut1,cut2,cut3,cut4,cut5)
     if cut0>0:
-        print(f"Org: {cut0/cut0:.6f} PID1: {cut1/cut0:.6f} PID_BOTH: {cut2/cut0:.6f} PIDBoth+BNVmom: {cut3/cut0:.6f} PIDBoth+BNVmom+costh: {cut4/cut0:.6f} SELCUTS: {cut5/cut0:.6f}")
+        print(f"Org: {cut0/cut0:.6f}\nPID1: {cut1/cut0:.6f}\nPID_BOTH: {cut2/cut0:.6f}\nPIDBoth+BNVmom: {cut3/cut0:.6f}\nPIDBoth+BNVmom+costh: {cut4/cut0:.6f}\nSELCUTS: {cut5/cut0:.6f}")
 
     #exit()
 
