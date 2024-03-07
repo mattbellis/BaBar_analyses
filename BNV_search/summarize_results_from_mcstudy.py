@@ -124,8 +124,10 @@ plt.ylabel('Fit # of signal events',fontsize=14)
 #plt.ylim(-100,12000)
 #plt.xlim(-50,1200) # pnu
 #plt.ylim(-10,1200)
-plt.xlim(-500,12000)
-plt.ylim(-500,12000)
+#plt.xlim(-500,12000)
+#plt.ylim(-500,12000)
+plt.xlim(-100,1000)
+plt.ylim(-100,1000)
 plt.tight_layout()
 
 plt.savefig(f"plots_{decay}/mcstudy_summaries_{decay}_{sptrain}_00.png")
@@ -158,7 +160,8 @@ plt.plot([lo,hi],[lo,hi],'k--')
 #plt.xlim(-500,12000)
 #plt.ylim(-12000,12000)
 #plt.xlim(-50,1200)   # pnu
-plt.xlim(-500,10000)
+plt.xlim(-100,1000)
+plt.ylim(-100,1000)
 plt.tight_layout()
 plt.savefig(f"plots_{decay}/mcstudy_summaries_{decay}_{sptrain}_01.png")
 
@@ -172,6 +175,7 @@ plt.ylabel('% of toy studies with significant signal',fontsize=14)
 #plt.xlim(-50,1200) # pnu
 #plt.ylim(0)
 plt.xlim(-500,10000)
+plt.ylim(-0.1,1.1)
 plt.tight_layout()
 plt.savefig(f"plots_{decay}/mcstudy_summaries_{decay}_{sptrain}_02.png")
 
