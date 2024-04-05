@@ -187,7 +187,7 @@ if not os.access(submissiondir,os.W_OK):
   print submissiondir + " does not exist!\n"
   print "Will make directory.\n"
   idx = submissiondir.rfind('/')
-  os.mkdir(submissiondir[0:idx], 0744)
+  #os.mkdir(submissiondir[0:idx], 0744)
   os.mkdir(submissiondir, 0744)
 if not os.access(rootfiledir,os.W_OK):
   print rootfiledir + " does not exist!\n"
@@ -248,12 +248,16 @@ os.chdir(dataset)
 os.chdir(tclfile)
 
 # Run the commands to grab the collection information.
-cmd = ['BbkDatasetTcl', '-t', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--basename',  'info-'+dataset]
+#cmd = ['BbkDatasetTcl', '-t', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--basename',  'info-'+dataset]
+# On LTDA
+cmd = ['BbkDatasetTcl', '-t', '-ds', dataset, '--dbname', 'bbkr24', '--basename',  'info-'+dataset]
 subprocess.Popen(cmd,0).wait()
 if options.collection.find("1197")>=0 or options.collection.find("945")>=0:
-	cmd = ['BbkDatasetTcl', '-t', '10k', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--splitruns']
+	#cmd = ['BbkDatasetTcl', '-t', '10k', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--splitruns']
+	cmd = ['BbkDatasetTcl', '-t', '10k', '-ds', dataset, '--dbname', 'bbkr24', '--splitruns']
 else:
-	cmd = ['BbkDatasetTcl', '-t', '100k', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--splitruns']
+	#cmd = ['BbkDatasetTcl', '-t', '100k', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--splitruns']
+	cmd = ['BbkDatasetTcl', '-t', '100k', '-ds', dataset, '--dbname', 'bbkr24', '--splitruns']
 	#cmd = ['BbkDatasetTcl', '-t', '1M', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--splitruns']
 subprocess.Popen(cmd,0).wait()
 
