@@ -64,15 +64,17 @@ path append Everything BtuTupleMaker
 
 talkto myList {
     # muons
-    inputListNames set muCombinedVeryLooseFakeRate
+    #inputListNames set muCombinedVeryLooseFakeRate
     # protons
-    inputListNames set pCombinedSuperLoose
+    #inputListNames set pCombinedSuperLoose
     # electrons
     inputListNames set eCombinedSuperLoose
     # pions
-    inputListNames set piCombinedSuperLoose
+    #inputListNames set piCombinedSuperLoose
     # kaons
-    inputListNames set KCombinedSuperLoose
+    #inputListNames set KCombinedSuperLoose
+    # Conversion photons
+    inputListNames set gammaConversionDefault
 
     #inputList set LambdaCTopKpi
     #outputList set myLambdaCList
@@ -82,60 +84,47 @@ talkto myList {
 talkto BtuTupleMaker {
 
     #eventTagsFloat     set "R2 R2All xPrimaryVtx yPrimaryVtx zPrimaryVtx probPrimaryVtx eePx eePy eePz eeE beamSX beamSY beamSZ"
-    #mcBlockContents set "Mass CMMomentum Momentum Vertex"
+    mcBlockContents set "Mass CMMomentum Momentum Vertex"
 
     eventBlockContents set "EventID CMp4 BeamSpot"
     eventTagsFloat     set "R2 R2All xPrimaryVtx yPrimaryVtx zPrimaryVtx probPrimaryVtx thrustMag thrustMagAll thrustCosTh thrustCosThAll thrustPhi thrustPhiAll sphericityAll"
+    #eventTagsFloat     set "R2 R2All xPrimaryVtx yPrimaryVtx zPrimaryVtx probPrimaryVtx" 
     eventTagsInt       set "nTracks nGoodTrkLoose"
     eventTagsBool      set ""
 
-    fillMC             set false
+    #fillMC             set false
+    fillMC             set true
 
     listToDump         set myList
 
     #mcBlockContents    set "Mass CMMomentum Momentum Vertex"
 
+
     #ntpBlockConfigs  set "gamma  gamma   4   100"
     #ntpBlockConfigs  set "D0   D0      2   100"
 
     #Momentum CMMomentum Doca DocaXY
-
-    #ntpBlockContents set "gamma : Momentum CMMomentum"
-    #ntpBlockContents set "D0 : Mass Momentum CMMomentum Vertex"
-
-    ntpBlockConfigs  set "p+     p       0   100"
-    #ntpBlockContents set "p :  Momentum CMMomentum Doca DocaXY PIDWeight(pLHVeryLoose,pLHLoose,pLHTight,pLHVeryTight)"
-    ntpBlockContents set "p :  MCIdx Momentum CMMomentum"
-
-    ntpBlockConfigs  set "K+     K       0   100"
-    #ntpBlockContents set "K :  MCIdx Momentum CMMomentum Doca DocaXY PIDWeight(KLHVeryLoose,KLHLoose,KLHTight,KLHVeryTight)"
-    ntpBlockContents set "K :  MCIdx Momentum CMMomentum"
-
-    ntpBlockConfigs  set "pi+    pi      0   100"
-    #ntpBlockContents set "Pi : Momentum CMMomentum Doca DocaXY PIDWeight(piLHVeryLoose,piLHLoose,piLHTight,piLHVeryTight)"
-    ntpBlockContents set "pi : MCIdx Momentum CMMomentum"
-
-    ntpBlockConfigs  set "mu-    mu      0   100"
-    #ntpBlockContents set "mu : Momentum CMMomentum Doca DocaXY PIDWeight(muNNVeryLoose,muNNLoose,muNNTight,muNNVeryTight)"
-    ntpBlockContents set "mu : MCIdx Momentum CMMomentum"
-
+    #ntpBlockConfigs  set "p+     p       0   100"
+    #ntpBlockConfigs  set "K+     K       0   100"
+    #ntpBlockConfigs  set "pi+    pi      0   100"
+    #ntpBlockConfigs  set "mu-    mu      0   100"
+    ntpBlockConfigs  set "gamma      gamma         2   90"
     ntpBlockConfigs  set "e-     e       0   100"
-    #ntpBlockContents set "e :  MCIdx Doca DocaXY PIDWeight(eMicroVeryLoose) UsrData(myCandData)"
-    ntpBlockContents set "e :  MCIdx Momentum CMMomentum"
 
-    ntpBlockConfigs set "gamma      gamma         0   90"
-    ntpBlockContents set "gamma     : MCIdx Momentum CMMomentum"
+    #ntpBlockContents set "p :  MCIdx"
+    #ntpBlockContents set "K :  MCIdx"
+    #ntpBlockContents set "pi : MCIdx"
+    #ntpBlockContents set "mu : MCIdx"
+    #ntpBlockContents set "gamma   : Mass Momentum CMMomentum MCIdx Vertex VtxChi2 FlightBS"
+    ntpBlockContents set "gamma   : Mass Momentum CMMomentum MCIdx Vertex VtxChi2"
+    ntpBlockContents set "e :  MCIdx"
 
     ntpBlockContents set "TRK  : MCIdx Momentum CMMomentum"
- 
- 
-    ntpBlockToTrk set "pi K mu e p"
 
-    #gamExtraContents set EMC
-    trkExtraContents set HOTS:detailSVT,detailDCH
+    fillAllCandsInList set "gamma CalorNeutral"
+    ntpBlockToTrk set "e"
+
     trkExtraContents set "BitMap:pSelectorsMap,KSelectorsMap,piSelectorsMap,muSelectorsMap,eSelectorsMap,TracksMap"
-    
-    #fillAllCandsInList set "gamma CalorNeutral"
     
     writeEveryEvent  set f 
     wantATrkBlock set true
