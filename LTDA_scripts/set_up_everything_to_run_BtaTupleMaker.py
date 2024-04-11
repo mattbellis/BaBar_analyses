@@ -25,12 +25,6 @@ parser.add_option("-t", "--tcl-config",  dest="tcl_config", \
                    have a soft link to it created in the workdir.")
 parser.add_option("--mc",  dest="mc", action="store_true", default=False, help="Collection which is being processed is Monte Carlo.")
 parser.add_option("--data",  dest="data", action="store_true", default=False, help="Collection which is being processed is data.")
-"""
-parser.add_option("--tcl-dir",  dest="tcl_dir", \
-                   help="Separate directory where .tcl files for BtaTupleMaker are kept. If this is set, \
-                   a soft link is created to the .tcl file in the workdir. If this is not set, the .tcl file \
-                   is assumed to be in the workdir.")
-"""
 parser.add_option("-l", "--link-directory",  dest="link_directory", \
                    help="For output directories, when they are created, \
                    link them to this directory (e.g. /scratch/myname, /nfs/farm/myAWG/myname/, etc.")
@@ -113,7 +107,9 @@ dirs_to_make.append("testrootfiles")
 
 for dir in dirs_to_make:
   # Check if directory exists and if not...
-  if not os.access( dir, os.W_OK ):
+  print "Should we make %s" % (dir)
+  # Forcing writing the directories in the link directory
+  if 1:#not os.access( dir, os.W_OK ):
     # ....either make in link directory...
     if options.link_directory != None:
       print "%s does not exist! Will make and link this directory\n" % (dir)
@@ -126,6 +122,8 @@ for dir in dirs_to_make:
     else:
       print "%s does not exist! Will make this directory\n" % (dir)
       os.mkdir(dir, 0744)
+
+#exit()
 
 #tcldir = "tcl_collections/" + dataset
 #logdir = "log/" + dataset
@@ -249,8 +247,9 @@ os.chdir(tclfile)
 
 # Run the commands to grab the collection information.
 #cmd = ['BbkDatasetTcl', '-t', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--basename',  'info-'+dataset]
-# On LTDA
 cmd = ['BbkDatasetTcl', '-t', '-ds', dataset, '--dbname', 'bbkr24', '--basename',  'info-'+dataset]
+print(' '.join(cmd))
+#exit()
 subprocess.Popen(cmd,0).wait()
 if options.collection.find("1197")>=0 or options.collection.find("945")>=0:
 	#cmd = ['BbkDatasetTcl', '-t', '10k', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--splitruns']
@@ -259,6 +258,7 @@ else:
 	#cmd = ['BbkDatasetTcl', '-t', '100k', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--splitruns']
 	cmd = ['BbkDatasetTcl', '-t', '100k', '-ds', dataset, '--dbname', 'bbkr24', '--splitruns']
 	#cmd = ['BbkDatasetTcl', '-t', '1M', '-ds', dataset, '--dbname', 'bbkr24', '--dbsite','slac','--splitruns']
+	print(' '.join(cmd))
 subprocess.Popen(cmd,0).wait()
 
 print "\n"
@@ -370,6 +370,7 @@ for i,file in enumerate(list_of_runfiles):
     shellscript = open(filename, "w+")
     shellscript.write("#!/bin/csh\n\n")
     shellscript.write("date\n")
+    shellscript.write("srtpath 24.5.12 Linux26SL6_i386_gcc446\n")
     shellscript.write("mkdir -p " + batchworkdir + "\n")
     shellscript.write("ls -l " + batchworkdir + "\n")
     shellscript.write("which BtaTupleApp\n")
@@ -381,6 +382,7 @@ for i,file in enumerate(list_of_runfiles):
     shellscript.write("ls -ltr " + batchworkdir + "\n")
 
     # Skimming scripts
+    '''
     shellscript.write("bbrroot -l -q -b \'copytree3_modified.C(\"" + batchworkdir + "/" + list_of_rootfiles[i] + "\")\'\n")
     # SP-11975
     #shellscript.write("bbrroot -l -q -b \'copytree3_require_proton.C(\"" + batchworkdir + "/" + list_of_rootfiles[i] + "\")\'\n")
@@ -388,16 +390,18 @@ for i,file in enumerate(list_of_runfiles):
     #shellscript.write("bbrroot -l -q -b \'copytree3_require_muon.C(\"" + batchworkdir + "/" + list_of_rootfiles[i] + "\")\'\n")
     # SP-11977
     #shellscript.write("bbrroot -l -q -b \'copytree3_require_electron.C(\"" + batchworkdir + "/" + list_of_rootfiles[i] + "\")\'\n")
+    '''
 
     shellscript.write("# Copy over the files\n")
-    #shellscript.write("cp -p " + batchworkdir + "/" + list_of_rootfiles[i] + " " + rootfiledir + "/.\n")
-    shellscript.write("cp -p " + batchworkdir + "/" + list_of_rootfiles[i].split(".root")[0] + "_SKIMMED.root " + rootfiledir + "/.\n")
+    # NO SKIM
+    shellscript.write("cp -p " + batchworkdir + "/" + list_of_rootfiles[i] + " " + rootfiledir + "/.\n")
+    #shellscript.write("cp -p " + batchworkdir + "/" + list_of_rootfiles[i].split(".root")[0] + "_SKIMMED.root " + rootfiledir + "/.\n")
     #shellscript.write("cp -p " + batchworkdir + "/*.root " + rootfiledir + "/.\n")
     #shellscript.write("ls -l " + rootfiledir + "/" + list_of_rootfiles[i] + "\n")
     #shellscript.write("ls -l " + rootfiledir + "/*.root" + "\n")
     shellscript.write("# Clean up the files\n")
     #shellscript.write("rm -r " + batchworkdir + "/" + list_of_rootfiles[i].split(".root")[0] + "*.root\n")
-    #shellscript.write("rm -r " + batchworkdir + "/*.root" + "\n")
+    shellscript.write("rm -r " + batchworkdir + "/" + list_of_rootfiles[i] + "\n")
 
     shellscript.close()
     os.chmod(filename, 0744)
@@ -414,7 +418,9 @@ script.write('#!/bin/sh -f\n')
 for file in list_of_shellscripts:
   #output = "bsub -W 06:00 -q long -o " + logdir + "/" + file.split('/')[-1] + ".log" + " " + file + "\n"
   # Need this part to run on LTDA with SL5
-  output = "bsub -W 06:00  -l other=SL5 -o " + logdir + "/" + file.split('/')[-1] + ".log" + " " + file + "\n"
+  #output = "bsub -W 06:00  -l other=SL5 -o " + logdir + "/" + file.split('/')[-1] + ".log" + " " + file + "\n"
+  # FOR RUNNING AT UVIC`
+  output = "bsub -o " + logdir + "/" + file.split('/')[-1] + ".log" + " -j oe " + file + "\n" + "sleep 1" + "\n"
   #output = "bsub -q long -o " + logdir + "/" + file.split('/')[-1] + ".log" + " ../bin/$BFARCH/BtaTupleApp " + file + "\n"
   script.write(output)
 
