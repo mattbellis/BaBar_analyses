@@ -145,11 +145,11 @@ then
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_653139_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-998_nmu_SAMPLE_N_106200_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
-                    $nsig 1000 SP998TRAINED $is_batch # nsig ntrials 
+                    $nsig 100 SP998TRAINED $is_batch # nsig ntrials 
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_653139_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_nmu_SAMPLE_N_266178_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11976_nmu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_nmu.npy.root \
-                    $nsig 1000 SP1005TRAINED $is_batch # nsig ntrials 
+                    $nsig 100 SP1005TRAINED $is_batch # nsig ntrials 
 
         done
 
@@ -299,12 +299,12 @@ then
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11977_ne_SAMPLE_N_481991_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11977_ne_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_ne.npy.root \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_ne_SAMPLE_N_83676_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11977_ne_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_ne.npy.root \
-            $nsig 1000 SP1005TRAINED  $is_batch # nsig ntrials
+            $nsig 100 SP1005TRAINED  $is_batch # nsig ntrials
 
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11977_ne_SAMPLE_N_481991_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11977_ne_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_ne.npy.root \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-998_ne_SAMPLE_N_42427_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11977_ne_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_ne.npy.root  \
-            $nsig 1000 SP998TRAINED  $is_batch # nsig ntrials
+            $nsig 100 SP998TRAINED  $is_batch # nsig ntrials
 
         done
 
@@ -449,12 +449,12 @@ then
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-1005_pnu_SAMPLE_N_4854_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
-            $nsig 10 SP1005TRAINED $is_batch # nsig ntrials
+            $nsig 100 SP1005TRAINED $is_batch # nsig ntrials
 
         python read_in_two_workspaces.py \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_495315_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
             workspace_PREDICTIONS_CUT_SUMMARY_SP-998_pnu_SAMPLE_N_8265_OPPOSITE_KERAS_TRAINING_CUT_SUMMARY_SP-11975_pnu_SAMPLE_N_50000_MC_TRAINING_WEIGHTED_1005_1235_1237_998_pnu.npy.root \
-            $nsig 10 SP998TRAINED $is_batch # nsig ntrials
+            $nsig 100 SP998TRAINED $is_batch # nsig ntrials
 
         done
         # Study MC studies with 
@@ -546,7 +546,7 @@ then
 I 
         for nsig in 0 10 20 30 40 50 60 70 80 90 100 200 300 400 500
         do
-            python read_in_two_workspaces.py workspace_PREDICTIONS_MES_SP-9456_pmu.root workspace_PREDICTIONS_MES_MC-bkg_pmu.root $nsig 1000 TRAINED $is_batch
+            python read_in_two_workspaces.py workspace_PREDICTIONS_MES_SP-9456_pmu.root workspace_PREDICTIONS_MES_MC-bkg_pmu.root $nsig 100 TRAINED $is_batch
         done
 
 
