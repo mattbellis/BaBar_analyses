@@ -3,14 +3,14 @@ echo "Data -------------------------------------"
 for tag in "LambdaVeryVeryLoose";
 do
 	tag2=""
-	if [[ $tag == "-LambdaVeryVeryLoose" ]] 
+	if [[ $tag == "LambdaVeryVeryLoose" ]] 
 	then
 		tag2="a2-v03"
 	fi
 
 	for run in $(seq 1 6);
 	do
-		echo "Run ""${run}"
+		echo "Run ""${run}  ${tag}"
 		BbkDatasetTcl --notcl "${tag}-Run$run-OnPeak-R24${tag2}" --dbname bbkr24
 	done
 done
