@@ -1,6 +1,6 @@
 echo "Data -------------------------------------"
-for tag in "" "-LambdaVeryVeryLoose";
-#for tag in "-LambdaVeryVeryLoose";
+#for tag in "AllEvents" "LambdaVeryVeryLoose";
+for tag in "LambdaVeryVeryLoose";
 do
 	tag2=""
 	if [[ $tag == "-LambdaVeryVeryLoose" ]] 
@@ -11,9 +11,11 @@ do
 	for run in $(seq 1 6);
 	do
 		echo "Run ""${run}"
-		BbkDatasetTcl --notcl "AllEvents-Run$run-OnPeak-R24" --dbname bbkr24
+		BbkDatasetTcl --notcl "${tag}-Run$run-OnPeak-R24${tag2}" --dbname bbkr24
 	done
 done
+
+exit
 
 echo "MC -------------------------------------"
 for tag in "" "-LambdaVeryVeryLoose";
