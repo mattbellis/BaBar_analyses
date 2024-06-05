@@ -1,0 +1,21 @@
+# condor_submit TEST_MOOSE.jdl
+
+Universe      = vanilla
+
+request_cpus = 1
+request_disk = 1
+request_memory = 2
+
+Requirements = group_name =?= "babar" && Arch == "Intel"
++IwdFlushNFSCache = False
++PreserveRelativeExecutable = True
+GetEnv = True
+transfer_executable = False
+RunAsOwner = True
+
+executable    = moose_app_shell_script.csh
+arguments     = "JOB_NAME SINGLE_DIGIT LEADING_ZEROS"
+output        = log/JOB_NAME_LEADING_ZEROS.out
+error         = log/JOB_NAME_LEADING_ZEROS.out
+log           = log/JOB_NAME_LEADING_ZEROS.log
+queue 1

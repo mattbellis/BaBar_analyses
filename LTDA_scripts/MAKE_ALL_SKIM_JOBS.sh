@@ -1,13 +1,20 @@
-for run in $(seq 1 6);
+#tag1="LambdaVeryVeryLoose-"
+tag1=""
+
+#tag2="a2-v03"
+tag2=""
+
+#for run in $(seq 1 6);
+for run in $(seq 2 6);
 do
-	for sp in 1235 1237 998 1005 3429 3981 2400;
-	#for sp in 998;
+	#for sp in 1235 1237 998 1005 3429 3981 2400;
+	for sp in 991;
 	do
 	    echo $run $sp
 	    #echo python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-Run${run}-R24 -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
-	    #echo python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-LambdaVeryVeryLoose-Run${run}-R24a2 -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
-	    #python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-LambdaVeryVeryLoose-Run${run}-R24a2 -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
-	    echo python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-LambdaVeryVeryLoose-Run${run}-R24a2-v03 -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
-	    python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-LambdaVeryVeryLoose-Run${run}-R24a2-v03 -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
+	    #echo python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-${tag1}Run${run}-R24${tag2} -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
+	    #python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-${tag1}Run${run}-R24${tag2} -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
+	    echo python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-${tag1}Run${run}-R24${tag2} -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
+	    python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-${tag1}Run${run}-R24${tag2} -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
 	done
 done
