@@ -113,7 +113,16 @@ def scaling_value(spmode,plot= False, verbose= False):
 
     return scaling
 
+##########################################################################
 
+def table_from_df(df):
+    output = df.to_latex(index=False,
+                  float_format="{:.4f}".format,
+    )  # converts dataframe into latex readable text
+    full_table = "\\begin{table}\n" # initializes the table before the beginning of the tabular 
+    full_table += "\\caption{This could be the caption}\n" 
+    full_table += output #includes the converted dataframe in the table
+    full_table += "\\end{table}" # ends the table, same purpose as begin{table} 
+    return print(full_table) #make sure to return the print() of the full_table, otherwise it'll be one big string that latex can't handle
 
-
-
+##########################################################################
