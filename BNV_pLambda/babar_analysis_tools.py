@@ -73,8 +73,11 @@ def mask_PID_selection(bits, selector, pid_map_object):
 
 
 ##########################################################################
-def scaling_value(spmode,plot= False, verbose= False):
+def scaling_value(spmode, dataset_information=None, cs_data=None, plot= False, verbose= False):
     mode= spmode 
+
+    if spmode==0 or spmode==-999:
+        return 1 # This is data
     
     mc_mask= (dataset_information["SP mode"]== mode) & (dataset_information["Skim"] != "LambdaVeryVeryLoose")
     # Pulls out all unskimmed MC with desired SP mode
