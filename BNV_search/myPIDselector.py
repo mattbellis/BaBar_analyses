@@ -102,12 +102,12 @@ class PIDselector:
       self.selectors[8] =  "TightGLHPionSelection"
       self.selectors[9] =  "VeryTightGLHPionSelection"
         
-      self.selectors[10] =  "SuperLooseKMPionSelection"
-      self.selectors[11] =  "VeryLooseKMPionSelection"
-      self.selectors[12] =  "LooseKMPionSelectionLooseGLHPionSelection"
-      self.selectors[13] =  "TightKMPionSelection"
-      self.selectors[14] =  "VeryTightKMPionSelection"
-      self.selectors[15] =  "SuperTightKMPionSelection"
+      self.selectors[10] =  "SuperLooseKMPionMicroSelection"
+      self.selectors[11] =  "VeryLooseKMPionMicroSelection"
+      self.selectors[12] =  "LooseKMPionMicroSelection"
+      self.selectors[13] =  "TightKMPionMicroSelection"
+      self.selectors[14] =  "VeryTightKMPionMicroSelection"
+      self.selectors[15] =  "SuperTightKMPionMicroSelection"
       #print(self.selectors)
     elif  self.particle == "e" or self.particle == "electron":
       self.max_bits = 12 
