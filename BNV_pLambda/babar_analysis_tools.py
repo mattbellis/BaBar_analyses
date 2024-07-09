@@ -19,6 +19,11 @@ def calculate_bits_for_PID_selector(trkidx, trk_selector_map, verbose=0):
     
     bits = None
 
+    # If there is no trk index passed in, just calculate the bits for
+    # all of the tracks
+    if trkidx is None:
+        trkidx = ak.local_index(trk_selector_map)
+
     # Grab the tracks that map on to the particle/collection we are interested in 
     subset_of_trk_selector_map = trk_selector_map[trkidx]
     if verbose:
