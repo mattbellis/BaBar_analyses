@@ -9,8 +9,8 @@ for run in $(seq 1 6);
 #for run in $(seq 2 6);
 do
 	    echo $run 
-	    echo python set_up_everything_to_run_BtaTupleMaker.py -c ${tag1}-Run$run-OnPeak-R24${tag2} -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
-	    python set_up_everything_to_run_BtaTupleMaker.py -c ${tag1}-Run$run-OnPeak-R24${tag2} -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
+	    echo python set_up_everything_to_run_BtaTupleMaker.py -c ${tag1}-Run$run-OnPeak-R24${tag2} -t tclfiles/bnv_analysis.tcl --data -l /awg/bellis/bnv_analysis/
+	    python set_up_everything_to_run_BtaTupleMaker.py -c ${tag1}-Run$run-OnPeak-R24${tag2} -t tclfiles/bnv_analysis.tcl --data -l /awg/bellis/bnv_analysis/
 done
 
 exit
