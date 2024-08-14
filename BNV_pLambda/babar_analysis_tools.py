@@ -139,19 +139,186 @@ def table_from_df(df, outfilename):
     return print(full_table) #make sure to return the print() of the full_table, otherwise it'll be one big string that latex can't handle
 
 
+##########################################################################
 
+def indices_to_booleans(indices, array_to_slice):
+    whole_set, in_set = ak.unzip(ak.cartesian([ 
+                                  ak.local_index(array_to_slice), indices ], nested=True))
 
-
-
-
-
-
-
-
-
-
-
-
-
+    return ak.any(whole_set == in_set, axis=-1)
 
 ##########################################################################
+
+def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelection', verbose=0):
+
+    if verbose:
+        print("The MC and tracks for the first entry")
+        idx = ak_arr['TRKMCIdx'][0]
+        mclund = ak_arr['mcLund'][0]
+
+        for i,id in enumerate(idx):
+            print(f"{i:2d}  {id:4d}   {mclund[id]}")
+    print()
+
+    
+    lamd1idx = ak_arr['Lambda0d1Idx']
+    lamd1Lund = ak_arr['Lambda0d1Lund']
+
+    if verbose:
+        print(f'lamd1idx\n{lamd1idx}')
+        print(f'lamd1Lund\n{lamd1Lund}')
+    
+    d2idx = ak_arr['Bd2Idx']
+    d2Lund = ak_arr['Bd2Lund']
+
+    if verbose:
+        print()
+        print(f'B d2idx\n{d2idx}')
+        print(f'B d2Lund\n{d2Lund}')
+        print()
+
+    qBd2 = (ak_arr['Bd2Lund'])/np.abs(ak_arr['Bd2Lund'])
+    qBd2 = qBd2[:,0]
+
+    qlamd1 = (ak_arr['Lambda0d1Lund'])/np.abs(ak_arr['Lambda0d1Lund'])
+    qlamd1 = qlamd1[:,0]
+
+    if verbose:
+        print("Proton charges ----------------")
+        print(f"qBd2\n{qBd2}\n")
+        print(f"qlamd1\n{qlamd1}\n")
+        print("Proton charges ----------------\n\n")
+
+    qtrk = (ak_arr['TRKLund'])/np.abs(ak_arr['TRKLund'])
+
+    if verbose:
+        print("Track charges ----------------")
+        print(f"qtrk\n{qtrk}\n")
+        print("Track charges ----------------\n\n")
+    
+    
+    trkidx_proton = ak_arr['pTrkIdx']
+
+    if verbose:
+        print(f"# of protons: {ak_arr['np']}")
+        print(f"trkidx_proton (the track index for labeled protons) \n{trkidx_proton}")
+        print()
+    
+    lamd1_trkidx = trkidx_proton[lamd1idx]
+    d2_trkidx = trkidx_proton[d2idx]
+
+    if verbose:
+        print(f"lamd1_trkidx\n{lamd1_trkidx}\n")    
+        print(f"B d2_trkidx\n{d2_trkidx}\n")
+    
+
+    trk_selector_map = ak_arr['pSelectorsMap']
+    
+    if verbose:
+        print(f"qtrk\n{qtrk}\n")
+        print(f"proton trk_selector_map\n{trk_selector_map}\n")
+        print(f"pion   trk_selector_map\n{ak_arr['piSelectorsMap']}\n")
+        print(f"kaon   trk_selector_map\n{ak_arr['KSelectorsMap']}\n")
+
+    lamproton_selector_map = trk_selector_map[lamd1_trkidx]
+
+    if verbose:
+        print(lamproton_selector_map)
+        print()
+    
+    bool_idx1 = indices_to_booleans(lamd1_trkidx, trk_selector_map)
+    bool_idx2 = indices_to_booleans(d2_trkidx, trk_selector_map)
+
+    if verbose:
+        print(f"proton track selectors for the index of the proton from the lambda (and not that)")
+        print(f"The boolean mask bool_idx1\n{bool_idx1}")
+        print(trk_selector_map[bool_idx1])
+        print(trk_selector_map[~bool_idx1])
+        print()
+
+        print(f"proton track selectors for the index of the proton from the B (and not that)")
+        print(f"The boolean mask bool_idx1\n{bool_idx2}")
+        print(trk_selector_map[bool_idx2])
+        print(trk_selector_map[~bool_idx2])
+        print()
+        
+    
+        # Both protons
+        print(f"Boolean for both protons (or) \n{(bool_idx1 | bool_idx2)}")
+        print(f"trk selectors for both protons (or) \n{trk_selector_map[bool_idx1 | bool_idx2]}")
+        print(f"trk selectors for other protons     \n{trk_selector_map[~(bool_idx1 | bool_idx2)]}")
+        print()
+    
+    
+    
+    pbits = bat.calculate_bits_for_PID_selector(None, trk_selector_map)
+
+    if verbose:
+        print(f"The pbits -----------------")
+        print(f'All the pbits\n{pbits}')
+        print(f"bool for protons from Lambda\n{bool_idx1}")
+        print(f'pbits for protons from Lambda     pbits[bool_idx1]\n{pbits[bool_idx1]}')
+        print(f'pbits for protons not from Lambda pbits[~bool_idx1]\n{pbits[~bool_idx1]}')
+        print()
+
+        print(f"bool for protons from B\n{bool_idx2}")
+        print(f'pbits for protons from B     pbits[bool_idx2]\n{pbits[bool_idx2]}')
+        print(f'pbits for protons not from B pbits[~bool_idx2]\n{pbits[~bool_idx2]}')
+        print()
+
+        
+    mask_bool = bat.mask_PID_selection(pbits, selector, pps)
+
+    if verbose:
+        print(f"mask_bool, (mask_PID_selection) the tracks that pass {selector}")
+        print(mask_bool)
+        print(pbits[mask_bool])
+        print(pbits[~mask_bool])
+        print()
+        
+        print(f"pbits that are not the final state lambda but are protons")
+        print(pbits[~bool_idx1 & mask_bool])
+        print()
+        
+        print(f"TRKcharge that are not the final state lambda but are protons")
+        print(qtrk[~bool_idx1 & mask_bool])
+        print()
+    
+    charge_test_idx1 = qtrk[~bool_idx1 & mask_bool] == -qlamd1
+    charge_test_idx2 = qtrk[~bool_idx2 & mask_bool] == -qBd2
+
+    if verbose:
+        print(f"charge test idx1\n{charge_test_idx1}")
+        print(f"charge test idx2\n{charge_test_idx2}")
+    
+
+    # This is True if there is an antiproton in the other final state particles
+    # This is likely (I think) with background and less likely with signal
+    charge_test = qtrk[~(bool_idx1 | bool_idx2) & mask_bool] == -qlamd1
+
+    if verbose:
+        print(f"charge test both: is neither Lam/B dau, passes selectors, opposite charge\n{charge_test}")
+
+    print("\nCounting..............")
+    print(f'{charge_test[charge_test] = }')
+    print(f'{ak.num(charge_test[charge_test]) = }')
+    print(f'{ak.sum(ak.num(charge_test[charge_test])) = }')
+    print()
+    
+    #nhave_opposite = ak.sum(ak.num(charge_test[charge_test]))
+    #n = ak.num(charge_test, axis=0)
+    
+    have_opp = ak.num(charge_test[charge_test])
+    
+    nhave_opp = len(have_opp[have_opp>0])
+
+    ndont_have_opp = len(have_opp[have_opp==0])
+
+    n = len(ak_arr)
+
+    print(f"# of events:                                  {n}")
+    print(f"# of events that don't have opposite protons: {ndont_have_opp}")
+    print(f"# of events that       have opposite protons: {nhave_opp}")
+
+    return charge_test
+
