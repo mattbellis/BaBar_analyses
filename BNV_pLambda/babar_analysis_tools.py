@@ -322,3 +322,178 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
 
     return charge_test
 
+################################################################################
+def create_empty_histograms(hist_defs): 
+    ### Creates empty Hist object histograms based on the information in the dictionary above
+    ### Then overwrites the information in the dictionary to be the hist object. All_hists goes from containing unconnected
+    ### info about each variable to a single object containing all the same info 
+    
+    all_hists={}
+    for var in hist_defs.keys():
+        h = Hist.new.Reg(hist_defs[var]["nbins"], hist_defs[var]["lo"], hist_defs[var]["hi"], name='var', label=f"{hist_defs[var]['label']}") \
+                 .StrCat([], name="SP", label="SP modes", growth=True)\
+                 .StrCat([], name="cuts", label="Cuts", growth=True)\
+                 .Weight()
+    
+        all_hists[var] = h
+
+    return all_hists
+
+
+
+################################################################################
+def fill_histograms_v2(ak_arr, empty_hists, spmodes=['998'], weights=[1.0]):
+    ### Takes the dictionary of objects we made before and fills them 
+    ### with the correct information, based on SP mode and Cut. 
+    ### Each cut pares down the background and hopefully makes the signal more apparent
+
+    # Save the result of the cuts in a dataframe
+    df_dict = {}
+    df_dict['var'] = []
+    df_dict['cut'] = []
+    df_dict['spmode'] = []
+    df_dict['n'] = []
+
+    for key in empty_hists.keys(): 
+        print(key)
+
+        for spmode in spmodes:
+            #print(spmode)
+            weight = 1
+            if spmode=='-999':
+                weight = .005
+            else:
+                weight = weights[spmode]
+
+            all_cuts = {}
+            mask_sp= (ak_arr.spmode== spmode)            
+            mask_fl0 = (ak_arr['Lambda0FlightLen']>=0)
+            mask_fl1 = (ak_arr['Lambda0FlightLen']>=1)
+            mask_ntrk = (ak_arr['nTRK'] > 4)
+
+            # Blinding
+            mes = ak_arr['BpostFitMes']
+            de  = ak_arr['BpostFitDeltaE']           
+            # Stuff
+            blinding_mask =   (mes>5.27) & ((de>-.07) & (de<.07)) 
+            fitarea_mask   =  (mes>5.2) & ((de>-.2) & (de<.2)) 
+
+            #var_mask = mask_fl & ~blinding_mask & fitarea_mask
+
+            all_cuts['0'] = {'mask_ev':mask_sp, 'mask_part':mask_fl0}
+            all_cuts['1'] = {'mask_ev':mask_sp & mask_ntrk, 'mask_part':mask_fl0}
+            all_cuts['2'] = {'mask_ev':mask_sp & mask_ntrk, 'mask_part':mask_fl1}
+            all_cuts['3'] = {'mask_ev':mask_sp & mask_ntrk, 'mask_part':mask_fl1 & ~blinding_mask & fitarea_mask}
+            all_cuts['4'] = {'mask_ev':mask_sp & mask_ntrk, 'mask_part':mask_fl1 & fitarea_mask}
+
+            for cutname,cutmasks in all_cuts.items():
+
+                #print(f"cutname: {cutname}")
+
+                mask_ev =   cutmasks['mask_ev']
+                mask_part = cutmasks['mask_part']
+
+                n = -1
+                # Apply the cuts and fill the histograms
+                if key[0]=='B' or key.find('Lambda0')==0:
+                    x = ak.flatten(ak_arr[mask_ev][key][mask_part[mask_ev]])
+                else:
+                    x = ak_arr[mask_ev][key]
+
+                n = len(x)
+                empty_hists[key].fill(var=x, SP= spmode, cuts= f"{cutname}", weight= weight)
+
+                # Fill the dataframe dictionary
+                df_dict['var'].append(key)
+                df_dict['cut'].append(cutname)
+                df_dict['spmode'].append(spmode)
+                df_dict['n'].append(n)
+
+    df = pd.DataFrame.from_dict(df_dict)
+    
+    return df
+
+def plot_histograms(all_hists, vars=[], bkg_spmodes=['998'], datamodes=['0'], sig_spmodes=['-999'], cut='0', save= True, overlay_data=True, only_stacked=False, fixed_grid=None):
+    
+    ### makes a directory (if it doesn't already exist) for these plots.
+    ### plots will be saved to this dictionary if save= true
+    current_dir= os.getcwd()
+    directory = "BNV_pLambda_plots"
+    path= os.path.join(current_dir,directory)
+    if os.path.isdir(path)== False:
+        os.mkdir(path)
+    
+    if len(vars) == 0:
+        vars = list(all_hists.keys())
+
+    ### color scheme dictionary
+    cd= {}
+    cd["998"]=  {"tab:blue"}
+    cd["1005"]= {"tab:orange"}
+    cd["-999"]= {"tab:brown"}
+    cd["1235"]= {"tab:green"}
+    cd["1237"]= {"tab:red"}
+    cd["3981"]= {"tab:purple"}
+    cd["3429"]= {"tab:pink"}
+    cd["0"]= {"tab:cyan"}
+
+    print(bkg_spmodes)
+
+    if only_stacked and fixed_grid:
+        width = fixed_grid[0] * 5
+        height = fixed_grid[1] * 3
+        plt.figure(figsize=(width,height))           
+
+    
+    for axes_idx,var in enumerate(vars):
+        
+        h = all_hists[var]
+                
+        if only_stacked and not fixed_grid:   # if you only want the stacked sp and not the breakdown for individual modes 
+            plt.figure(figsize=(5,3))
+        elif only_stacked and fixed_grid:     # fixed grid is a grid of subplots 
+            plt.subplot(fixed_grid[0], fixed_grid[1], axes_idx+1)
+        else:
+            plt.figure(figsize=(18,12))
+            plt.subplot(3,3,1)
+            
+        h[:,bkg_spmodes,cut].stack('SP')[:].project('var').plot(stack=True, histtype="fill")
+        h[:,sig_spmodes,cut].project('var').plot(histtype="step", color='yellow', label= "signal")
+
+        if overlay_data:
+            h[:,datamodes,cut].project('var').plot(histtype="errorbar", color='black', label='Data')
+
+        plt.legend()
+        plt.xlabel(plt.gca().get_xlabel(), fontsize=18)
+
+
+        # If we are only plotting the stacked histograms, then we can skip over plotting them individually
+        if not only_stacked:
+            
+            # Plot all the others 
+            all_modes = bkg_spmodes + sig_spmodes + datamodes
+            
+            for idx,spmode in enumerate(all_modes):
+                plt.subplot(3,3,idx+2)
+                h[:,spmode,cut].project('var').plot(histtype="fill", label=spmode, color= cd[str(spmode)])
+                plt.legend()
+                plt.xlabel(plt.gca().get_xlabel(), fontsize=18)
+
+        plt.tight_layout()
+        
+        if save== True:
+            
+            outfilename=f"plot_hist_cut{cut}_{var}.png" 
+            if only_stacked and not fixed_grid:
+                outfilename=f"plot_hist_cut{cut}_ONLY_STACKED_{var}.png" 
+                
+            plt.savefig(f"{path}/{outfilename}")
+
+    if save== True and fixed_grid and only_stacked:
+        # name of .png saved to computer based on fields specified on function call 
+        varnames = "_".join(vars)
+        outfilename=f"plot_hist_cut{cut}_ONLY_STACKED_FIXED_GRID_{varnames}.png" 
+            
+        plt.savefig(f"{path}/{outfilename}")
+
+
