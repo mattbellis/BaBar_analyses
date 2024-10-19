@@ -1,6 +1,8 @@
 import uproot
 import awkward as ak
 
+import pandas as pd
+
 import matplotlib.pylab as plt
 import numpy as np
 
@@ -13,6 +15,73 @@ import myPIDselector
 
 import math
 
+import os
+
+################################################################################
+def read_in_dataset_statistics(infilename='dataset_statistics.csv'):
+    df = pd.read_csv(infilename)
+
+    return df
+################################################################################
+
+################################################################################
+def get_SP_cross_sections_and_labels(infilename='SP_cross_sections_and_labels.csv'):
+    df = pd.read_csv(infilename)
+
+    return df
+################################################################################
+
+################################################################################
+def create_table_of_data_skims_statistics():
+    df = read_in_dataset_statistics()
+    
+    dfspinfo = get_SP_cross_sections_and_labels()
+
+    mask = dfspinfo['SP Mode']==1235
+    bbbar_xsec = dfspinfo[mask]['Cross section [nb]'].values[0]
+
+    mask = dfspinfo['SP Mode']==1237
+    bbbar_xsec += dfspinfo[mask]['Cross section [nb]'].values[0]
+
+    print(f"The total BBbar cross section is {bbbar_xsec} nb")
+
+    mask = df['Data or MC']=='Data'
+    #df[mask]
+
+    mask = (df['Data or MC']=='Data') & (df['Skim']=='LambdaVeryVeryLoose')
+    dftmp = df[mask][['Run', 'Luminosity (Data only) 1/pb','# of events (Data or MC)', '# of events (Data or MC) NOT SURE WHICH NUMBER TO USE']]
+
+    dftmp['# of BBbar pairs'] = dftmp['Luminosity (Data only) 1/pb']*bbbar_xsec*1000
+
+    dftmp['Run'] = dftmp['Run'].astype(int).astype(str)
+    dftmp.loc['Total'] = dftmp.sum(numeric_only=True)
+
+    dftmp.at['Total','Run'] = 'Total'
+
+    header = []
+    header.append('Run')
+    header.append('Luminosity (1/pb)')
+    header.append('\# skimmed events')
+    header.append('\# org. events')
+    header.append('\# BB pairs')
+
+    caption = "Details of the numbers of events and luminosity from the {\\tt LambdaVeryVeryLoose} skim used in this analysis."
+    label = 'tab:dataskims'
+
+    df.style.to_latex(position_float='centering')
+
+    output = dftmp.to_latex(index=False, header=header, float_format="%.1f", caption=caption, label=label)
+
+    # Add in centering by replacing the first EOL with "EOL + \centering + EOL"
+    output = output.replace('\n','\n\centering\n', 1)
+
+    # Add an hline learn the bottom above the total
+    output = output.replace('Total','\hline\nTotal', 1)
+
+    return output
+
+
+################################################################################
 
 ###################################################################################
 def calculate_bits_for_PID_selector(trkidx, trk_selector_map, verbose=0):
