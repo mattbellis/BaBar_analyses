@@ -564,5 +564,31 @@ def plot_histograms(all_hists, vars=[], bkg_spmodes=['998'], datamodes=['0'], si
         outfilename=f"plot_hist_cut{cut}_ONLY_STACKED_FIXED_GRID_{varnames}.png" 
             
         plt.savefig(f"{path}/{outfilename}")
+################################################################################
+
+################################################################################
+def get_signal_mask(data, region_definitions):
+    mes= data["BpostFitMes"]
+    de= data["BpostFitDeltaE"]
+    signal_mask = (mes > region_definitions["signal MES"][0]) & ((de>region_definitions["signal DeltaE"][0]) & (de<region_definitions["signal DeltaE"][1])) 
+    #fitarea_mask   =  (mes>5.2) & ((de>-.2) & (de<.2))
+    return signal_mask 
+
+################################################################################
+
+################################################################################
+def get_fit_mask(data, region_definitions):
+    mes= data["BpostFitMes"]
+    de= data["BpostFitDeltaE"]
+    fit_mask = (mes > region_definitions["fitting MES"][0]) & ((de>region_definitions["fitting DeltaE"][0]) & (de<region_definitions["fitting DeltaE"][1])) 
+    return fit_mask 
+
+################################################################################
+
+################################################################################
+
+
+
+
 
 
