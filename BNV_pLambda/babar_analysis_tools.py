@@ -584,10 +584,44 @@ def get_fit_mask(data, region_definitions):
     return fit_mask 
 
 ################################################################################
+################################################################################
+def get_flight_len_mask(data, region_definitions, flightlenvar='Lambda0FlightLen'):
+    
+    cutvariable = data[flightlenvar]
+
+    mask_fl = cutvariable>region_definitions['Lambda0 flightlen']
+
+    lo = region_definitions['Lambda0 mass'][0]
+    hi = region_definitions['Lambda0 mass'][1]
+
+    m = data['Lambda0_unc_Mass']
+    mask = (m>lo) & (m<hi) & mask_fl
+
+    return mask
 
 ################################################################################
 
 
+################################################################################
+def get_duplicates_mask(data):
+
+    fl = data['Lambda0FlightLen']
+
+    # Cuts out duplicates
+    mask_fl = fl>=0
+
+    # Keep events with only 1 B candidate
+    nB = ak.num(data['BMass'][mask_fl])
+    
+    mask = nB==1
+
+    return mask, mask_fl
+
+    
+
+
+
+################################################################################
 
 
 
