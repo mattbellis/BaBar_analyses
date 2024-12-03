@@ -617,12 +617,117 @@ def get_duplicates_mask(data):
 
     return mask, mask_fl
 
-    
-
-
-
 ################################################################################
 
+def PID_masks(data, \
+              lamp_selector='VeryLooseKMProtonSelection', \
+              lampi_selector='SuperLooseKMPionMicroSelection', \
+              Bp_selector='VeryLooseKMProtonSelection', \
+             verbosity=0):
+    # Get these maps first
+    pps = myPIDselector.PIDselector("p")
+    pips = myPIDselector.PIDselector("pi")
+
+    if verbosity:
+        print("Names of selectors:\npions")
+        print(pips.selectors)
+        print("\nprotons\n")
+        print(pps.selectors) 
+
+    # Proton and pion information from the Lambda decay
+    # These are the index of the proton (d1) and pion (d2) in those lists
+    d1idx = data['Lambda0d1Idx']
+    d2idx = data['Lambda0d2Idx']
+    
+    d1lund = data['Lambda0d1Lund']
+    d2lund = data['Lambda0d2Lund']
+    
+    Bd2idx = data['Bd2Idx']
+    Bd2lund = data['Bd2Lund']
+
+    if verbosity==1:
+        print(d1lund)
+        print(d2lund)
+        print(Bd2lund)
+        print()
+        
+        print(d1idx)
+        print(d2idx)
+        print(Bd2idx)
+        print()
+    
+    trkidx_proton = data['pTrkIdx']
+    trk_selector_map_proton = data['pSelectorsMap']
+    
+    trkidx_pion = data['piTrkIdx']
+    trk_selector_map_pion = data['piSelectorsMap']
+    
+    # Proton
+    pbits = calculate_bits_for_PID_selector(trkidx_proton, trk_selector_map_proton, verbose=verbosity)
+    # Pion
+    pibits = calculate_bits_for_PID_selector(trkidx_pion, trk_selector_map_pion, verbose=verbosity)
+    
+    
+    #selector_proton = 'TightKMProtonSelection'
+    #selector_pion = 'TightKMPionMicroSelection'
+    #print(f"Now trying to create a mask with {selector_proton}")
+    #print(f"Now trying to create a mask with {selector_pion}")
+    
+    
+    mask_bool_proton = mask_PID_selection(pbits[d1idx], lamp_selector, pps)
+    mask_bool_protonB = mask_PID_selection(pbits[Bd2idx], Bp_selector, pps)
+        
+    mask_bool_pion = mask_PID_selection(pibits[d2idx], lampi_selector, pips)
+
+    return mask_bool_proton, mask_bool_pion, mask_bool_protonB
+
+
+##########################################################################
 
 
 
+
+##########################################################################
+def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_definitions=None, ax=None):
+
+    #plt.gca()
+    print("Here")
+    h= Hist(
+    hist.axis.Regular(100,region_definitions['fitting MES'][0],region_definitions['fitting MES'][1],name= "sig_BPFM", label= "M$_{ES}$ [GeV/c$^2$]", flow= True),
+    hist.axis.Regular(100,-.5,.5,name= "bkg_BPFMDE", label= "$\Delta$E [GeV]", flow= True),
+    )
+
+    # normal fill
+    h.fill(mes, DeltaE)
+
+    h.plot2d_full(
+        main_cmap="coolwarm",
+        top_ls="--",
+        top_color="orange",
+        top_lw=2,
+        side_ls=":",
+        side_lw=2,
+        side_color="steelblue",
+    )
+
+    #plt.xlim(5.1,5.3)
+    #plt.ylim(-.5,.5)
+    #plt.show()
+
+
+    if draw_signal_region==True:
+        plt.plot([5.2002,5.2002,5.3,5.3,5.2],[-0.2,0.2,0.2,-0.2,-0.2], "w-", linewidth= 4, ax=ax)
+        plt.plot([5.27,5.27,5.3,5.3,5.27],[-0.07,0.07,0.07,-0.07,-0.07], "k--", linewidth= 4, ax=ax)
+
+
+    plt.xlabel(plt.gca().get_xlabel(), fontsize=18)
+    plt.ylabel(plt.gca().get_ylabel(), fontsize=18)
+    #plt.tight_layout()
+
+    if tag is not None:
+        plt.savefig(f'BNV_pLambda_plots/plot_{tag}_bkg_de_vs_mes.png')
+
+
+
+
+##########################################################################
