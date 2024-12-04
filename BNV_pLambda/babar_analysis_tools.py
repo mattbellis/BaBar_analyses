@@ -320,7 +320,7 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
     
     
     
-    pbits = bat.calculate_bits_for_PID_selector(None, trk_selector_map)
+    pbits = calculate_bits_for_PID_selector(None, trk_selector_map)
 
     if verbose:
         print(f"The pbits -----------------")
@@ -336,7 +336,7 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
         print()
 
         
-    mask_bool = bat.mask_PID_selection(pbits, selector, pps)
+    mask_bool = mask_PID_selection(pbits, selector, pps)
 
     if verbose:
         print(f"mask_bool, (mask_PID_selection) the tracks that pass {selector}")
@@ -688,20 +688,22 @@ def PID_masks(data, \
 
 
 ##########################################################################
-def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_definitions=None, ax=None):
+def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_definitions=None, bins=100):
 
-    #plt.gca()
-    print("Here")
+    meslo = region_definitions['fitting MES'][0]
+    meshi = region_definitions['fitting MES'][1]
+
     h= Hist(
-    hist.axis.Regular(100,region_definitions['fitting MES'][0],region_definitions['fitting MES'][1],name= "sig_BPFM", label= "M$_{ES}$ [GeV/c$^2$]", flow= True),
-    hist.axis.Regular(100,-.5,.5,name= "bkg_BPFMDE", label= "$\Delta$E [GeV]", flow= True),
+    hist.axis.Regular(bins,meslo,meshi,name= "sig_BPFM", label= "M$_{ES}$ [GeV/c$^2$]", flow= True),
+    hist.axis.Regular(bins,-.5,.5,name= "bkg_BPFMDE", label= "$\Delta$E [GeV]", flow= True),
     )
 
     # normal fill
     h.fill(mes, DeltaE)
 
     h.plot2d_full(
-        main_cmap="coolwarm",
+            #main_cmap="coolwarm",
+        main_cmap="plasma",
         top_ls="--",
         top_color="orange",
         top_lw=2,
@@ -715,18 +717,18 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_d
     #plt.show()
 
 
+    #'''
     if draw_signal_region==True:
-        plt.plot([5.2002,5.2002,5.3,5.3,5.2],[-0.2,0.2,0.2,-0.2,-0.2], "w-", linewidth= 4, ax=ax)
-        plt.plot([5.27,5.27,5.3,5.3,5.27],[-0.07,0.07,0.07,-0.07,-0.07], "k--", linewidth= 4, ax=ax)
-
+        plt.plot([5.2002,5.2002,5.3,5.3,5.2],[-0.2,0.2,0.2,-0.2,-0.2], "w-", linewidth= 4)
+        plt.plot([5.27,5.27,5.3,5.3,5.27],[-0.07,0.07,0.07,-0.07,-0.07], "k--", linewidth= 4)
+    #'''
 
     plt.xlabel(plt.gca().get_xlabel(), fontsize=18)
     plt.ylabel(plt.gca().get_ylabel(), fontsize=18)
-    #plt.tight_layout()
+    plt.tight_layout()
 
     if tag is not None:
         plt.savefig(f'BNV_pLambda_plots/plot_{tag}_bkg_de_vs_mes.png')
-
 
 
 
