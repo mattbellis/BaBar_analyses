@@ -227,7 +227,7 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
 
         for i,id in enumerate(idx):
             print(f"{i:2d}  {id:4d}   {mclund[id]}")
-    print()
+        print()
 
     
     lamd1idx = ak_arr['Lambda0d1Idx']
@@ -368,11 +368,12 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
     if verbose:
         print(f"charge test both: is neither Lam/B dau, passes selectors, opposite charge\n{charge_test}")
 
-    print("\nCounting..............")
-    print(f'{charge_test[charge_test] = }')
-    print(f'{ak.num(charge_test[charge_test]) = }')
-    print(f'{ak.sum(ak.num(charge_test[charge_test])) = }')
-    print()
+    if verbose:
+        print("\nCounting..............")
+        print(f'{charge_test[charge_test] = }')
+        print(f'{ak.num(charge_test[charge_test]) = }')
+        print(f'{ak.sum(ak.num(charge_test[charge_test])) = }')
+        print()
     
     #nhave_opposite = ak.sum(ak.num(charge_test[charge_test]))
     #n = ak.num(charge_test, axis=0)
@@ -385,11 +386,15 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
 
     n = len(ak_arr)
 
-    print(f"# of events:                                  {n}")
-    print(f"# of events that don't have opposite protons: {ndont_have_opp}")
-    print(f"# of events that       have opposite protons: {nhave_opp}")
+    if verbose:
+        print(f"# of events:                                  {n}")
+        print(f"# of events that don't have opposite protons: {ndont_have_opp}")
+        print(f"# of events that       have opposite protons: {nhave_opp}")
 
-    return charge_test
+    # Select events that *don't* have opposite protons
+    mask_no_antiprotons = ak.any(charge_test, axis=-1)
+
+    return mask_no_antiprotons, charge_test
 
 ################################################################################
 def create_empty_histograms(hist_defs): 
@@ -720,7 +725,7 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_d
     #'''
     if draw_signal_region==True:
         plt.plot([5.2002,5.2002,5.3,5.3,5.2],[-0.2,0.2,0.2,-0.2,-0.2], "w-", linewidth= 4)
-        plt.plot([5.27,5.27,5.3,5.3,5.27],[-0.07,0.07,0.07,-0.07,-0.07], "k--", linewidth= 4)
+        plt.plot([5.27,5.27,5.29,5.29,5.27],[-0.07,0.07,0.07,-0.07,-0.07], "k--", linewidth= 4)
     #'''
 
     plt.xlabel(plt.gca().get_xlabel(), fontsize=18)
