@@ -218,27 +218,28 @@ def indices_to_booleans(indices, array_to_slice):
 
 ##########################################################################
 
-def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelection', verbose=0):
+def build_antiproton_antimask(data, pps, selector = 'SuperLooseKMProtonSelection', IS_MC=True, verbose=0):
 
     if verbose:
         print("The MC and tracks for the first entry")
-        idx = ak_arr['TRKMCIdx'][0]
-        mclund = ak_arr['mcLund'][0]
+        idx = data['TRKMCIdx'][0]
+        if IS_MC:
+            mclund = data['mcLund'][0]
 
-        for i,id in enumerate(idx):
-            print(f"{i:2d}  {id:4d}   {mclund[id]}")
-        print()
+            for i,id in enumerate(idx):
+                print(f"{i:2d}  {id:4d}   {mclund[id]}")
+            print()
 
     
-    lamd1idx = ak_arr['Lambda0d1Idx']
-    lamd1Lund = ak_arr['Lambda0d1Lund']
+    lamd1idx = data['Lambda0d1Idx']
+    lamd1Lund = data['Lambda0d1Lund']
 
     if verbose:
         print(f'lamd1idx\n{lamd1idx}')
         print(f'lamd1Lund\n{lamd1Lund}')
     
-    d2idx = ak_arr['Bd2Idx']
-    d2Lund = ak_arr['Bd2Lund']
+    d2idx = data['Bd2Idx']
+    d2Lund = data['Bd2Lund']
 
     if verbose:
         print()
@@ -246,10 +247,12 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
         print(f'B d2Lund\n{d2Lund}')
         print()
 
-    qBd2 = (ak_arr['Bd2Lund'])/np.abs(ak_arr['Bd2Lund'])
+    qBd2 = (data['Bd2Lund'])/np.abs(data['Bd2Lund'])
+    print(qBd2)
+    print(qBd2[:,0])
     qBd2 = qBd2[:,0]
 
-    qlamd1 = (ak_arr['Lambda0d1Lund'])/np.abs(ak_arr['Lambda0d1Lund'])
+    qlamd1 = (data['Lambda0d1Lund'])/np.abs(data['Lambda0d1Lund'])
     qlamd1 = qlamd1[:,0]
 
     if verbose:
@@ -258,7 +261,7 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
         print(f"qlamd1\n{qlamd1}\n")
         print("Proton charges ----------------\n\n")
 
-    qtrk = (ak_arr['TRKLund'])/np.abs(ak_arr['TRKLund'])
+    qtrk = (data['TRKLund'])/np.abs(data['TRKLund'])
 
     if verbose:
         print("Track charges ----------------")
@@ -266,10 +269,10 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
         print("Track charges ----------------\n\n")
     
     
-    trkidx_proton = ak_arr['pTrkIdx']
+    trkidx_proton = data['pTrkIdx']
 
     if verbose:
-        print(f"# of protons: {ak_arr['np']}")
+        print(f"# of protons: {data['np']}")
         print(f"trkidx_proton (the track index for labeled protons) \n{trkidx_proton}")
         print()
     
@@ -281,13 +284,13 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
         print(f"B d2_trkidx\n{d2_trkidx}\n")
     
 
-    trk_selector_map = ak_arr['pSelectorsMap']
+    trk_selector_map = data['pSelectorsMap']
     
     if verbose:
         print(f"qtrk\n{qtrk}\n")
         print(f"proton trk_selector_map\n{trk_selector_map}\n")
-        print(f"pion   trk_selector_map\n{ak_arr['piSelectorsMap']}\n")
-        print(f"kaon   trk_selector_map\n{ak_arr['KSelectorsMap']}\n")
+        print(f"pion   trk_selector_map\n{data['piSelectorsMap']}\n")
+        print(f"kaon   trk_selector_map\n{data['KSelectorsMap']}\n")
 
     lamproton_selector_map = trk_selector_map[lamd1_trkidx]
 
@@ -384,7 +387,7 @@ def build_antiproton_antimask(ak_arr, pps, selector = 'SuperLooseKMProtonSelecti
 
     ndont_have_opp = len(have_opp[have_opp==0])
 
-    n = len(ak_arr)
+    n = len(data)
 
     if verbose:
         print(f"# of events:                                  {n}")
