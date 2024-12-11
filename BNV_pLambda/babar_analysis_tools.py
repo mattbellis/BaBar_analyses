@@ -248,8 +248,8 @@ def build_antiproton_antimask(data, pps, selector = 'SuperLooseKMProtonSelection
         print()
 
     qBd2 = (data['Bd2Lund'])/np.abs(data['Bd2Lund'])
-    print(qBd2)
-    print(qBd2[:,0])
+    #print(qBd2)
+    #print(qBd2[:,0])
     qBd2 = qBd2[:,0]
 
     qlamd1 = (data['Lambda0d1Lund'])/np.abs(data['Lambda0d1Lund'])
