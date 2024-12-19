@@ -593,19 +593,29 @@ def get_fit_mask(data, region_definitions):
 
 ################################################################################
 ################################################################################
-def get_flight_len_mask(data, region_definitions, flightlenvar='Lambda0FlightLen'):
+def get_lambda0_mask(data, region_definitions, flightlenvar='Lambda0FlightLen'):
     
+    # Which variable are we using to cut upon
     cutvariable = data[flightlenvar]
 
+    # Get the cut value from our region_definitions file
+    # Cut on the flight length
     mask_fl = cutvariable>region_definitions['Lambda0 flightlen']
 
+    # Cut on the mass
     lo = region_definitions['Lambda0 mass'][0]
     hi = region_definitions['Lambda0 mass'][1]
 
     m = data['Lambda0_unc_Mass']
-    mask = (m>lo) & (m<hi) & mask_fl
+    mask_lambda0 = (m>lo) & (m<hi) & mask_fl
 
-    return mask
+    # We also only want to keep events with one candidate, so let's do that here
+    nlambda0 = ak.num(m[mask_lambda0])
+    print(nlambda0)
+
+    mask_event_nlambda0 = nlambda0==1
+
+    return mask_lambda0, mask_event_nlambda0
 
 ################################################################################
 
