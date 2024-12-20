@@ -706,14 +706,20 @@ def PID_masks(data, \
 
 
 ##########################################################################
-def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_definitions=None, bins=100):
+def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_definitions=None, bins=100, zoom=False):
 
     meslo = region_definitions['fitting MES'][0]
     meshi = region_definitions['fitting MES'][1]
+    DeltaElo = -0.5
+    DeltaEhi =  0.5
+
+    if zoom==True and region_definitions is not None:
+        DeltaElo = region_definitions['fitting DeltaE'][0]
+        DeltaEhi = region_definitions['fitting DeltaE'][1]
 
     h= Hist(
-    hist.axis.Regular(bins,meslo,meshi,name= "sig_BPFM", label= "M$_{ES}$ [GeV/c$^2$]", flow= True),
-    hist.axis.Regular(bins,-.5,.5,name= "bkg_BPFMDE", label= "$\Delta$E [GeV]", flow= True),
+        hist.axis.Regular(bins,meslo,meshi,name= "sig_BPFM", label= "M$_{ES}$ [GeV/c$^2$]", flow= True),
+        hist.axis.Regular(bins,DeltaElo,DeltaEhi,name= "bkg_BPFMDE", label= "$\Delta$E [GeV]", flow= True),
     )
 
     # normal fill
@@ -748,6 +754,19 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_d
     if tag is not None:
         plt.savefig(f'BNV_pLambda_plots/plot_{tag}_bkg_de_vs_mes.png')
 
+    signal_mask = (mes > region_definitions["signal MES"][0]) & ((DeltaE>region_definitions["signal DeltaE"][0]) & (DeltaE<region_definitions["signal DeltaE"][1])) 
+
+    fit_mask = (mes > region_definitions["fitting MES"][0]) & ((DeltaE>region_definitions["fitting DeltaE"][0]) & (DeltaE<region_definitions["fitting DeltaE"][1])) 
+
+    sideband1_mask = (mes > region_definitions["sideband MES"][0]) & ((DeltaE>region_definitions["sideband 1 DeltaE"][0]) & (DeltaE<region_definitions["sideband 1 DeltaE"][1])) 
+    sideband2_mask = (mes > region_definitions["sideband MES"][0]) & ((DeltaE<region_definitions["sideband 2 DeltaE"][0]) & (DeltaE>region_definitions["sideband 2 DeltaE"][1])) 
+
+    nsig = len(mes[signal_mask])
+    nfit = len(mes[fit_mask])
+    nside1 = len(mes[sideband1_mask])
+    nside2 = len(mes[sideband2_mask])
+
+    print(f'signal: {nsig}   fit: {nfit}  s1: {nside1}  s2: {nside2}  ave(s1,s2): {(nside1 + nside2)/2}')
 
 
 ##########################################################################

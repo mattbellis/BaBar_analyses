@@ -24,3 +24,38 @@ region_definitions['Lambda0 mass'] = [lo, hi]
 region_definitions['Lambda0 flightlen'] = 1.00
 
 
+
+# Histogram definitions
+hist_defs = {}
+
+
+### Entries followed by lots of hashtags have outliers
+
+hist_defs['BSphr'] =                           {"nbins":100, "lo":0,     "hi":0.2,   "label":"Sphericity"}
+hist_defs["BpostFitDeltaE"]=                   {"nbins":100, "lo":-1.0,  "hi":1.0,   "label":"$\Delta$ E"}
+hist_defs["BpostFitMes"]=                      {"nbins":100, "lo":5.2,   "hi":5.3,   "label":"$M_{ES}$ [GeV/c$^2$]"}
+hist_defs["BThrust"]=                          {"nbins":100, "lo":0.9,   "hi":1.05,  "label":"B thrust"}
+hist_defs["BCosThetaS"]=                       {"nbins":150, "lo":-1.05, "hi":1.05,  "label":"B Cos Theta S"}
+hist_defs["Lambda0_unc_Mass"]=                 {"nbins":100, "lo":1.105, "hi":1.125, "label":"$\Lambda^0$ mass [GeV/c$^2$]"}
+hist_defs["nTracks"]=                          {"nbins":100, "lo":0,     "hi":18,    "label":"number of tracks"}
+hist_defs["nGoodTrkLoose"]=                    {"nbins":100, "lo":0,     "hi":14,    "label":"number of Good Tracks- Loose"}
+hist_defs["nChargedTracks"]=                   {"nbins":100, "lo":0,     "hi":0.2,   "label":"number of Charged Tracks"}
+hist_defs["R2"]=                               {"nbins":100, "lo":0,     "hi":1.05,  "label":"R2"}
+hist_defs["R2All"]=                            {"nbins":100, "lo":0,     "hi":1,     "label":"R2All"}
+hist_defs["thrustMag"]=                        {"nbins":100, "lo":.6,    "hi":1,     "label":"thrustMag"}
+hist_defs["thrustMagAll"]=                     {"nbins":100, "lo":.6,    "hi":1,     "label":"thrustMagAll"}
+hist_defs["thrustCosTh"]=                      {"nbins":100, "lo":0,     "hi":1,     "label":"thrustCosTh"}
+hist_defs["thrustCosThAll"]=                   {"nbins":100, "lo":0,     "hi":1,     "label":"thrustCosThAll"}
+hist_defs["sphericityAll"]=                    {"nbins":100, "lo":0,     "hi":0.75,  "label":"Sphericity"}
+hist_defs["BCosSphr"]=                         {"nbins":100, "lo":-.8,   "hi":1,     "label":"BCosSphr"}
+hist_defs["BCosThetaT"]=                       {"nbins":100, "lo":-1,    "hi":1,     "label":"BCosThetaT"}
+hist_defs["BCosThrust"]=                       {"nbins":100, "lo":0,     "hi":1,     "label":"BCosThrust"}
+hist_defs["BLegendreP2"]=                      {"nbins":100, "lo":0,     "hi":7,     "label":"BLegendreP2"}#################
+hist_defs["BR2ROE"]=                           {"nbins":100, "lo":0,     "hi":1,     "label":"BR2ROE"}
+hist_defs["BSphrROE"]=                         {"nbins":100, "lo":0,     "hi":1,     "label":"BSphrROE"}
+hist_defs["BThrustROE"]=                       {"nbins":100, "lo":0.5,   "hi":1,     "label":"BThrustROE"}
+hist_defs["Lambda0postFitFlight"]=             {"nbins":100, "lo":-1,    "hi":40,    "label":"Lambda0postFitFlight"} ######################
+hist_defs["Lambda0postFitFlightSignificance"]= {"nbins":100, "lo":-20,   "hi":300,   "label":"Lambda0postFitFlightSignificance"} ##################
+hist_defs["nTRK"]=                             {"nbins":20, "lo":0,      "hi":20,    "label":"# of charged tracks"}
+
+
