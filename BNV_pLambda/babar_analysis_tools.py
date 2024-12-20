@@ -611,7 +611,7 @@ def get_lambda0_mask(data, region_definitions, flightlenvar='Lambda0FlightLen'):
 
     # We also only want to keep events with one candidate, so let's do that here
     nlambda0 = ak.num(m[mask_lambda0])
-    print(nlambda0)
+    #print(nlambda0)
 
     mask_event_nlambda0 = nlambda0==1
 

@@ -21,6 +21,6 @@ hi = lammass_world_average + width
 
 region_definitions['Lambda0 mass'] = [lo, hi]
 # Which variable is this for?
-region_definitions['Lambda0 flightlen'] = 1.25
+region_definitions['Lambda0 flightlen'] = 1.00
 
 
