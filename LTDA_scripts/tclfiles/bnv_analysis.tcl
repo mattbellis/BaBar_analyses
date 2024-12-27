@@ -202,13 +202,28 @@ createsmpmerger BetaMiniPhysicsSequence AllB_pLam {
     # Our dummy baryon-antibaryon composite particles
     ntpBlockConfigs set "B-         B             2   100"
     ntpBlockConfigs set "Lambda0    Lambda0       2   20"
-    ntpBlockConfigs set "p+         p             0   20"
-    ntpBlockConfigs set "pi-        pi            0   30"
 
     ntpBlockContents set "B         : Mass Momentum CMMomentum MCIdx Vertex VtxChi2 UsrData(myB_unc) ShapeVars"
     ntpBlockContents set "Lambda0   : Mass Momentum CMMomentum MCIdx Vertex VtxChi2 UsrData(MyConstL0) Flight FlightBS"
+
+    ntpBlockConfigs set "pi-        pi            0   30"
     ntpBlockContents set "pi        : Momentum CMMomentum MCIdx"
+
+    ntpBlockConfigs set "p+         p             0   20"
     ntpBlockContents set "p         : Momentum CMMomentum MCIdx"
+
+    ntpBlockConfigs set "gamma      gamma         0   90"
+    ntpBlockContents set "gamma     : MCIdx Momentum CMMomentum"
+
+    ntpBlockConfigs  set "K+     K       0   100"
+    ntpBlockContents set "K :  MCIdx Momentum CMMomentum"
+
+    ntpBlockConfigs  set "mu-    mu      0   100"
+    ntpBlockContents set "mu : MCIdx Momentum CMMomentum"
+
+    ntpBlockConfigs  set "e-     e       0   100"
+    ntpBlockContents set "e :  MCIdx Momentum CMMomentum"
+
     ntpBlockContents set "TRK       : Momentum CMMomentum MCIdx"
 
     ntpAuxListContents set "B       : myB_con: _con_ : Mass Momentum CMMomentum Vertex VtxChi2 UsrData(myB_con)"
@@ -219,7 +234,9 @@ createsmpmerger BetaMiniPhysicsSequence AllB_pLam {
 #..Want to save all CalorNeutrals in the gamma block
     gamExtraContents set EMC
 
-    ntpBlockToTrk   set "p pi "
+    #ntpBlockToTrk   set "p pi "
+    ntpBlockToTrk set "pi K mu e p"
+
 
     trkExtraContents set "BitMap:pSelectorsMap,KSelectorsMap,piSelectorsMap,muSelectorsMap,eSelectorsMap,TracksMap"
     trkExtraContents set HOTS:detailSVT
@@ -230,7 +247,7 @@ createsmpmerger BetaMiniPhysicsSequence AllB_pLam {
     # Trying to set this as true for TRK's only?
     ############################################
     checkClones set false
-    checkCloneBlocks set "p pi TRK" 
+    checkCloneBlocks set "p pi Lambda0 TRK" 
 
     show
   }
