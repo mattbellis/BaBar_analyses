@@ -235,6 +235,13 @@ createsmpmerger BetaMiniPhysicsSequence AllB_pLam {
     gamExtraContents set EMC
     fillAllCandsInList set "gamma CalorNeutral"
 
+    ntpBlockConfigs set "pi0   pi0    2 256"
+    ntpBlockContents set "pi0  : Mass VtxChi2 MCIdx CMMomentum"
+    ntpAuxListContents set "pi0 : pi0LooseMass : _unc_ : Mass CMMomentum"
+
+    fillAllCandsInList set "pi0   pi0Loose"
+
+
     #ntpBlockToTrk   set "p pi "
     ntpBlockToTrk set "pi K mu e p"
 
