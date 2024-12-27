@@ -233,6 +233,7 @@ createsmpmerger BetaMiniPhysicsSequence AllB_pLam {
 
 #..Want to save all CalorNeutrals in the gamma block
     gamExtraContents set EMC
+    fillAllCandsInList set "gamma CalorNeutral"
 
     #ntpBlockToTrk   set "p pi "
     ntpBlockToTrk set "pi K mu e p"
