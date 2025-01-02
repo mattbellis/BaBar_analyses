@@ -253,9 +253,14 @@ createsmpmerger BetaMiniPhysicsSequence AllB_pLam {
     # This will give me two different daughter candidates
     # if that's what happens.
     # Trying to set this as true for TRK's only?
+    #
+    # Checking the documentation here
+    # https://babar-wiki.heprc.uvic.ca/bbr_wiki/index.php/Physics_analysis/BtoDtaunu_SLtag/tupleCode/script
     ############################################
+    #checkClones set false
+    #checkCloneBlocks set "p pi Lambda0 TRK" 
     checkClones set false
-    checkCloneBlocks set "p pi Lambda0 TRK" 
+    checkCloneBlocks set "gamma TRK" 
 
     show
   }
