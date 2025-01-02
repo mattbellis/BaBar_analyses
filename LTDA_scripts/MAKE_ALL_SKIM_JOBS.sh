@@ -28,8 +28,8 @@ tag2=""
 #for run in $(seq 1 6);
 for run in $(seq 2 6);
 do
-	#for sp in 1235 1237 998 1005 3429 3981 2400;
-	for sp in 991;
+	for sp in 1235 1237 998 1005 3429 3981 2400 991;
+	#for sp in 991;
 	do
 	    echo $run $sp
 	    #echo python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-Run${run}-R24 -t tclfiles/bnv_analysis.tcl --mc -l /awg/bellis/bnv_analysis/
