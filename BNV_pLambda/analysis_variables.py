@@ -28,9 +28,7 @@ region_definitions['Lambda0 flightlen'] = 1.00
 # Histogram definitions
 hist_defs = {}
 
-
 ### Entries followed by lots of hashtags have outliers
-
 hist_defs['BSphr'] =                           {"nbins":100, "lo":0,     "hi":0.2,   "label":"Sphericity"}
 hist_defs["BpostFitDeltaE"]=                   {"nbins":100, "lo":-1.0,  "hi":1.0,   "label":"$\Delta$ E"}
 hist_defs["BpostFitMes"]=                      {"nbins":100, "lo":5.2,   "hi":5.3,   "label":"$M_{ES}$ [GeV/c$^2$]"}
@@ -58,4 +56,5 @@ hist_defs["Lambda0postFitFlight"]=             {"nbins":100, "lo":-1,    "hi":40
 hist_defs["Lambda0postFitFlightSignificance"]= {"nbins":100, "lo":-20,   "hi":300,   "label":"Lambda0postFitFlightSignificance"} ##################
 hist_defs["nTRK"]=                             {"nbins":20, "lo":0,      "hi":20,    "label":"# of charged tracks"}
 
+hist_defs["BtagSideMes"]=                      {"nbins":100, "lo":4,     "hi":5,     "label":"tag-B $M_{ES}$ [GeV/c$^2$]"}
 

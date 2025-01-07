@@ -218,6 +218,7 @@ def indices_to_booleans(indices, array_to_slice):
 
 ##########################################################################
 
+# Only works when there is one candidate for the B and the Lambda0 right now
 def build_antiproton_antimask(data, pps, selector = 'SuperLooseKMProtonSelection', IS_MC=True, verbose=0):
 
     if verbose:
@@ -250,6 +251,7 @@ def build_antiproton_antimask(data, pps, selector = 'SuperLooseKMProtonSelection
     qBd2 = (data['Bd2Lund'])/np.abs(data['Bd2Lund'])
     #print(qBd2)
     #print(qBd2[:,0])
+    # Assuming we have only one B candidate here
     qBd2 = qBd2[:,0]
 
     qlamd1 = (data['Lambda0d1Lund'])/np.abs(data['Lambda0d1Lund'])
@@ -395,9 +397,10 @@ def build_antiproton_antimask(data, pps, selector = 'SuperLooseKMProtonSelection
         print(f"# of events that       have opposite protons: {nhave_opp}")
 
     # Select events that *don't* have opposite protons
+    # We need the opposite of this when we return it
     mask_no_antiprotons = ak.any(charge_test, axis=-1)
 
-    return mask_no_antiprotons, charge_test
+    return ~mask_no_antiprotons, charge_test
 
 ################################################################################
 def create_empty_histograms(hist_defs): 
@@ -610,13 +613,16 @@ def get_lambda0_mask(data, region_definitions, flightlenvar='Lambda0FlightLen'):
     m = data['Lambda0_unc_Mass']
     mask_lambda0 = (m>lo) & (m<hi) & mask_fl
 
-    # We also only want to keep events with one candidate, so let's do that here
+    # We also only want to keep events with one B candidate and one Lambda0 candidate, 
+    # so let's do that here
     nlambda0 = ak.num(m[mask_lambda0])
+    mB = data['BpostFitMes']
+    nB = ak.num(mB)
     #print(nlambda0)
 
-    mask_event_nlambda0 = nlambda0==1
+    mask_event_nlambda0_and_nB = (nlambda0==1) & (nB==1)
 
-    return mask_lambda0, mask_event_nlambda0
+    return mask_lambda0, mask_event_nlambda0_and_nB
 
 ################################################################################
 
@@ -624,17 +630,13 @@ def get_lambda0_mask(data, region_definitions, flightlenvar='Lambda0FlightLen'):
 ################################################################################
 def get_duplicates_mask(data):
 
-    fl = data['Lambda0FlightLen']
-
-    # Cuts out duplicates
-    mask_fl = fl>=0
-
     # Keep events with only 1 B candidate
-    nB = ak.num(data['BMass'][mask_fl])
+    nB = ak.num(data['BMass'])
+    nlambda0 = ak.num(data['Lambda0_unc_Mass'])
     
-    mask = nB==1
+    mask_event_nlambda0_and_nB = (nlambda0==1) & (nB==1)
 
-    return mask, mask_fl
+    return mask_event_nlambda0_and_nB
 
 ################################################################################
 
@@ -770,4 +772,454 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_d
     print(f'signal: {nsig}   fit: {nfit}  s1: {nside1}  s2: {nside2}  ave(s1,s2): {(nside1 + nside2)/2}')
 
 
+##########################################################################
+##########################################################################
+def spherical_to_cartesian(r, costh, phi):
+
+    #print(p3_spher)
+    #print(costh)
+    theta = np.arccos(costh)
+
+    x = r*np.sin(theta)*np.cos(phi)
+    y = r*np.sin(theta)*np.sin(phi)
+    z = r*np.cos(theta)
+
+    pmag = np.sqrt(x**2 + y**2 + z**2)
+    #print(pmag, r)
+
+    return x,y,z, pmag
+
+##########################################################################
+##########################################################################
+def mass_from_spherical(p4s_spherical):
+
+    etot,px,py,pz = 0,0,0,0
+
+    for p4s_sph in p4s_spherical:
+        #print("Here")
+        #print(p4s_sph, p4s_sph[1:])
+        x,y,z,pmag = spherical_to_cartesian(p4s_sph[1:])
+        mass = p4s_sph[0]
+        e = np.sqrt(mass**2 + pmag**2)
+
+        etot += e
+        px += x
+        py += y
+        pz += z
+
+    #print("p4: ", etot, px, py, pz)
+    m2 = etot**2 - (px**2 + py**2 + pz**2)
+    if m2>=0:
+        return np.sqrt(m2)
+    else:
+        return -np.sqrt(-m2)
+
+
+##########################################################################
+##########################################################################
+def fill_new_entry_with_tag_side_B(data):
+    '''
+    # This is when I was trying to get the B-tag-side mass to have
+    # the same shape as the other event shape variables, which
+    # depend on the B candidate
+    # Create a dummy set of data the size of our primary array
+    x = -999*ak.ones_like(data['BSphr'], dtype=float)
+
+    # We're going to flatten and then unflatten it so that it has the same shape
+    # as the other event-shape variables
+    xvals = ak.flatten(x) # This is when we thought we would have a jagged array
+    n = ak.num(x)
+    idx = ak.local_index(xvals)
+
+    # Calculate the tag side B mass for entries with only one B and one Lambda
+    mask_event_duplicates= get_duplicates_mask(data)
+    m = tag_side_B(data[mask_event_duplicates], verbose=0, reverse_for_testing=False)
+
+    # Numpy will be easier for what we want to do
+    xvals = xvals.to_numpy()
+    xvals[idx[mask_event_duplicates]] = m
+
+    # Roll it back up to the original shape
+    x = ak.unflatten(xvals, n)
+    '''
+
+    # Calculate the tag side B mass for entries with only one B and one Lambda
+    mask_event_duplicates= get_duplicates_mask(data)
+    m = tag_side_B(data[mask_event_duplicates], verbose=0, reverse_for_testing=False)
+
+    x= -999*ak.ones_like(data['spmode'], dtype=float)
+    idx = ak.local_index(x)
+
+    # Numpy will be easier for what we want to do
+    x = x.to_numpy()
+    x[idx[mask_event_duplicates]] = m
+
+    data['BtagSideMes'] = x
+
+##########################################################################
+##########################################################################
+def tag_side_B(data, verbose=0, reverse_for_testing=False):
+
+    if verbose:
+        idx = data['TRKMCIdx'][0]
+        mclund = data['mcLund'][0]
+        nTRK = data['nTRK'][0]
+
+        print("The MC and tracks for the first entry")
+
+        print(f"nTRK: {nTRK}")
+        for i,id in enumerate(idx):
+            print(f"{i:2d}  {id:4d}   {mclund[id]}")
+        print()
+
+    lamd1idx = data['Lambda0d1Idx']
+    lamd1Lund = data['Lambda0d1Lund']
+    lamd2idx = data['Lambda0d2Idx']
+    lamd2Lund = data['Lambda0d2Lund']
+
+    TRKp3CM = data['TRKp3CM']
+    TRKcosthCM = data['TRKcosthCM']
+    TRKphiCM = data['TRKphiCM']
+
+    gammap3CM = data['gammap3CM']
+    gammacosthCM = data['gammacosthCM']
+    gammaphiCM = data['gammaphiCM']
+
+    #gammap3CM = data['pi0p3CM']
+    #gammacosthCM = data['pi0costhCM']
+    #gammaphiCM = data['pi0phiCM']
+
+    if verbose:
+        print(f'lamd1idx\n{lamd1idx}')
+        print(f'lamd1Lund\n{lamd1Lund}')
+        print(f'lamd2idx\n{lamd2idx}')
+        print(f'lamd2Lund\n{lamd2Lund}')
+
+    d2idx = data['Bd2Idx']
+    d2Lund = data['Bd2Lund']
+
+    if verbose:
+        print()
+        print(f'B d2idx\n{d2idx}')
+        print(f'B d2Lund\n{d2Lund}')
+        print()
+
+    trkidx_proton = data['pTrkIdx']
+    trkidx_pion = data['piTrkIdx']
+
+    if verbose:
+        print(f"# of protons: {data['np']}")
+        print(f"trkidx_proton (the track index for labeled protons) \n{trkidx_proton}")
+        print(f"# of pions: {data['npi']}")
+        print(f"trkidx_pion (the track index for labeled pions) \n{trkidx_pion}")
+
+        print()
+
+    lamd1_trkidx = trkidx_proton[lamd1idx]
+    lamd2_trkidx = trkidx_pion[lamd2idx]
+
+    d2_trkidx = trkidx_proton[d2idx]
+
+    if verbose:
+        print(f"lamd1_trkidx\n{lamd1_trkidx}\n")
+        print(f"lamd2_trkidx\n{lamd2_trkidx}\n")
+        print(f"B d2_trkidx\n{d2_trkidx}\n")
+
+    # This does not do things correctly when we have *two* candidates for either 
+    # the lambda or B because it cuts out all of the tracks for both candidates but 
+    # is assuming they are both part of one candidate
+    bool_proton1 = indices_to_booleans(lamd1_trkidx, TRKp3CM)
+    bool_pi = indices_to_booleans(lamd2_trkidx, TRKp3CM)
+
+    bool_proton2 = indices_to_booleans(d2_trkidx, TRKp3CM)
+
+    mask_tag_side_track = None
+    if not reverse_for_testing:
+        mask_tag_side_track = ~(bool_proton1 | bool_proton2 | bool_pi)
+    else:
+        # Use the candidates on the signal side
+        mask_tag_side_track = (bool_proton1 | bool_proton2 | bool_pi)
+
+    if verbose:
+        print(f"bool_proton1: {bool_proton1}")
+        print(f"bool_proton2: {bool_proton2}")
+        print(f"bool_pi:      {bool_pi}")
+        print(f"mask all:     {mask_tag_side_track}")
+
+    TRKxCM, TRKyCM, TRKzCM, TRKpmagCM = spherical_to_cartesian(TRKp3CM[mask_tag_side_track], TRKcosthCM[mask_tag_side_track], TRKphiCM[mask_tag_side_track])
+    gammaxCM, gammayCM, gammazCM, gammapmagCM = spherical_to_cartesian(gammap3CM, gammacosthCM, gammaphiCM)
+
+    if verbose:
+        print(f"TRKxCM: {TRKxCM}")
+        print(f"TRKyCM: {TRKyCM}")
+        print(f"TRKzCM: {TRKzCM}")
+        print()
+        print(f"gammaxCM: {gammaxCM}")
+        print(f"gammayCM: {gammayCM}")
+        print(f"gammazCM: {gammazCM}")
+        print()
+
+    TRKxCMtot = ak.sum(TRKxCM, axis=-1)
+    TRKyCMtot = ak.sum(TRKyCM, axis=-1)
+    TRKzCMtot = ak.sum(TRKzCM, axis=-1)
+
+    gammaxCMtot = ak.sum(gammaxCM, axis=-1)
+    gammayCMtot = ak.sum(gammayCM, axis=-1)
+    gammazCMtot = ak.sum(gammazCM, axis=-1)
+
+    pxCMtot = TRKxCMtot
+    pyCMtot = TRKyCMtot
+    pzCMtot = TRKzCMtot
+
+    # Add in the photons
+    if not reverse_for_testing:
+        pxCMtot = pxCMtot + gammaxCMtot
+        pyCMtot = pyCMtot + gammayCMtot
+        pzCMtot = pxCMtot + gammazCMtot
+
+
+    beamE = data['eeE']
+    beamx = data['eePx']
+    beamy = data['eePy']
+    beamz = data['eePz']
+
+    m = np.sqrt(beamE**2 - (beamx**2 + beamy**2 + beamz**2))
+
+    if verbose:
+        print(f'beam mass: {m}')
+        print(f'beam E:    {beamE}')
+        print(f'beam Px:   {beamx}')
+        print(f'beam Py:   {beamy}')
+        print(f'beam Pz:   {beamz}')
+
+    Bpseudomass2 = (m/2)**2 - (pxCMtot**2 + pyCMtot**2 + pzCMtot**2)
+    Bpseudomass = np.sqrt(Bpseudomass2)
+    #mask_pos = Bpseudomass2>=0
+    #Bpseudomass = -999*ak.ones_like(Bpseudomass2)
+    #Bpseudomass[mask_pos] = np.sqrt(Bpseudomass2[mask_pos])
+    #Bpseudomass[~mask_pos] = -np.sqrt(-Bpseudomass2[mask_pos])
+
+    return Bpseudomass
+
+##########################################################################
+##########################################################################
+##########################################################################################
+def munge_mask_shapes(mask_larger, mask_smaller):
+
+    # mask_larger will be bigger and have some Trues and Falses
+    #
+    # We want a mask the same size as mask_larger but where the Trues
+    # have been replaces by the values in mask_smaller
+
+    # Get the original indices
+    idx = ak.local_index(mask_larger)
+    
+    # Make a mask of Falses. This will be the replacement mask
+    mask = ak.zeros_like(mask_larger, dtype=bool)
+
+    # It's a bit easier to work with numpy for this step
+    mask = mask.to_numpy()
+
+    # Get the indices where the larger mask is true and set it equal to the 
+    # values of the smaller mask
+    mask[idx[mask_larger]] = mask_smaller
+
+    return mask
+
+##########################################################################################
+def get_final_masks(data_temp, region_definitions=None, tag="DEFAULT", IS_MC=True):
+
+    if region_definitions is None:
+        print("Need to pass in the region definitions")
+        print("Exiting...")
+        return None
+
+    #dcuts = {"cut":[], "name":[], "event":[], "candidates":[]}
+    dcuts = {}
+    
+    #########################################################################
+    # First select events without duplicate candidates
+    #########################################################################
+    mask_event_duplicates= get_duplicates_mask(data_temp)
+
+    ##########################################################################
+    # Redefine the data array
+    # tO only use the events with one candidate for Lambda0 and B
+    ##########################################################################
+    data = data_temp[mask_event_duplicates]
+
+    #dcuts['cut'].append(1)
+    dcuts[1] = {}
+    dcuts[1]["name"] = "cut duplicates"
+    dcuts[1]["event"] = mask_event_duplicates
+    dcuts[1]["candidates"] = None
+    
+    
+    #########################################################################
+    # Events with Mes and DeltaE
+    #########################################################################
+    mask_candidates_fit = get_fit_mask(data, region_definitions=region_definitions)
+
+    mask_event_fit_region = ak.any(mask_candidates_fit, axis=-1)
+
+    # Munge the shape to ensure it is the same shape as the original data array
+    mask_event_fit_region = munge_mask_shapes(mask_event_duplicates, mask_event_fit_region)
+
+    # We need to make sure it is the same size as the original file
+    
+    dcuts[2] = {}
+    dcuts[2]["name"] = "fitting region"
+    dcuts[2]["event"] = mask_event_fit_region
+    dcuts[2]["candidates"] = mask_candidates_fit
+    
+    
+    #########################################################################
+    # Cut on Lambda and number of candidates
+    #########################################################################
+    mask_candidates_lambda0, mask_event_nlambda0_and_nB = get_lambda0_mask(data, region_definitions=region_definitions, \
+                                                                    flightlenvar='Lambda0FlightLen')
+
+    # Munge the shape to ensure it is the same shape as the original data array
+    mask_event_nlambda0_and_nB = munge_mask_shapes(mask_event_duplicates, mask_event_nlambda0_and_nB)
+
+    dcuts[3] = {} 
+    dcuts[3]["name"] = "Lambda0 cuts / nB / nLambda"
+    dcuts[3]["event"] = mask_event_nlambda0_and_nB
+    dcuts[3]["candidates"] = mask_candidates_lambda0
+    
+    #########################################################################
+    # PID cuts
+    #########################################################################
+    
+    mask_bool_proton, mask_bool_pion, mask_bool_protonB = PID_masks(data, \
+                  lamp_selector='SuperLooseKMProtonSelection', \
+                  lampi_selector='VeryTightKMPionMicroSelection', \
+                  Bp_selector='SuperTightKMProtonSelection', \
+                  verbosity=0)
+
+    #mask_event = mask_event_nlambda0_and_nB & mask_event_fit_region
+
+    # We can do this because we selected the data where there is only one candidate for th
+    # B and Lambda0
+    mask_pid =      mask_bool_proton & \
+                    mask_bool_pion & \
+                    mask_bool_protonB
+
+    mask_event_pid = ak.any(mask_pid, axis=-1)
+
+    # Munge the shape to ensure it is the same shape as the original data array
+    mask_event_pid = munge_mask_shapes(mask_event_duplicates, mask_event_pid)
+    
+    dcuts[4] = {} 
+    dcuts[4]["name"] = "PID cuts"
+    dcuts[4]["event"] = mask_event_pid
+    dcuts[4]["candidates"] = mask_pid
+    
+
+    #########################################################################
+    # Antiproton
+    #########################################################################
+
+    pps = myPIDselector.PIDselector("p")
+    selector_to_test = "TightKMProtonSelection"
+    
+    # Is MC?
+    # Note that we use the previous cuts on PID and fitting region
+
+    mask_event_no_antiprotons, ct = build_antiproton_antimask(data, pps, selector_to_test, IS_MC=IS_MC, verbose=0)
+    
+    #mask_event = mask_no_antiprotons & mask_event_pid & mask_event_nlambda0_and_nB & mask_event_fit_region
+
+    # Munge the shape to ensure it is the same shape as the original data array
+    mask_event_no_antiprotons = munge_mask_shapes(mask_event_duplicates, mask_event_no_antiprotons)
+
+    
+    dcuts[6] = {}
+    dcuts[6]["name"] = "antiproton cuts"
+    dcuts[6]["event"] = mask_event_no_antiprotons
+    dcuts[6]["candidates"] = None
+
+    #########################################################################
+    # Everything
+    #########################################################################
+
+    mask_event = mask_event_no_antiprotons & mask_event_pid & mask_event_nlambda0_and_nB & mask_event_fit_region
+
+    dcuts[-1] = {}
+    dcuts[-1]["name"] = "all"
+    dcuts[-1]["event"] = mask_event
+    dcuts[-1]["candidates"] = None
+    
+    return dcuts
+
+############################################################################
+############################################################################
+##########################################################################################
+def get_numbers_for_cut_flow(data, region_definitions=None,tag="DEFAULT", spmodes=None, verbose=False):
+
+    if region_definitions is None:
+        print("Need to pass in the region definitions")
+        print("Exiting...")
+        return None
+
+    # Check to make sure the user passed in some SP modes
+    if spmodes is None:
+        print("Will default to using all the spmodes in the file")
+        spmodes = np.unique(data['spmode'].to_list())
+        print(spmodes)
+        print()
+
+    # Need to get the original duplicates mask for any other cuts we might generate outside the function
+    dcuts = get_final_masks(data, region_definitions=region_definitions)
+
+    df_dict = {"cut":[], "name":[], "nevents":[], "pct":[], "tag":[], "spmode":[]}
+
+    #########################################################################
+    # Go through all the cuts
+    #########################################################################
+    for spmode in spmodes:
+        mask_sp = data['spmode']==spmode
+
+        #########################################################################
+        # Org
+        #########################################################################
+        norg = len(data[mask_sp])
+
+        df_dict["cut"].append(0)
+        df_dict["name"].append("org")
+        df_dict["nevents"].append(norg)
+        df_dict["tag"].append(tag)
+        df_dict["spmode"].append(spmode)
+
+        if verbose:
+            print(f"{norg} events in original file")
+
+        df_dict["pct"].append(100*norg/norg)
+
+        for key in dcuts.keys():
+            if verbose:
+                print(f'{key:3d} {dcuts[key]["name"]}')
+
+            # Get the event mask
+            mask_event = dcuts[key]['event']
+
+            mask = mask_sp & mask_event
+            n = len(mask[mask])
+
+            df_dict["cut"].append(key)
+            df_dict["name"].append(dcuts[key]["name"])
+            df_dict["nevents"].append(n)
+            df_dict["tag"].append(tag)
+            df_dict["spmode"].append(spmode)
+            df_dict["pct"].append(100*n/norg)
+
+
+    df = pd.DataFrame.from_dict(df_dict)
+
+    return df
+
+############################################################################
+############################################################################
+
+##########################################################################
 ##########################################################################
