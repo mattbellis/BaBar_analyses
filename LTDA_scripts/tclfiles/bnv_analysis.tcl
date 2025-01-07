@@ -259,8 +259,9 @@ createsmpmerger BetaMiniPhysicsSequence AllB_pLam {
     ############################################
     #checkClones set false
     #checkCloneBlocks set "p pi Lambda0 TRK" 
-    checkClones set false
-    checkCloneBlocks set "gamma TRK" 
+    checkClones set true
+    #checkCloneBlocks set "p pi gamma TRK" 
+    #checkCloneBlocks set "p pi gamma TRK" 
 
     show
   }
