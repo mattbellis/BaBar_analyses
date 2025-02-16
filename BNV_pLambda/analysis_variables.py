@@ -11,6 +11,16 @@ region_definitions['sideband 1 DeltaE'] = [0.07, 0.14]
 region_definitions['sideband 2 DeltaE'] = [-0.07, -0.14]
 region_definitions['sideband MES'] = [5.27, 5.3]
 
+region_definitions['inference'] = []
+region_definitions['inference'].append([5.27, 5.3, -0.2, -0.07])
+region_definitions['inference'].append([5.27, 5.3,  0.07, 0.20])
+region_definitions['inference'].append([5.25, 5.27, -0.2, 0.0])
+region_definitions['inference'].append([5.25, 5.27,  0.0, 0.20])
+region_definitions['inference'].append([5.23, 5.25, -0.2, 0.0])
+region_definitions['inference'].append([5.23, 5.25,  0.0, 0.20])
+region_definitions['inference'].append([5.20, 5.23, -0.2, 0.0])
+region_definitions['inference'].append([5.20, 5.23,  0.0, 0.20])
+
 # For the Lambda0 identification
 # Define the mass cuts around the lambda
 lammass_world_average = 1.115683
