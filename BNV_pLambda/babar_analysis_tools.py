@@ -709,12 +709,25 @@ def PID_masks(data, \
 
 
 ##########################################################################
-def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_definitions=None, bins=100, zoom=False):
+def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=False, draw_inference_bins=False, tag=None, region_definitions=None, bins=100, zoom=False):
 
     meslo = region_definitions['fitting MES'][0]
     meshi = region_definitions['fitting MES'][1]
     DeltaElo = -0.5
     DeltaEhi =  0.5
+
+    sigmeslo = region_definitions['signal MES'][0]
+    sigmeshi = region_definitions['signal MES'][1]
+    sigDeltaElo = region_definitions['signal DeltaE'][0]
+    sigDeltaEhi = region_definitions['signal DeltaE'][1]
+
+    sbDE1lo = region_definitions['sideband 1 DeltaE'][0]
+    sbDE1hi = region_definitions['sideband 1 DeltaE'][1]
+    sbDE2lo = region_definitions['sideband 2 DeltaE'][0]
+    sbDE2hi = region_definitions['sideband 2 DeltaE'][1]
+
+    sbmeslo = region_definitions['sideband MES'][0]
+    sbmeshi = region_definitions['sideband MES'][1]
 
     if zoom==True and region_definitions is not None:
         DeltaElo = region_definitions['fitting DeltaE'][0]
@@ -743,12 +756,31 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_d
     #plt.ylim(-.5,.5)
     #plt.show()
 
+    def draw_box(xlo,xhi, ylo,yhi,fmt='w--'):
+        plt.plot([xlo,xlo,xhi,xhi,xlo],[ylo,yhi,yhi,ylo,ylo], fmt, linewidth= 4)
+        mask_temp = (mes>xlo) & (mes<xhi) & (DeltaE>ylo) & (DeltaE<yhi)
+        #print(mask_temp)
+        print(ylo,yhi)
+        print(f"{xlo:.2f} {xhi:.2f} {ylo:6.2f} {yhi:6.2f} {len(mask_temp[mask_temp]):6d}")
+
+
 
     #'''
     if draw_signal_region==True:
-        plt.plot([5.2002,5.2002,5.3,5.3,5.2],[-0.2,0.2,0.2,-0.2,-0.2], "w-", linewidth= 4)
-        plt.plot([5.27,5.27,5.29,5.29,5.27],[-0.07,0.07,0.07,-0.07,-0.07], "k--", linewidth= 4)
+        print("Signal region")
+        #plt.plot([meslo,meslo,meshi,meshi,meslo],[DeltaElo,DeltaEhi,DeltaEhi,DeltaElo,DeltaElo], "w-", linewidth= 4)
+        #plt.plot([sigmeslo,sigmeslo,sigmeshi,sigmeshi,sigmeslo],[sigDeltaElo,sigDeltaEhi,sigDeltaEhi,sigDeltaElo,sigDeltaElo], "w--", linewidth= 4)
+        draw_box(sigmeslo,sigmeshi,sigDeltaElo,sigDeltaEhi)
     #'''
+    if draw_sidebands==True:
+        print("Sidebands")
+        draw_box(sbmeslo,sbmeshi,sbDE1lo,sbDE1hi)
+        draw_box(sbmeslo,sbmeshi,sbDE2lo,sbDE2hi)
+
+    if draw_inference_bins==True:
+        print("Inference bins")
+        for xlo,xhi,ylo,yhi in region_definitions['inference']:
+            draw_box(xlo,xhi,ylo,yhi,fmt='y--')
 
     plt.xlabel(plt.gca().get_xlabel(), fontsize=18)
     plt.ylabel(plt.gca().get_ylabel(), fontsize=18)
@@ -769,7 +801,15 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, tag=None, region_d
     nside1 = len(mes[sideband1_mask])
     nside2 = len(mes[sideband2_mask])
 
-    print(f'signal: {nsig}   fit: {nfit}  s1: {nside1}  s2: {nside2}  ave(s1,s2): {(nside1 + nside2)/2}')
+    print(f'signal: {nsig}   fit: {nfit}  s1: {nside1}  s2: {nside2}  sum(s1,s2): {nside1 + nside2}')
+
+    d = {}
+    d['nsig'] = nsig
+    d['nfit'] = nfit
+    d['nside1'] = nside1
+    d['nside2'] = nside2
+
+    return d
 
 
 ##########################################################################
