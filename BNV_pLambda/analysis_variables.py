@@ -12,6 +12,7 @@ region_definitions['sideband 2 DeltaE'] = [-0.07, -0.14]
 region_definitions['sideband MES'] = [5.27, 5.3]
 
 region_definitions['inference'] = []
+region_definitions['inference'].append([5.27, 5.3, -0.07, 0.07 ])
 region_definitions['inference'].append([5.27, 5.3, -0.2, -0.07])
 region_definitions['inference'].append([5.27, 5.3,  0.07, 0.20])
 region_definitions['inference'].append([5.25, 5.27, -0.2, 0.0])
