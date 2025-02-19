@@ -706,6 +706,29 @@ def PID_masks(data, \
 ##########################################################################
 
 
+##########################################################################
+def count_events_in_inference_regions(mes, DeltaE, region_definitions=None, tag="DEFAULT"):
+    dict_temp = {'meslo':[], 'meshi':[], 'dElo':[], 'dEhi':[],'N':[]}
+    for xlo,xhi,ylo,yhi in region_definitions['inference']:
+        mask_temp = (mes>xlo) & (mes<xhi) & (DeltaE>ylo) & (DeltaE<yhi)
+        N = len(mask_temp[mask_temp])
+        print(f"{xlo:.2f} {xhi:.2f} {ylo:6.2f} {yhi:6.2f} {N:6d}")
+        dict_temp['meslo'].append(xlo)
+        dict_temp['meshi'].append(xhi)
+        dict_temp['dElo'].append(ylo)
+        dict_temp['dEhi'].append(yhi)
+        dict_temp['N'].append(N)
+
+    df = pd.DataFrame.from_dict(dict_temp)
+
+    outfilename = f"inference_region_counts_{tag}.parquet"
+    df.to_parquet(outfilename)
+
+
+    return df,outfilename
+
+##########################################################################
+
 
 
 ##########################################################################
