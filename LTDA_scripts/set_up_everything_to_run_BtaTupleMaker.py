@@ -155,49 +155,62 @@ if not os.access(tcldir,os.W_OK):
   print tcldir + " does not exist!\n"
   print "Will make directory.\n"
   idx = tcldir.rfind('/')
-  os.mkdir(tcldir[0:idx], 0744)
-  os.mkdir(tcldir, 0744)
+  print(tcldir[0:idx])
+  print(tcldir)
+  #os.makedirs(tcldir[0:idx], 0744, exist_ok=True)
+  #os.makedirs(tcldir, 0744, exist_ok=True)
+  if not os.access(tcldir[0:idx], os.W_OK):
+	  os.mkdir(tcldir[0:idx], 0744)
+  if not os.access(tcldir, os.W_OK):
+	  os.mkdir(tcldir, 0744)
 if not os.access(logdir,os.W_OK):
   print logdir + " does not exist!\n"
   print "Will make directory.\n"
   idx = logdir.rfind('/')
-  os.mkdir(logdir[0:idx], 0744)
+  if not os.access(logdir[0:idx],os.W_OK):
+    os.mkdir(logdir[0:idx], 0744)
   os.mkdir(logdir, 0744)
 if not os.access(rundir,os.W_OK):
   print rundir + " does not exist!\n"
   print "Will make directory.\n"
   idx = rundir.rfind('/')
-  os.mkdir(rundir[0:idx], 0744)
+  if not os.access(rundir[0:idx],os.W_OK):
+    os.mkdir(rundir[0:idx], 0744)
   os.mkdir(rundir, 0744)
 if not os.access(testrundir,os.W_OK):
   print testrundir + " does not exist!\n"
   print "Will make directory.\n"
   idx = testrundir.rfind('/')
-  os.mkdir(testrundir[0:idx], 0744)
+  if not os.access(testrundir[0:idx],os.W_OK):
+    os.mkdir(testrundir[0:idx], 0744)
   os.mkdir(testrundir, 0744)
 if not os.access(shellscriptsdir,os.W_OK):
   print shellscriptsdir + " does not exist!\n"
   print "Will make directory.\n"
   idx = shellscriptsdir.rfind('/')
-  os.mkdir(shellscriptsdir[0:idx], 0744)
+  if not os.access(shellscriptsdir[0:idx],os.W_OK):
+    os.mkdir(shellscriptsdir[0:idx], 0744)
   os.mkdir(shellscriptsdir, 0744)
 if not os.access(submissiondir,os.W_OK):
   print submissiondir + " does not exist!\n"
   print "Will make directory.\n"
   idx = submissiondir.rfind('/')
-  #os.mkdir(submissiondir[0:idx], 0744)
+  if not os.access(submissiondir[0:idx],os.W_OK):
+    os.mkdir(submissiondir[0:idx], 0744)
   os.mkdir(submissiondir, 0744)
 if not os.access(rootfiledir,os.W_OK):
   print rootfiledir + " does not exist!\n"
   print "Will make directory.\n"
   idx = rootfiledir.rfind('/')
-  os.mkdir(rootfiledir[0:idx], 0744)
+  if not os.access(rootfiledir[0:idx],os.W_OK):
+    os.mkdir(rootfiledir[0:idx], 0744)
   os.mkdir(rootfiledir, 0744)
 if not os.access(testrootfiledir,os.W_OK):
   print testrootfiledir + " does not exist!\n"
   print "Will make directory.\n"
   idx = testrootfiledir.rfind('/')
-  os.mkdir(testrootfiledir[0:idx], 0744)
+  if not os.access(testrootfiledir[0:idx],os.W_OK):
+    os.mkdir(testrootfiledir[0:idx], 0744)
   os.mkdir(testrootfiledir, 0744)
 
 ################################################

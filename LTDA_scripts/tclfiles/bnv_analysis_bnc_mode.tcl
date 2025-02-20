@@ -119,7 +119,7 @@ createsmpmerger BetaMiniPhysicsSequence AllConstLambda0 {
 createsmpmaker BetaMiniPhysicsSequence myB_unc {
   debug              set f
   verbose            set f
-  decayMode          set "B+ -> Lambda0 p-"
+  decayMode          set "B- -> Lambda0 anti-p-"
   daughterListNames  set "AllConstLambda0"
   daughterListNames  set "GoodTracksVeryLoose"
   fittingAlgorithm   set "TreeFitter"
@@ -141,7 +141,7 @@ createsmpmaker BetaMiniPhysicsSequence myB_unc {
 createsmprefitter BetaMiniPhysicsSequence myB_con {
   debug              set f
   verbose            set f
-  decayMode          set "B+ -> Lambda0 p-"
+  decayMode          set "B- -> Lambda0 anti-p-"
   unrefinedListName  set "myB_unc"
   fittingAlgorithm   set "TreeFitter"
   fitConstraints     set "Geo"
