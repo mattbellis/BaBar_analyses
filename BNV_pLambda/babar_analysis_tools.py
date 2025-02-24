@@ -422,6 +422,58 @@ def create_empty_histograms(hist_defs):
 
 
 ################################################################################
+def fill_histograms_v3(data, subset=None, empty_hists=None, spmodes=['998'], weights=[1.0], cutname="DEFAULT"):
+    ### Takes the dictionary of objects we made before and fills them 
+    ### with the correct information, based on SP mode and Cut. 
+    ### Each cut pares down the background and hopefully makes the signal more apparent
+
+    if empty_hists is None:
+        print("Must pass in histograms to be filled")
+        return None
+
+    if subset is None:
+        subset = list(empty_hists.keys())
+
+    # Save the result of the cuts in a dataframe
+    df_dict = {}
+    df_dict['var'] = []
+    df_dict['cut'] = []
+    df_dict['spmode'] = []
+    df_dict['n'] = []
+
+    for key in subset: 
+        print(key)
+
+        for spmode in spmodes:
+            #print(spmode)
+            weight = 1
+            if spmode=='-999':
+                weight = .005
+            else:
+                weight = weights[spmode]
+
+            n = -1
+            # Apply the cuts and fill the histograms
+            #if key[0]=='B' or key.find('Lambda0')==0:
+            #    x = ak.flatten(data[mask_ev][key][mask_part[mask_ev]])
+            #else:
+           #     x = data[mask_ev][key]
+            x = ak.flatten(data[key])
+
+            n = len(x)
+            empty_hists[key].fill(var=x, SP= spmode, cuts= f"{cutname}", weight= weight)
+
+            # Fill the dataframe dictionary
+            df_dict['var'].append(key)
+            df_dict['cut'].append(cutname)
+            df_dict['spmode'].append(spmode)
+            df_dict['n'].append(n)
+
+    df = pd.DataFrame.from_dict(df_dict)
+
+    return df
+
+################################################################################
 def fill_histograms_v2(ak_arr, empty_hists, spmodes=['998'], weights=[1.0]):
     ### Takes the dictionary of objects we made before and fills them 
     ### with the correct information, based on SP mode and Cut. 
