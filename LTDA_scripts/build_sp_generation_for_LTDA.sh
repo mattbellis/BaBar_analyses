@@ -6,9 +6,20 @@
 
 # Build the smp_task file
 
-decfile="B+B-_lambdaproton_BNV.dec"
-prod_run_name="bnv_plam3"
+# Need to make sure this is in `smp_decfile` directory as a softlink
+#decfile="B+B-_lambdaproton_BNV.dec"
+#prod_run_name="bnv_plam3"
+#nevents="100000"
+
+# BNC
+# Need to make sure this is in `smp_decfile` directory as a softlink
+decfile="B+B-_lambdaproton.dec"
+prod_run_name="bnc_plam"
 nevents="100000"
+
+# Need to make our directory first
+# OR NOT?
+#mkdir ${prod_run_name}
 
 
 SMP_CFG_FILE=smp_task_"${prod_run_name}".cfg
@@ -16,6 +27,9 @@ SMP_CFG_FILE=smp_task_"${prod_run_name}".cfg
 cat SMP_TASK_TEMPLATE.cfg  | sed "s/PRODUCTION_RUN_NAME/${prod_run_name}/" > temp.cfg
 cat temp.cfg  | sed "s/NEVENTS/${nevents}/" > temp2.cfg
 cat temp2.cfg  | sed "s/DEC_FILE/${decfile}/" > $SMP_CFG_FILE
+
+echo "SMP_CFG_FILE"
+echo $SMP_CFG_FILE
 
 smp prepare $SMP_CFG_FILE
 
@@ -43,3 +57,7 @@ do
 done
 
 chmod +x ${ALL_SUBMISSION_COMMANDS}
+
+
+# All the output rootfiles are copied to 
+# workdir/scratch/bellis/$prod_run_name
