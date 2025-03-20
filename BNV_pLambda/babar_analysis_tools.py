@@ -422,6 +422,58 @@ def create_empty_histograms(hist_defs):
 
 
 ################################################################################
+def fill_histograms_v3(data, subset=None, empty_hists=None, spmodes=['998'], weights=[1.0], cutname="DEFAULT"):
+    ### Takes the dictionary of objects we made before and fills them 
+    ### with the correct information, based on SP mode and Cut. 
+    ### Each cut pares down the background and hopefully makes the signal more apparent
+
+    if empty_hists is None:
+        print("Must pass in histograms to be filled")
+        return None
+
+    if subset is None:
+        subset = list(empty_hists.keys())
+
+    # Save the result of the cuts in a dataframe
+    df_dict = {}
+    df_dict['var'] = []
+    df_dict['cut'] = []
+    df_dict['spmode'] = []
+    df_dict['n'] = []
+
+    for key in subset: 
+        print(key)
+
+        for spmode in spmodes:
+            #print(spmode)
+            weight = 1
+            if spmode=='-999':
+                weight = .005
+            else:
+                weight = weights[spmode]
+
+            n = -1
+            # Apply the cuts and fill the histograms
+            #if key[0]=='B' or key.find('Lambda0')==0:
+            #    x = ak.flatten(data[mask_ev][key][mask_part[mask_ev]])
+            #else:
+           #     x = data[mask_ev][key]
+            x = ak.flatten(data[key])
+
+            n = len(x)
+            empty_hists[key].fill(var=x, SP= spmode, cuts= f"{cutname}", weight= weight)
+
+            # Fill the dataframe dictionary
+            df_dict['var'].append(key)
+            df_dict['cut'].append(cutname)
+            df_dict['spmode'].append(spmode)
+            df_dict['n'].append(n)
+
+    df = pd.DataFrame.from_dict(df_dict)
+
+    return df
+
+################################################################################
 def fill_histograms_v2(ak_arr, empty_hists, spmodes=['998'], weights=[1.0]):
     ### Takes the dictionary of objects we made before and fills them 
     ### with the correct information, based on SP mode and Cut. 
@@ -732,7 +784,7 @@ def count_events_in_inference_regions(mes, DeltaE, region_definitions=None, tag=
 
 
 ##########################################################################
-def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=False, draw_inference_bins=False, tag=None, region_definitions=None, bins=100, zoom=False):
+def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=False, draw_inference_bins=False, tag=None, region_definitions=None, bins=100, zoom=False, plot_full=True):
 
     meslo = region_definitions['fitting MES'][0]
     meshi = region_definitions['fitting MES'][1]
@@ -764,16 +816,24 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=Fal
     # normal fill
     h.fill(mes, DeltaE)
 
-    h.plot2d_full(
-            #main_cmap="coolwarm",
-        main_cmap="plasma",
-        top_ls="--",
-        top_color="orange",
-        top_lw=2,
-        side_ls=":",
-        side_lw=2,
-        side_color="steelblue",
-    )
+    #plt.gca()
+
+    if plot_full:
+        h.plot2d_full(
+                #main_cmap="coolwarm",
+            main_cmap="plasma",
+            top_ls="--",
+            top_color="orange",
+            top_lw=2,
+            side_ls=":",
+            side_lw=2,
+            side_color="steelblue",
+        )
+    else:
+        h.plot2d(
+                #main_cmap="coolwarm",
+            cmap="plasma",
+        )
 
     #plt.xlim(5.1,5.3)
     #plt.ylim(-.5,.5)
@@ -807,7 +867,7 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=Fal
 
     plt.xlabel(plt.gca().get_xlabel(), fontsize=18)
     plt.ylabel(plt.gca().get_ylabel(), fontsize=18)
-    plt.tight_layout()
+    #plt.tight_layout()
 
     if tag is not None:
         plt.savefig(f'BNV_pLambda_plots/plot_{tag}_bkg_de_vs_mes.png')
