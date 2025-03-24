@@ -1,8 +1,11 @@
+#subdir='bnv_analysis'
+subdir='bnv_analysis_bnc_mode'
 for dir in $@; do
     echo $dir
-    outname=$dir"_COMBINED.root"
+    outname=$dir"_""$subdir""_COMBINED.root"
     echo $outname
-    ls $dir/bnv_analysis/*.root
+    #ls $dir/${subdir}/*.root
     # -k means skip corrupted files. There might be a couple
-    hadd -k $outname $dir/bnv_analysis/*.root
+    # -f forces recreation of the output file
+    hadd -f -k $outname $dir/${subdir}/*.root
 done
