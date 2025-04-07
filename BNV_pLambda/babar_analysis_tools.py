@@ -1346,3 +1346,46 @@ def get_numbers_for_cut_flow(data, region_definitions=None,tag="DEFAULT", spmode
 
 ##########################################################################
 ##########################################################################
+def dump_awkward_to_dataframe(arr, fields_to_dump=None, write_to_filename=None):
+    subset = ['spmode', 'BpostFitMes', 'BpostFitDeltaE', 'Lambda0_unc_Mass', \
+          'BtagSideMes', 'BSphr', 'BThrust', 'BCosThetaS', \
+          'R2', 'R2All', \
+          'thrustMag', 'thrustMagAll', 'thrustCosTh', 'thrustCosThAll', 'sphericityAll', \
+          'BCosSphr', 'BCosThetaT', 'BCosThrust', 'BLegendreP2', 'BR2ROE', 'BSphrROE', \
+          'BThrustROE']
+    if fields_to_dump is None:
+        fields_to_dump = arr.fields
+
+    # Get the type of array of a single dim array.
+    # This should be more codified, but right now I am just hoping that
+    # the first entry is something that should be flattened
+    ak_array_type= type(arr[fields_to_dump[0]])
+
+    df_dict={}
+    nentries = -1
+    for i,var in enumerate(fields_to_dump):
+        x= arr[var] ##in each event, cut on the above cuts and pull out the info from each of the variables listed above
+        if type(x[0]) == ak_array_type:
+            x= ak.flatten(arr[var])
+        df_dict[var] = x
+        if i==0:
+            nentries = len(x)
+        else:
+            if nentries != len(x):
+                print("Irregular number of entries!")
+                print("Not filling the dictionary!\n")
+                for key,vals in df_dict.items():
+                    print(f"{key:16s}  {len(vals)}")
+                print(f"{val:16d} {len(x)}")
+
+    df_out= pd.DataFrame.from_dict(df_dict)
+
+    if write_to_filename is not None:
+        df_out.to_parquet(write_to_filename)
+
+    return df_out
+
+
+
+##########################################################################
+##########################################################################
