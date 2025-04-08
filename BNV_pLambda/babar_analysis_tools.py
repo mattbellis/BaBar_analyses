@@ -1347,12 +1347,14 @@ def get_numbers_for_cut_flow(data, region_definitions=None,tag="DEFAULT", spmode
 ##########################################################################
 ##########################################################################
 def dump_awkward_to_dataframe(arr, fields_to_dump=None, write_to_filename=None):
+    '''
     subset = ['spmode', 'BpostFitMes', 'BpostFitDeltaE', 'Lambda0_unc_Mass', \
           'BtagSideMes', 'BSphr', 'BThrust', 'BCosThetaS', \
           'R2', 'R2All', \
           'thrustMag', 'thrustMagAll', 'thrustCosTh', 'thrustCosThAll', 'sphericityAll', \
           'BCosSphr', 'BCosThetaT', 'BCosThrust', 'BLegendreP2', 'BR2ROE', 'BSphrROE', \
           'BThrustROE']
+    '''
     if fields_to_dump is None:
         fields_to_dump = arr.fields
 
