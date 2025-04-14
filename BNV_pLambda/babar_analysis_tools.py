@@ -1382,6 +1382,9 @@ def dump_awkward_to_dataframe(arr, fields_to_dump=None, write_to_filename=None):
 
     df_out= pd.DataFrame.from_dict(df_dict)
 
+    #if dropna==True:
+    #    df_out.dropna(inplace=True)
+
     if write_to_filename is not None:
         df_out.to_parquet(write_to_filename)
 
