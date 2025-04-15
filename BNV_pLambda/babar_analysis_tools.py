@@ -18,6 +18,43 @@ import math
 import os
 
 ################################################################################
+def load_datasets(topdir=None, sp_file_tag='Background_and_signal_SP_modes', \
+                  collision_file_tag='Data', BNC=False, \
+                  subset='Run1', sp_or_data=None):
+
+    subset_tag = ""
+    if subset=='Run1' or subset=='run1':
+        subset_tag = 'Only_Run_1'
+    elif subset=='all' or subset=='All':
+        subset_tag = 'All_runs'
+
+    BNC_tag = ""
+    if BNC is True:
+        BNC_tag = "_BNC"
+
+    data_sp, data_collision = None, None
+
+    if sp_or_data=='sp' or sp_or_data=='SP' or sp_or_data==None:
+        start= time.time()
+        filename= f"{topdir}/{sp_file_tag}{BNC_tag}_{subset_tag}.parquet"
+        print(f"Opening {filename}...")
+        data_sp = ak.from_parquet(filename)
+        print(f"Took {time.time()-start:.3f} seconds\n")
+
+
+    if sp_or_data=='col' or sp_or_data=='collision' or sp_or_data==None:
+        start= time.time()
+        filename= f"{topdir}/{collision_file_tag}{BNC_tag}_{subset_tag}_BLINDED.parquet"
+        if BNC is True:
+            filename= f"{topdir}/{collision_file_tag}{BNC_tag}_{subset_tag}.parquet"
+        print(f"Opening {filename}...")
+        data_collision = ak.from_parquet(filename)
+        print(f"Took {time.time()-start:.3f} seconds\n")
+
+    return data_sp, data_collision 
+################################################################################
+
+################################################################################
 def read_in_dataset_statistics(infilename='dataset_statistics.csv'):
     df = pd.read_csv(infilename)
 
