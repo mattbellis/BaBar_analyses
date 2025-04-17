@@ -183,7 +183,7 @@ def myRooKeys(z,data1):
 # Signal
 #########################################
 ################################################################################
-def sig_PDF(x,y,z, dataset, dim = 2, use_double_CB=False, workspace=None):
+def sig_PDF(x, dataset,  use_double_CB=False, workspace=None):
     pars = []
 
     cb = None
@@ -198,51 +198,13 @@ def sig_PDF(x,y,z, dataset, dim = 2, use_double_CB=False, workspace=None):
     funcs0 = []
 
     pars_0, cb = crystal_barrel_x(x)
-    pars_1, cbdE, cbdE_2 = crystal_barrel_y(y)
 
-    if dim==2 and use_double_CB==False:
-        sig_prod = ROOT.RooProdPdf("sig_pdf","cb*cbdE",ROOT.RooArgList(cb, cbdE)) 
-
-    elif dim==2 and use_double_CB==True:
-        pars_2, double_cbdE = double_cb_in_dE(cbdE, cbdE_2)
-        sig_prod = ROOT.RooProdPdf("sig_pdf","cb*double_cbdE",ROOT.RooArgList(cb, double_cbdE)) 
-
-    #'''
-    elif dim==3 and use_double_CB==False:
-        print("NOT SET UP TO USE THIS SET OF PDFS!!!!!!!!!!!")
-        print("NOT SET UP TO USE THIS SET OF PDFS!!!!!!!!!!!")
-        print("NOT SET UP TO USE THIS SET OF PDFS!!!!!!!!!!!")
-        print("NOT SET UP TO USE THIS SET OF PDFS!!!!!!!!!!!")
-        print("NOT SET UP TO USE THIS SET OF PDFS!!!!!!!!!!!")
-        pars_2, rpsf_s = myROOT.RooParSF(z, bh, vary_limits, "sig", lo, hi)
-        sig_prod =   ROOT.RooProdPdf("sig_pdf","cb*cbdE*rpsf_s",ROOT.RooArgList(cb, cbdE, rpsf_s)) 
-    #''' 
-
-    elif dim==3 and use_double_CB==True:
-        pars_d, double_cbdE = double_cb_in_dE(cbdE, cbdE_2)
-        # Here I'm going to try the ROOT.RooKeysPdf
-        if workspace==None:
-            # Fit to a new KeysPdf
-            funcs0, nn_sig = myROOT.RooKeys(z,dataset)
-        else:
-            # Read one in from a file
-            nn_sig = workspace.pdf("nn_sig")
-            funcs0 = []
-
-        pars_2 = pars_d
-
-        sig_prod = ROOT.RooProdPdf("sig_pdf","cb*double_cbdE*nn_sig",ROOT.RooArgList(cb, double_cbdE, nn_sig)) 
-
+    sig_prod = cb
+    sig_prod.SetName("sig_pdf")
 
     pars += pars_0
-    pars += pars_1
-    pars += pars_2
 
-    # Return all the sub-functions so that they stay active in the main program.
-    if nn_sig!=None:
-        funcs = [nn_sig, cb, cbdE, cbdE_2, double_cbdE, sig_prod]
-    else:
-        funcs = [cb, cbdE, cbdE_2, double_cbdE, sig_prod]
+    funcs = [cb, sig_prod]
 
     funcs += funcs0
 
@@ -253,7 +215,7 @@ def sig_PDF(x,y,z, dataset, dim = 2, use_double_CB=False, workspace=None):
 # Background
 #########################################
 # Multiply the components
-def bkg_PDF(x,y,z, dataset, dim = 2):
+def bkg_PDF(x, dataset):
 
     nn_bkg = None
     bkg_prod = None
@@ -263,38 +225,25 @@ def bkg_PDF(x,y,z, dataset, dim = 2):
 
     pars_a, argus = argus_in_x(x)
     pars_b = []
-    pars_p, polyy = linear_in_y(y)
 
-    if dim==2:
-        bkg_prod = ROOT.RooProdPdf("bkg_pdf","argus*polyy", ROOT.RooArgList(argus,polyy)) 
-    elif dim==3:
-        # Trying out an different analytic functions function
-        #pars_b, nn_bkg = argus_in_z(z)
-        #pars_b, nn_bkg = bifurgauss_in_z(z)
-        pars_b, nn_bkg = crystal_barrel_z(z)
-        bkg_prod = ROOT.RooProdPdf("bkg_pdf","argus*polyy*nn_bkg", ROOT.RooArgList(argus, polyy, nn_bkg)) 
+    bkg_prod = argus
+    bkg_prod.SetName("bkg_pdf")
 
     pars += pars_a
-    pars += pars_p
 
     # Return all the sub-functions so that they stay active in the main program.
-    funcs = [argus, polyy]
-
-    # If 2D fit (only x and y)
-    if len(pars_b)>0:
-        pars += pars_b
-        funcs = [nn_bkg, argus, polyy]
+    funcs = [argus, bkg_prod]
 
     return pars, funcs, bkg_prod
 
 
 #############################################################
 #############################################################
-def tot_PDF(x,y,z, dataset, dim = 2, use_double_CB=False, workspace=None):
+def tot_PDF(x, dataset, use_double_CB=False, workspace=None):
     funcs = []
 
-    pars_s, funcs_s, sig_pdf = sig_PDF(x,y,z, dataset, dim, use_double_CB, workspace)
-    pars_b, funcs_b, bkg_pdf = bkg_PDF(x,y,z, dataset, dim)
+    pars_s, funcs_s, sig_pdf = sig_PDF(x, dataset, use_double_CB, workspace)
+    pars_b, funcs_b, bkg_pdf = bkg_PDF(x, dataset)
 
     conv_factor_calc = ROOT.RooRealVar("conv_factor_calc","Conversion factor (calculated)",13.272) # Conversion factor, calculated
     conv_factor_fit  = ROOT.RooRealVar("conv_factor_fit", "Conversion factor (fit)",13.272) # Conversion factor, fit
@@ -310,7 +259,8 @@ def tot_PDF(x,y,z, dataset, dim = 2, use_double_CB=False, workspace=None):
     #gc = ROOT.RooFormulaVar("gc","exp(-(conv_factor_fit-conv_factor_calc)*(conv_factor_fit-conv_factor_calc)/(2.0*conv_factor_err*conv_factor_err))", \
     #ROOT.RooArgList(conv_factor_fit,conv_factor_calc,conv_factor_fit,conv_factor_calc,conv_factor_err,conv_factor_err))
     log_gc = ROOT.RooFormulaVar("log_gc","(conv_factor_calc-conv_factor_fit)*(conv_factor_calc-conv_factor_fit)/(2.0*conv_factor_err*conv_factor_err)", \
-            ROOT.RooArgList(conv_factor_calc,conv_factor_fit,conv_factor_calc,conv_factor_fit,conv_factor_err,conv_factor_err))
+    ROOT.RooArgList(conv_factor_calc,conv_factor_fit,conv_factor_calc,conv_factor_fit,conv_factor_err,conv_factor_err))
+            #ROOT.RooArgList(conv_factor_calc,conv_factor_fit,conv_factor_err))
 
 
     #sig_temp = ROOT.RooGenericPdf("sig_temp","gc*sig_pdf", ROOT.RooArgList(gc,sig_pdf))
