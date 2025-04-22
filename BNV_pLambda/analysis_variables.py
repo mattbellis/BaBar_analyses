@@ -69,3 +69,7 @@ hist_defs["nTRK"]=                             {"nbins":20, "lo":0,      "hi":20
 
 hist_defs["BtagSideMes"]=                      {"nbins":100, "lo":4,     "hi":5,     "label":"tag-B $M_{ES}$ [GeV/c$^2$]"}
 
+
+brfr_info= {}
+
+brfr_info["p_lambda_conserved"]= {"branching_fraction":2.4e-7,"uncertainty_plus":1,"uncertainty_minus":.9}
