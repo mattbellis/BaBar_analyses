@@ -533,7 +533,7 @@ def fill_histograms_v2(ak_arr, empty_hists, spmodes=['998'], weights=[1.0]):
                 weight = .005
             else:
                 weight = weights[spmode]
-
+            
             all_cuts = {}
             mask_sp= (ak_arr.spmode== spmode)            
             mask_fl0 = (ak_arr['Lambda0FlightLen']>=0)
@@ -544,11 +544,11 @@ def fill_histograms_v2(ak_arr, empty_hists, spmodes=['998'], weights=[1.0]):
             mes = ak_arr['BpostFitMes']
             de  = ak_arr['BpostFitDeltaE']           
             # Stuff
-            blinding_mask =   (mes>5.27) & ((de>-.07) & (de<.07)) 
-            fitarea_mask   =  (mes>5.2) & ((de>-.2) & (de<.2)) 
+            blinding_mask=   (mes>5.27) & ((de>-.07) & (de<.07)) 
+            fitarea_mask=  (mes>5.2) & ((de>-.2) & (de<.2)) 
 
             #var_mask = mask_fl & ~blinding_mask & fitarea_mask
-
+            
             all_cuts['0'] = {'mask_ev':mask_sp, 'mask_part':mask_fl0}
             all_cuts['1'] = {'mask_ev':mask_sp & mask_ntrk, 'mask_part':mask_fl0}
             all_cuts['2'] = {'mask_ev':mask_sp & mask_ntrk, 'mask_part':mask_fl1}
@@ -581,7 +581,7 @@ def fill_histograms_v2(ak_arr, empty_hists, spmodes=['998'], weights=[1.0]):
     df = pd.DataFrame.from_dict(df_dict)
     
     return df
-
+    
 ################################################################################
 def plot_histograms(all_hists, vars=[], bkg_spmodes=['998'], datamodes=['0'], sig_spmodes=['-999'], cut='0', save= True, overlay_data=True, only_stacked=False, fixed_grid=None):
     
