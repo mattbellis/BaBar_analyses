@@ -459,13 +459,17 @@ def create_empty_histograms(hist_defs):
 
 
 ################################################################################
-def fill_histograms_v3(data, subset=None, empty_hists=None, spmodes=['998'], weights=[1.0], cutname="DEFAULT"):
+def fill_histograms_v3(data, subset=None, empty_hists=None, spmodes=['998'], weights=[1.0], cuts=None):
     ### Takes the dictionary of objects we made before and fills them 
     ### with the correct information, based on SP mode and Cut. 
     ### Each cut pares down the background and hopefully makes the signal more apparent
 
     if empty_hists is None:
         print("Must pass in histograms to be filled")
+        return None
+
+    if cuts is None:
+        print("Must pass in lists of cuts")
         return None
 
     if subset is None:
@@ -481,6 +485,10 @@ def fill_histograms_v3(data, subset=None, empty_hists=None, spmodes=['998'], wei
     for key in subset: 
         print(key)
 
+        # Check to see if the variable is in the array
+        if key not in list(data.fields):
+            continue
+
         for spmode in spmodes:
             #print(spmode)
             weight = 1
@@ -489,22 +497,38 @@ def fill_histograms_v3(data, subset=None, empty_hists=None, spmodes=['998'], wei
             else:
                 weight = weights[spmode]
 
-            n = -1
-            # Apply the cuts and fill the histograms
-            #if key[0]=='B' or key.find('Lambda0')==0:
-            #    x = ak.flatten(data[mask_ev][key][mask_part[mask_ev]])
-            #else:
-           #     x = data[mask_ev][key]
-            x = ak.flatten(data[key])
+            for cutname in cuts.keys():
+                cut = cuts[cutname]['event']
+                mask_sp = data['spmode']==spmode
+                n = -1
+                # Apply the cuts and fill the histograms
+                #if key[0]=='B' or key.find('Lambda0')==0:
+                #    x = ak.flatten(data[mask_ev][key][mask_part[mask_ev]])
+                #else:
+                #     x = data[mask_ev][key]
+                #x = ak.flatten(data[key])
+                x = data[key][cut & mask_sp]
+                #print(type(x), type(x[0]))
+                #if type(x[0])==int or type(x[0])==float:
+                # Make sure array is not 0-length
+                if len(x)<=0:
+                    continue
 
-            n = len(x)
-            empty_hists[key].fill(var=x, SP= spmode, cuts= f"{cutname}", weight= weight)
+                try:
+                    float(x[0])
+                        #1#x = ak.flatten(data[key][cut])
+                except:
+                    x = ak.flatten(x)
 
-            # Fill the dataframe dictionary
-            df_dict['var'].append(key)
-            df_dict['cut'].append(cutname)
-            df_dict['spmode'].append(spmode)
-            df_dict['n'].append(n)
+                n = len(x)
+                if n>0:
+                    empty_hists[key].fill(var=x, SP= spmode, cuts= f"{cutname}", weight= weight)
+
+                # Fill the dataframe dictionary
+                df_dict['var'].append(key)
+                df_dict['cut'].append(cutname)
+                df_dict['spmode'].append(spmode)
+                df_dict['n'].append(n)
 
     df = pd.DataFrame.from_dict(df_dict)
 
