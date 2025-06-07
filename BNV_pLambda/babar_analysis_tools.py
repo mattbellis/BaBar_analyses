@@ -932,6 +932,7 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=Fal
 
     if tag is not None:
         plt.savefig(f'BNV_pLambda_plots/plot_{tag}_bkg_de_vs_mes.png')
+        plt.tight_layout()
 
     signal_mask = (mes > region_definitions["signal MES"][0]) & ((DeltaE>region_definitions["signal DeltaE"][0]) & (DeltaE<region_definitions["signal DeltaE"][1])) 
 
