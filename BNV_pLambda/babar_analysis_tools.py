@@ -107,7 +107,7 @@ def create_table_of_data_skims_statistics():
 
     df.style.to_latex(position_float='centering')
 
-    output = dftmp.to_latex(index=False, header=header, float_format="%.1f", caption=caption, label=label)
+    output = dftmp.to_latex(index=False, header=header, float_format="%.1f", caption=caption, label=label, position='h')
 
     # Add in centering by replacing the first EOL with "EOL + \centering + EOL"
     output = output.replace('\n','\n\centering\n', 1)
@@ -229,12 +229,14 @@ def scaling_value(spmode, dataset_information=None, cs_data=None, plot= False, v
 
 ##########################################################################
 
-def table_from_df(df, outfilename):
+def table_from_df(df, outfilename, caption="DEFAULT", label='tab:DEFAULT'):
     output = df.to_latex(index=False,
                   float_format="{:.4f}".format,
     )  # converts dataframe into latex readable text
-    full_table = "\\begin{table}\n" # initializes the table before the beginning of the tabular 
-    full_table += "\\caption{This could be the caption}\n" 
+    full_table = "\\begin{table}[h]\n" # initializes the table before the beginning of the tabular 
+    full_table += "\\caption{" + f"{caption}" +"}\n" 
+    full_table += "\\label{" + f"{label}" +"}\n" 
+    full_table += "\\centering\n" 
     full_table += output #includes the converted dataframe in the table
     full_table += "\\end{table}" # ends the table, same purpose as begin{table} 
     filename= f"table_{outfilename}.tex"
