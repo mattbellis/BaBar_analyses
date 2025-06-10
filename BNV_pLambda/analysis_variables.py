@@ -32,7 +32,10 @@ hi = lammass_world_average + width
 
 region_definitions['Lambda0 mass'] = [lo, hi]
 # Which variable is this for?
+# FlightLen or postFitFlightLen
 region_definitions['Lambda0 flightlen'] = 1.00
+# Lambda0postFitFlightSignificance
+region_definitions['Lambda0 flightlen'] = 25.0
 
 
 

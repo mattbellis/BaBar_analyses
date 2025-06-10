@@ -1263,8 +1263,12 @@ def get_final_masks(data_temp, region_definitions=None, tag="DEFAULT", IS_MC=Tru
     #########################################################################
     # Cut on Lambda and number of candidates
     #########################################################################
-    mask_candidates_lambda0, mask_event_nlambda0_and_nB = get_lambda0_mask(data, region_definitions=region_definitions, \
-                                                                    flightlenvar='Lambda0FlightLen')
+    lambda_var = 'Lambda0postFitFlightSignificance'
+    #lambda_var = 'Lambda0FlightLen'
+    #lambda_var = 'Lambda0postFitFlightLen'
+    mask_candidates_lambda0, mask_event_nlambda0_and_nB = get_lambda0_mask(data, \
+                                                                    region_definitions=region_definitions, \
+                                                                    flightlenvar=lambda_var)
 
     # Munge the shape to ensure it is the same shape as the original data array
     mask_event_nlambda0_and_nB = munge_mask_shapes(mask_event_duplicates, mask_event_nlambda0_and_nB)
@@ -1342,7 +1346,7 @@ def get_final_masks(data_temp, region_definitions=None, tag="DEFAULT", IS_MC=Tru
 ############################################################################
 ############################################################################
 ##########################################################################################
-def get_numbers_for_cut_flow(data, region_definitions=None,tag="DEFAULT", spmodes=None, verbose=False):
+def get_numbers_for_cut_flow(data, region_definitions=None,tag="DEFAULT", spmodes=None, verbose=False, dcuts=None):
 
     if region_definitions is None:
         print("Need to pass in the region definitions")
@@ -1356,8 +1360,9 @@ def get_numbers_for_cut_flow(data, region_definitions=None,tag="DEFAULT", spmode
         print(spmodes)
         print()
 
-    # Need to get the original duplicates mask for any other cuts we might generate outside the function
-    dcuts = get_final_masks(data, region_definitions=region_definitions)
+    if dcuts is None:
+        # Need to get the original duplicates mask for any other cuts we might generate outside the function
+        dcuts = get_final_masks(data, region_definitions=region_definitions)
 
     df_dict = {"cut":[], "name":[], "nevents":[], "pct":[], "tag":[], "spmode":[]}
 
