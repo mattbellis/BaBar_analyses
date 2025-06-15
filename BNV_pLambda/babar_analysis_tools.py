@@ -500,6 +500,7 @@ def fill_histograms_v3(data, subset=None, empty_hists=None, spmodes=['998'], wei
                 weight = weights[spmode]
 
             for cutname in cuts.keys():
+                #print(f"filling with {cutname}  for {spmode}   for {key}")
                 cut = cuts[cutname]['event']
                 mask_sp = data['spmode']==spmode
                 n = -1
@@ -524,6 +525,7 @@ def fill_histograms_v3(data, subset=None, empty_hists=None, spmodes=['998'], wei
 
                 n = len(x)
                 if n>0:
+                    #print(f"cuts = {cutname}")
                     empty_hists[key].fill(var=x, SP= spmode, cuts= f"{cutname}", weight= weight)
 
                 # Fill the dataframe dictionary
@@ -609,15 +611,15 @@ def fill_histograms_v2(ak_arr, empty_hists, spmodes=['998'], weights=[1.0]):
     return df
     
 ################################################################################
-def plot_histograms(all_hists, vars=[], bkg_spmodes=['998'], datamodes=['0'], sig_spmodes=['-999'], cut='0', save= True, overlay_data=True, only_stacked=False, fixed_grid=None):
+def plot_histograms(all_hists, vars=[], bkg_spmodes=['998'], datamodes=['0'], sig_spmodes=['-999'], sig_weight=1, cut='0', save= True, overlay_data=True, only_stacked=False, fixed_grid=None, path='BNV_pLambda_plots', extra_tag=""):
     
     ### makes a directory (if it doesn't already exist) for these plots.
     ### plots will be saved to this dictionary if save= true
     current_dir= os.getcwd()
     directory = "BNV_pLambda_plots"
-    path= os.path.join(current_dir,directory)
-    if os.path.isdir(path)== False:
-        os.mkdir(path)
+    #path= os.path.join(current_dir,directory)
+    #if os.path.isdir(path)== False:
+    #    os.mkdir(path)
     
     if len(vars) == 0:
         vars = list(all_hists.keys())
@@ -631,13 +633,25 @@ def plot_histograms(all_hists, vars=[], bkg_spmodes=['998'], datamodes=['0'], si
     cd["1237"]= {"tab:red"}
     cd["3981"]= {"tab:purple"}
     cd["3429"]= {"tab:pink"}
+    cd["991"]=  {"tab:blue"}
     cd["0"]= {"tab:cyan"}
 
-    print(bkg_spmodes)
+    #print("here: ", bkg_spmodes)
 
     if only_stacked and fixed_grid:
-        width = fixed_grid[0] * 5
-        height = fixed_grid[1] * 3
+        # For 4 rows and 5 columns
+        #width = fixed_grid[0] * 5
+        #height = fixed_grid[1] * 3
+
+        # For 1 row x 3 columns
+        width = fixed_grid[0] * 12
+        height = fixed_grid[1] * 1.5
+
+        # For 1 row x 3 columns, not as high
+        width = fixed_grid[0] * 12
+        height = fixed_grid[1] * 0.75
+
+
         plt.figure(figsize=(width,height))           
 
     
@@ -653,13 +667,14 @@ def plot_histograms(all_hists, vars=[], bkg_spmodes=['998'], datamodes=['0'], si
             plt.figure(figsize=(18,12))
             plt.subplot(3,3,1)
             
+        #print("there: ", var, bkg_spmodes, cut)
         h[:,bkg_spmodes,cut].stack('SP')[:].project('var').plot(stack=True, histtype="fill")
         h[:,sig_spmodes,cut].project('var').plot(histtype="step", color='yellow', label= "signal")
 
         if overlay_data:
             h[:,datamodes,cut].project('var').plot(histtype="errorbar", color='black', label='Data')
 
-        plt.legend()
+        plt.legend(loc='upper left')
         plt.xlabel(plt.gca().get_xlabel(), fontsize=18)
 
 
@@ -677,18 +692,20 @@ def plot_histograms(all_hists, vars=[], bkg_spmodes=['998'], datamodes=['0'], si
 
         plt.tight_layout()
         
+        '''
         if save== True:
             
             outfilename=f"plot_hist_cut{cut}_{var}.png" 
             if only_stacked and not fixed_grid:
-                outfilename=f"plot_hist_cut{cut}_ONLY_STACKED_{var}.png" 
+                outfilename=f"plot_hist_cut{cut}_ONLY_STACKED_{var}{extra_tag}.png" 
                 
             plt.savefig(f"{path}/{outfilename}")
+        '''
 
     if save== True and fixed_grid and only_stacked:
         # name of .png saved to computer based on fields specified on function call 
         varnames = "_".join(vars)
-        outfilename=f"plot_hist_cut{cut}_ONLY_STACKED_FIXED_GRID_{varnames}.png" 
+        outfilename=f"plot_hist_cut{cut}_ONLY_STACKED_FIXED_GRID_{varnames}{extra_tag}.png" 
             
         plt.savefig(f"{path}/{outfilename}")
 ################################################################################
