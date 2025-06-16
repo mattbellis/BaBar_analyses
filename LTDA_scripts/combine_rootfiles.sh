@@ -1,8 +1,11 @@
-#subdir='bnv_analysis'
-subdir='bnv_analysis_bnc_mode'
+subdir='bnv_analysis'
+#subdir='bnv_analysis_bnc_mode'
 for dir in $@; do
     echo $dir
-    outname=$dir"_""$subdir""_COMBINED.root"
+    # BNV
+    outname=$dir"_COMBINED.root"
+    # Do this for BNC
+    #outname=$dir"_""$subdir""_COMBINED.root"
     echo $outname
     #ls $dir/${subdir}/*.root
     # -k means skip corrupted files. There might be a couple

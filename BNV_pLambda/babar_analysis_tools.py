@@ -864,7 +864,7 @@ def count_events_in_inference_regions(mes, DeltaE, region_definitions=None, tag=
 
 
 ##########################################################################
-def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=False, draw_inference_bins=False, tag=None, region_definitions=None, bins=100, zoom=False, plot_full=True):
+def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=False, draw_inference_bins=False, tag=None, region_definitions=None, bins=100, zoom=False, plot_full=True, draw_fit_region=False):
 
     meslo = region_definitions['fitting MES'][0]
     meshi = region_definitions['fitting MES'][1]
@@ -883,6 +883,9 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=Fal
 
     sbmeslo = region_definitions['sideband MES'][0]
     sbmeshi = region_definitions['sideband MES'][1]
+
+    fitDeltaElo = region_definitions['fitting DeltaE'][0]
+    fitDeltaEhi = region_definitions['fitting DeltaE'][1]
 
     if zoom==True and region_definitions is not None:
         DeltaElo = region_definitions['fitting DeltaE'][0]
@@ -940,6 +943,11 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=Fal
         draw_box(sbmeslo,sbmeshi,sbDE1lo,sbDE1hi)
         draw_box(sbmeslo,sbmeshi,sbDE2lo,sbDE2hi)
 
+    if draw_fit_region==True:
+        print("Fitting region")
+        plt.plot([meslo,meshi],[fitDeltaElo, fitDeltaElo], 'w--')
+        plt.plot([meslo,meshi],[fitDeltaEhi, fitDeltaEhi], 'w--')
+
     if draw_inference_bins==True:
         print("Inference bins")
         for xlo,xhi,ylo,yhi in region_definitions['inference']:
@@ -950,7 +958,7 @@ def plot_mes_vs_DeltaE(mes, DeltaE, draw_signal_region=False, draw_sidebands=Fal
     #plt.tight_layout()
 
     if tag is not None:
-        plt.savefig(f'BNV_pLambda_plots/plot_{tag}_bkg_de_vs_mes.png')
+        plt.savefig(f'BNV_pLambda_plots/plot_{tag}_de_vs_mes.png')
         plt.tight_layout()
 
     signal_mask = (mes > region_definitions["signal MES"][0]) & ((DeltaE>region_definitions["signal DeltaE"][0]) & (DeltaE<region_definitions["signal DeltaE"][1])) 
