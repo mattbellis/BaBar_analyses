@@ -1239,7 +1239,7 @@ def munge_mask_shapes(mask_larger, mask_smaller):
     return mask
 
 ##########################################################################################
-def get_final_masks(data_temp, region_definitions=None, tag="DEFAULT", IS_MC=True):
+def get_final_masks(data_temp, region_definitions=None, tag="DEFAULT", IS_MC=True, is_BNC=False):
 
     if region_definitions is None:
         print("Need to pass in the region definitions")
