@@ -1488,3 +1488,259 @@ def dump_awkward_to_dataframe(arr, fields_to_dump=None, write_to_filename=None):
 
 ##########################################################################
 ##########################################################################
+#def punzi_fom_nn(model_aft_train, sp_data, threshold, sp_998_df, sp_999_df, sig_disc= 4, scaling= 0.3):
+def punzi_fom_nn(df_sp, df_col, sig_sp_mode='-999', region_definitions = None, sigma = 4.0, BNC=False):
+
+    # Collision data
+    mask = (df_col['cut_-1'] == True) 
+    if BNC is True:
+        mask = (df_col['cut_2'] == True) 
+        mask = mask & (df_col['cut_3'] == True) 
+        mask = mask & (df_col['cut_4'] == True) 
+        
+    
+    df_col_tmp = df_col[mask]
+
+    # SP
+    mask = (df_sp['cut_-1'] == True) 
+    if BNC is True:
+        mask = (df_sp['cut_2'] == True) 
+        mask = mask & (df_sp['cut_3'] == True) 
+        mask = mask & (df_sp['cut_4'] == True) 
+
+    mask = mask & (df_sp['spmode'] == sig_sp_mode)
+    mask = mask & (df_sp['used_in_sig_train'] == False)
+    df_sp_tmp = df_sp[mask]
+
+    meslo = region_definitions['signal MES'][0]
+    meshi = region_definitions['signal MES'][1]
+    
+    delo = region_definitions['signal DeltaE'][0]
+    dehi = region_definitions['signal DeltaE'][1]
+
+    messidelo = region_definitions['sideband MES'][0]
+    messidehi = region_definitions['sideband MES'][1]
+    
+    desidelo1 = region_definitions['sideband 1 DeltaE'][0]
+    desidehi1 = region_definitions['sideband 1 DeltaE'][1]
+    
+    desidelo2 = region_definitions['sideband 2 DeltaE'][0]
+    desidehi2 = region_definitions['sideband 2 DeltaE'][1]
+
+    # Print statements
+    print(f'{meslo = }        {meshi = }')
+    print(f'{messidelo = }    {messidehi = }')
+    print(f'{delo = }         {dehi = }')
+    print(f'{desidelo1 = }     {desidehi1 = }')
+    print(f'{desidelo2 = }     {desidehi2 = }')
+
+    
+    fom_dict = {}
+    fom_dict['thresh'] = []
+    fom_dict['nbkg_sb1'] = []
+    fom_dict['nbkg_sb2'] = []
+    fom_dict['nbkg'] = []
+    fom_dict['nsig'] = []
+
+    # Collision data
+    mes_col = df_col_tmp['BpostFitMes']
+    de_col = df_col_tmp['BpostFitDeltaE']
+
+    mask1_col = (mes_col>messidelo) & (mes_col<messidehi) & (de_col>desidelo1) & (de_col<desidehi1)    
+    mask2_col = (mes_col>messidelo) & (mes_col<messidehi) & (de_col>desidelo2) & (de_col<desidehi2)
+
+    # SP
+    mes_sp = df_sp_tmp['BpostFitMes']
+    de_sp = df_sp_tmp['BpostFitDeltaE']
+
+    mask_sp = (mes_sp>meslo) & (mes_sp<meshi) & (de_sp>delo) & (de_sp<dehi) 
+
+    for thresh in np.arange(0,1,0.01):
+        
+        # Collision data
+        mask_thresh_col = df_col_tmp['proba'] > thresh
+
+        nsb1 = len(df_col_tmp[mask1_col & mask_thresh_col])        
+        nsb2 = len(df_col_tmp[mask2_col & mask_thresh_col])
+    
+        # Collision data
+        mask_thresh_sp = df_sp_tmp['proba'] > thresh
+
+        nsig = len(df_sp_tmp[mask_sp & mask_thresh_sp])        
+    
+        #print(nsb1, nsb2, nsig)
+        
+        fom_dict['thresh'].append(thresh)
+        fom_dict['nbkg_sb1'].append(nsb1)
+        fom_dict['nbkg_sb2'].append(nsb2)
+        #fom_dict['nbkg'].append((nsb1 + nsb2)/2)
+        fom_dict['nbkg'].append(nsb1 + nsb2)
+
+        fom_dict['nsig'].append(nsig)
+
+    df_fom = pd.DataFrame.from_dict(fom_dict)
+    df_fom['sig_pct'] = df_fom['nsig'] / df_fom['nsig'].iloc[0]
+
+    # Number of signal estimation for S / sqrt(S+B)
+    N_S0 = 50
+    df_fom['N_S'] = N_S0*df_fom['sig_pct']
+
+
+    #sigma = 4.0
+    
+    df_fom['fom'] = df_fom['sig_pct'] / (np.sqrt(df_fom['nbkg']) + sigma/2.0)
+    df_fom['fom_std'] = df_fom['N_S'] / np.sqrt(df_fom['N_S'] + df_fom['nbkg'])
+
+    return df_fom
+##########################################################################
+##########################################################################
+def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, region_definitions=None, sig_eff=1.0):
+
+    nBpairs = 470.89e6
+    # Assuming 0.28%
+    #nBpairs_err =  1.32
+    # Assuming 0.6%
+    nBpairs_err =  2.83e6
+
+    #nB_bf = [0.484, 0.484, 0.516, 0.516, 0.516, 0.516, 0.516]
+    #nB_bf_err = [0.006,0.006,0.006,0.006,0.006,0.006]
+
+    # From PDG
+    nB_bf = [0.514]
+    nB_bf_err = [0.006]
+
+    # initial numbers for signal SP
+    #skim_eff = [0.467, 0.504, 0.553, 0.569, 0.553, 0.569]
+    #skim_eff_err = [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
+
+    # BNC
+    #skim_eff = [0.16] # Is this the efficiency after the skim?
+    skim_eff = [sig_eff] # Is this the efficiency after the skim?
+    skim_eff_err = [0.001] # Need to check this
+
+
+    ######### HOW ARE THESE DIFFERENT FROM ABOVE?
+    # initial numbers for signal SP
+    #initial_numbers = [22000, 22000, 28000, 28000, 28000, 28000]
+    #final_numbers =   [12387, 11223, 14536, 13371, 15867, 14760]
+
+    initial_numbers = [95243]
+    final_numbers =   [44905]
+
+    nmodes = len(initial_numbers)
+
+    # Baryon branching fractions
+    baryon_bf =     [0.639]
+    baryon_bf_err = [0.005]
+
+    # Tracking errors
+    # http://www.slac.stanford.edu/BFROOT/www/Physics/TrackEfficTaskForce/TauEff/R24/TauEff.html
+    trk_err_per_trk = 0.128/100.0 # percent error
+    trk_err_pct_l0 = 3.0 * trk_err_per_trk # 3 tracks
+    trk_err_pct_lc = 4.0 * trk_err_per_trk # 4 tracks
+
+    #trk_pct_err = [trk_err_pct_lc, trk_err_pct_lc, trk_err_pct_l0, trk_err_pct_l0, trk_err_pct_l0, trk_err_pct_l0]
+    trk_pct_err = [trk_err_pct_l0]
+
+    # PID errors
+    pid_err_p  = 0.010
+    pid_err_pi = 0.010
+    pid_err_k  = 0.012
+    #pid_err_e  = 0.004
+    #pid_err_mu = 0.007
+    pid_err_e  = 0.01
+    pid_err_mu = 0.025
+
+    pid_pct_err = []
+    # Precise
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_k*pid_err_k + pid_err_mu*pid_err_mu))
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_k*pid_err_k + pid_err_e*pid_err_e))
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_mu*pid_err_mu))
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_e*pid_err_e))
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_mu*pid_err_mu))
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_e*pid_err_e))
+
+    # BNC or BNV
+    pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_p*pid_err_p + pid_err_pi*pid_err_pi))
+
+
+    # Estimate
+    #pid_pct_err.append(0.025)
+    #pid_pct_err.append(0.025)
+    #pid_pct_err.append(0.020)
+    #pid_pct_err.append(0.020)
+    #pid_pct_err.append(0.020)
+    #pid_pct_err.append(0.020)
+
+    # Eff calculations
+    conv_factors = []
+    conv_factor_errs = []
+    for i in range(0,nmodes):
+        n0 = initial_numbers[i]
+        n =  final_numbers[i]
+        eff = n/float(n0)
+        eff_err = math.sqrt((eff*(1.0-eff))/n0)
+
+        pre_skim_eff = eff
+
+        eff *= skim_eff[i]
+
+        conv_factor = (nBpairs*2.0*nB_bf[i]) * eff * baryon_bf[i]
+
+        # Calculate all the percent errors. 
+        pct_errs = []
+
+        # number of Bs
+        pct_errs.append(nBpairs_err/float(nBpairs))
+        # B branching fraction
+        pct_errs.append(nB_bf_err[i]/float(nB_bf[i]))
+
+        # Efficiency
+        pct_errs.append(skim_eff_err[i]/skim_eff[i])
+        pct_errs.append(eff_err/eff)
+
+        # Branching fractions
+        pct_errs.append(baryon_bf_err[i]/baryon_bf[i])
+
+        # Tracking
+        pct_errs.append(trk_pct_err[i])
+        # PID?
+        pct_errs.append(pid_pct_err[i])
+
+        eff_tot_err =  (eff_err/eff)*(eff_err/eff)
+        eff_tot_err += trk_pct_err[i]*trk_pct_err[i]
+        eff_tot_err += pid_pct_err[i]*pid_pct_err[i]
+
+        tot_pct_err = 0.0
+        for pe in pct_errs:
+            tot_pct_err += pe*pe
+            #print "%f %f %f %f" % (tot_pct_err, math.sqrt(tot_pct_err), pe*pe, pe)
+
+        conv_factor_err = math.sqrt(tot_pct_err)
+        #print "conv_factor_err: %f" % (conv_factor_err)
+
+        # Convert back to a number, rather than a percentage
+        conv_factor_err *= conv_factor
+
+        output = "%d\ttrk_pct_err: %6.4f\n" % (i, trk_pct_err[i])
+        output += " \tpid_pct_err: %6.4f\n" % (pid_pct_err[i])
+        output += " \tnBpairs_err: %6.4f\n" % (nBpairs_err/float(nBpairs))
+        output += " \tnB_bf_err: %6.4f\n" % (nB_bf_err[i]/float(nB_bf[i]))
+        output += " \tbaryon_bf_err: %6.4f\n" % (baryon_bf_err[i]/baryon_bf[i])
+        output += "\tpre_skim_eff: %6.4f +/- %6.4f\t\teff: %6.4f +/- %6.4f" % \
+                (pre_skim_eff,eff_err, eff,eff*math.sqrt(eff_tot_err))
+        output += "\t\tconv_factor: %6.2f +/- %6.3f (pct_err: %6.3f)" % \
+                (conv_factor,conv_factor_err,100*conv_factor_err/conv_factor)
+
+        print(output)
+        print()
+        output = f"conv_factor: {conv_factor:6.4e} +/- {conv_factor_err:6.3e} (pct_err: {100*conv_factor_err/conv_factor:6.3f})"
+        print(output)
+
+        conv_factors.append(conv_factor)
+        conv_factor_errs.append(conv_factor_err)
+
+    return conv_factors, conv_factor_errs
+
+##########################################################################
+##########################################################################
