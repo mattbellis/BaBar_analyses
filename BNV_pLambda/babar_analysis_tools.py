@@ -1616,7 +1616,7 @@ def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, regio
     # BNC
     #skim_eff = [0.16] # Is this the efficiency after the skim?
     skim_eff = [sig_eff] # Is this the efficiency after the skim?
-    skim_eff_err = [0.001] # Need to check this
+    skim_eff_err = [0.0015] # Assuming that we go from ~60000 events to about 20000 after the ML selection
 
 
     ######### HOW ARE THESE DIFFERENT FROM ABOVE?
@@ -1624,8 +1624,18 @@ def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, regio
     #initial_numbers = [22000, 22000, 28000, 28000, 28000, 28000]
     #final_numbers =   [12387, 11223, 14536, 13371, 15867, 14760]
 
+    # BNC
     initial_numbers = [95243]
     final_numbers =   [44905]
+    if decay=='BNV':
+        initial_numbers = [2*99966] # I put 2 runs of ~100k 
+        final_numbers =   [119215]
+
+    print("At the skim stage...")
+    print(f"initial numbers: {initial_numbers[0]}")
+    print(f"final   numbers: {final_numbers[0]}")
+    print(f"eff            : {final_numbers[0]/initial_numbers[0]:.4f}%")
+    print()
 
     nmodes = len(initial_numbers)
 
