@@ -20,7 +20,12 @@ import os
 ################################################################################
 def load_datasets(topdir=None, sp_file_tag='Background_and_signal_SP_modes', \
                   collision_file_tag='Data', BNC=False, \
-                  subset='Run1', sp_or_data=None):
+                  subset='Run1', sp_or_data=None, UNBLINDED=False):
+
+    BLINDED_STRING = 'BLINDED'
+    if UNBLINDED is True:
+        BLINDED_STRING = 'UNBLINDED'
+
 
     subset_tag = ""
     if subset=='Run1' or subset=='run1':
@@ -44,7 +49,7 @@ def load_datasets(topdir=None, sp_file_tag='Background_and_signal_SP_modes', \
 
     if sp_or_data=='col' or sp_or_data=='collision' or sp_or_data==None:
         start= time.time()
-        filename= f"{topdir}/{collision_file_tag}{BNC_tag}_{subset_tag}_BLINDED.parquet"
+        filename= f"{topdir}/{collision_file_tag}{BNC_tag}_{subset_tag}_{BLINDED_STRING}.parquet"
         if BNC is True:
             filename= f"{topdir}/{collision_file_tag}{BNC_tag}_{subset_tag}.parquet"
         print(f"Opening {filename}...")
@@ -494,10 +499,14 @@ def fill_histograms_v3(data, subset=None, empty_hists=None, spmodes=['998'], wei
         for spmode in spmodes:
             #print(spmode)
             weight = 1
+            '''
             if spmode=='-999':
                 weight = .005
             else:
                 weight = weights[spmode]
+            '''
+            # Assuming this is passed in OK
+            weight = weights[spmode]
 
             for cutname in cuts.keys():
                 #print(f"filling with {cutname}  for {spmode}   for {key}")
@@ -648,8 +657,8 @@ def plot_histograms(all_hists, vars=[], bkg_spmodes=['998'], datamodes=['0'], si
         height = fixed_grid[1] * 1.5
 
         # For 1 row x 3 columns, not as high
-        width = fixed_grid[0] * 12
-        height = fixed_grid[1] * 0.75
+        #width = fixed_grid[0] * 12
+        #height = fixed_grid[1] * 0.75
 
 
         plt.figure(figsize=(width,height))           
@@ -1754,3 +1763,113 @@ def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, regio
 
 ##########################################################################
 ##########################################################################
+
+#""""
+def add_probas_to_dfs(workspace, df_col, df_sp):
+
+    model = workspace['model']
+    x_train = workspace['x_train']
+    y_train = workspace['y_train']
+    x_test = workspace['x_test']
+    y_test = workspace['y_test']
+
+    #idx_x_train     = workspace['idx_sig_train']
+    #idx_x_not_train = workspace['idx_sig_not_train']
+
+    # Get the training vars
+    training_vars = model.feature_names
+
+    print("Training vars initially: ")
+    print(training_vars)
+    print(len(training_vars))
+
+    remove_these = ['proba', 'used_in_sig_train', 'used_in_bkg_train']
+    #print(type(training_vars))
+    for r in remove_these:
+        print(f"Checking for {r}...")
+        if sum(training_vars.isin([r]).astype(int))>0:
+            idx = training_vars.get_loc(r)
+            print(idx, training_vars)
+            training_vars = training_vars.delete(idx)
+            print(training_vars)
+            print(f"removed {r}")
+
+    print("Training vars finally: ")
+    print(training_vars)
+    print(len(training_vars))
+
+
+    #x_train = df_col[training_vars]#[idx_x_train]
+
+    #### FOR SP
+    #for i in threshold:
+    #    output_df= see_stuff(sig_samp= sig_samp,bkg_samp= bkg_samp, thresh= i, verbose= False, df=MC_data, df_col=coll_data)
+
+    # 3. Scale the test data using the same scaler
+    #scaler = StandardScaler()
+
+    # SHOULD THIS BE THE ACTUAL TRAINING SP
+    #x_dummy = scaler.fit_transform(x_train)
+
+    #print(x_dummy.T[-1])
+    #print(len(x_dummy), len(x_dummy[0]))
+
+    #print("training vars after" )
+    #print(training_vars)
+
+    # Collision
+    x_test  = df_col[training_vars].values#[idx_x_not_train]
+    print(x_test.T[-1])
+
+    #x_test = scaler.transform(x_test)
+
+    proba = model.predict_proba(x_test)
+
+    #print("proba: ")
+    #print(proba)
+
+    df_col['proba'] = proba[:,0]
+
+    #print(df_col.columns)
+
+    # SP
+    # Collision
+    x_test  = df_sp[training_vars].values#[idx_x_not_train]
+    #x_test = scaler.transform(x_test)
+
+    #print(x_test)
+
+    proba = model.predict_proba(x_test)
+
+    #print("proba: ")
+    #print(proba)
+
+    df_sp['proba'] = proba[:,0]
+
+    #print(df_sp.columns)
+
+    idx_bkg_train = workspace['idx_bkg_train']
+    idx_sig_train = workspace['idx_sig_train']
+
+    nentries = len(df_sp)
+    df_sp['used_in_sig_train'] = np.zeros(nentries, dtype=bool)
+    df_sp.loc[idx_sig_train, "used_in_sig_train"] = True
+
+    df_sp['used_in_bkg_train'] = np.zeros(nentries, dtype=bool)
+    df_sp.loc[idx_bkg_train, 'used_in_bkg_train'] = True
+
+
+    #x_col_proba = model.predict_proba(df_col_tmp)
+
+    #### FOR COLLISION
+    #y_proba_col_sig = model.predict_proba()
+
+    #sp998= sp_data["spmode"]== "998"
+    #N_bkg = len(sp_998_df[sp998]) ## total number of background events (sp 998)
+    #signal_before= len(sp_999_df)
+    #signal_after= len(sp_999_df)
+    #efficiency = signal_after/signal_before ## the accuracy of the model after training with the SP
+    #fom = efficiency(threshold)/(np.sqrt(N_bkg(threshold)+sig_disc/2))
+    #return fom
+    return 0
+#"""
