@@ -1542,7 +1542,6 @@ def punzi_fom_nn(df_sp, df_col, sig_sp_mode='-999', region_definitions = None, s
     print(f'{delo = }         {dehi = }')
     print(f'{desidelo1 = }     {desidehi1 = }')
     print(f'{desidelo2 = }     {desidehi2 = }')
-
     
     fom_dict = {}
     fom_dict['thresh'] = []
@@ -1603,7 +1602,7 @@ def punzi_fom_nn(df_sp, df_col, sig_sp_mode='-999', region_definitions = None, s
     return df_fom
 ##########################################################################
 ##########################################################################
-def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, region_definitions=None, sig_eff=1.0):
+def calculate_conversion_factor(df_sp, df_col, decay='BNV', region_definitions=None, sig_eff_after_ML=1.0):
 
     nBpairs = 470.89e6
     # Assuming 0.28%
@@ -1624,8 +1623,8 @@ def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, regio
 
     # BNC
     #skim_eff = [0.16] # Is this the efficiency after the skim?
-    skim_eff = [sig_eff] # Is this the efficiency after the skim?
-    skim_eff_err = [0.0015] # Assuming that we go from ~60000 events to about 20000 after the ML selection
+    skim_eff_due_to_ML = [sig_eff_after_ML] # Is this the efficiency after the skim?
+    skim_eff_due_to_ML_err = [0.0015] # Assuming that we go from ~60000 events to about 20000 after the ML selection
 
 
     ######### HOW ARE THESE DIFFERENT FROM ABOVE?
@@ -1633,17 +1632,25 @@ def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, regio
     #initial_numbers = [22000, 22000, 28000, 28000, 28000, 28000]
     #final_numbers =   [12387, 11223, 14536, 13371, 15867, 14760]
 
+    # These are the numbers before and after BtaTupleMaker
     # BNC
     initial_numbers = [95243]
+    final_numbers_after_BTM =   [44905]
     final_numbers =   [44905]
     if decay=='BNV':
         initial_numbers = [2*99966] # I put 2 runs of ~100k 
-        final_numbers =   [119215]
+        # After BtaTupleMaker
+        final_numbers_after_BTM =   [119215]
+        # After rectangular cuts
+        final_numbers =   [59937]
 
     print("At the skim stage...")
-    print(f"initial numbers: {initial_numbers[0]}")
-    print(f"final   numbers: {final_numbers[0]}")
-    print(f"eff            : {final_numbers[0]/initial_numbers[0]:.4f}%")
+    print(f"initial numbers (before BTM):       {initial_numbers[0]}")
+    print(f"final   numbers (after BTM):        {final_numbers_after_BTM[0]}")
+    print(f"final   numbers (after rect cuts):  {final_numbers[0]}")
+    print(f"eff (after BTM)                  :  {final_numbers_after_BTM[0]/initial_numbers[0]:.4f}%")
+    print(f"eff (due to rectcuts)            :  {final_numbers[0]/final_numbers_after_BTM[0]:.4f}%")
+    print(f"eff (after rectcuts)             :  {final_numbers[0]/initial_numbers[0]:.4f}%")
     print()
 
     nmodes = len(initial_numbers)
@@ -1694,15 +1701,25 @@ def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, regio
     # Eff calculations
     conv_factors = []
     conv_factor_errs = []
+    total_efficiencies = []
+    total_efficiency_errs = []
     for i in range(0,nmodes):
         n0 = initial_numbers[i]
         n =  final_numbers[i]
         eff = n/float(n0)
-        eff_err = math.sqrt((eff*(1.0-eff))/n0)
+        # https://lss.fnal.gov/archive/test-tm/2000/fermilab-tm-2286-cd.pdf
+        #eff_err = math.sqrt((eff*(1.0-eff))/n0)
+        #eff_err = (1/n0) * math.sqrt(n*(1.0-n/n0))
+        eff_err = (1/n0) * math.sqrt(n*(1.0-n/n0))
 
-        pre_skim_eff = eff
+        pre_ML_eff = eff
+        pre_ML_eff_err = eff_err
 
-        eff *= skim_eff[i]
+        # Total efficiency due to 
+        # BTM
+        # Rectangular cuts
+        # ML cut
+        eff *= skim_eff_due_to_ML[i]
 
         conv_factor = (nBpairs*2.0*nB_bf[i]) * eff * baryon_bf[i]
 
@@ -1715,8 +1732,8 @@ def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, regio
         pct_errs.append(nB_bf_err[i]/float(nB_bf[i]))
 
         # Efficiency
-        pct_errs.append(skim_eff_err[i]/skim_eff[i])
-        pct_errs.append(eff_err/eff)
+        pct_errs.append(skim_eff_due_to_ML_err[i]/skim_eff_due_to_ML[i])
+        pct_errs.append(pre_ML_eff_err/pre_ML_eff)
 
         # Branching fractions
         pct_errs.append(baryon_bf_err[i]/baryon_bf[i])
@@ -1741,15 +1758,22 @@ def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, regio
         # Convert back to a number, rather than a percentage
         conv_factor_err *= conv_factor
 
+        total_eff = eff
+        #total_eff_err = eff*math.sqrt(eff_tot_err)
+        # Going to use the total fractional uncertainties to calculate the signal efficiency
+        total_eff_err = total_eff * (conv_factor_err/conv_factor)
+
         output = "%d\ttrk_pct_err: %6.4f\n" % (i, trk_pct_err[i])
         output += " \tpid_pct_err: %6.4f\n" % (pid_pct_err[i])
         output += " \tnBpairs_err: %6.4f\n" % (nBpairs_err/float(nBpairs))
         output += " \tnB_bf_err: %6.4f\n" % (nB_bf_err[i]/float(nB_bf[i]))
-        output += " \tbaryon_bf_err: %6.4f\n" % (baryon_bf_err[i]/baryon_bf[i])
-        output += "\tpre_skim_eff: %6.4f +/- %6.4f\t\teff: %6.4f +/- %6.4f" % \
-                (pre_skim_eff,eff_err, eff,eff*math.sqrt(eff_tot_err))
-        output += "\t\tconv_factor: %6.2f +/- %6.3f (pct_err: %6.3f)" % \
-                (conv_factor,conv_factor_err,100*conv_factor_err/conv_factor)
+        output += " \tbaryon_bf_err: %6.4f\n\n" % (baryon_bf_err[i]/baryon_bf[i])
+
+        output += f"\tpre_ML_eff: {pre_ML_eff:6.4f} +/- {pre_ML_eff_err:6.4f} ({pre_ML_eff_err/pre_ML_eff:6.4f} frac uncert) (we'll use this for the MC stat error)\n"
+        output += f"\ttotal eff:  {eff:6.4f} +/- {total_eff_err:6.4f}\n\n" 
+                #(pre_skim_eff,eff_err, eff,eff*math.sqrt(eff_tot_err))
+        output += f"\tconv_factor: {conv_factor:6.2f} +/- {conv_factor_err:6.3f} (pct_err: {100*conv_factor_err/conv_factor:6.3f})\n"
+                #(conv_factor,conv_factor_err,100*conv_factor_err/conv_factor)
 
         print(output)
         print()
@@ -1758,8 +1782,10 @@ def calculate_conversion_factor(df_sp, df_col, decay='BNV', proba_cut=0.0, regio
 
         conv_factors.append(conv_factor)
         conv_factor_errs.append(conv_factor_err)
+        total_efficiency_errs.append(total_eff_err)
+        total_efficiencies.append(total_eff)
 
-    return conv_factors, conv_factor_errs
+    return total_efficiencies, total_efficiency_errs, conv_factors, conv_factor_errs
 
 ##########################################################################
 ##########################################################################
