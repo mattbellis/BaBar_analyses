@@ -845,6 +845,65 @@ def PID_masks(data, \
 
 
 ##########################################################################
+##########################################################################
+def PID_masks_tiny_hydrogen(data, \
+              p_selector='VeryLooseKMProtonSelection', \
+              e_selector='SuperLooseKMElectronMicroSelection', \
+             verbosity=0):
+    # Get these maps first
+    pps = myPIDselector.PIDselector("p")
+    eps = myPIDselector.PIDselector("e")
+
+    if verbosity:
+        print("Names of selectors:\nelectrons")
+        print(eps.selectors)
+        print("\nprotons\n")
+        print(pps.selectors) 
+
+    # Proton and electron information from the neutron decay
+    # These are the index of the proton (d1) and electron (d2) in those lists
+    d1idx = data['nd1Idx']
+    d2idx = data['nd2Idx']
+    
+    d1lund = data['nd1Lund']
+    d2lund = data['nd2Lund']
+    
+    if verbosity==1:
+        print(d1lund)
+        print(d2lund)
+        print(Bd2lund)
+        print()
+        
+        print(d1idx)
+        print(d2idx)
+        print()
+    
+    trkidx_proton = data['pTrkIdx']
+    trk_selector_map_proton = data['pSelectorsMap']
+    
+    trkidx_electron = data['eTrkIdx']
+    trk_selector_map_electron = data['eSelectorsMap']
+    
+    # Proton
+    pbits = calculate_bits_for_PID_selector(trkidx_proton, trk_selector_map_proton, verbose=verbosity)
+    # electron
+    ebits = calculate_bits_for_PID_selector(trkidx_electron, trk_selector_map_electron, verbose=verbosity)
+    
+    
+    #selector_proton = 'TightKMProtonSelection'
+    #selector_pion = 'TightKMPionMicroSelection'
+    #print(f"Now trying to create a mask with {selector_proton}")
+    #print(f"Now trying to create a mask with {selector_pion}")
+    
+    
+    mask_bool_proton = mask_PID_selection(pbits[d1idx], p_selector, pps)
+        
+    mask_bool_electron = mask_PID_selection(ebits[d2idx], e_selector, eps)
+
+    return mask_bool_proton, mask_bool_electron
+
+
+##########################################################################
 
 
 ##########################################################################

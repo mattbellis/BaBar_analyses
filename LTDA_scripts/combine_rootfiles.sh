@@ -1,4 +1,5 @@
-subdir='bnv_analysis'
+subdir='tiny_hydrogen'
+#subdir='bnv_analysis'
 #subdir='bnv_analysis_bnc_mode'
 for dir in $@; do
     echo $dir
