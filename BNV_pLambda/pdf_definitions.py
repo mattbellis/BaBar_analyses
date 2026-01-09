@@ -183,7 +183,7 @@ def myRooKeys(z,data1):
 # Signal
 #########################################
 ################################################################################
-def sig_PDF(x, dataset,  use_double_CB=False, workspace=None):
+def sig_PDF(x, use_double_CB=False, workspace=None):
     pars = []
 
     cb = None
@@ -215,7 +215,7 @@ def sig_PDF(x, dataset,  use_double_CB=False, workspace=None):
 # Background
 #########################################
 # Multiply the components
-def bkg_PDF(x, dataset):
+def bkg_PDF(x):
 
     nn_bkg = None
     bkg_prod = None
@@ -239,11 +239,11 @@ def bkg_PDF(x, dataset):
 
 #############################################################
 #############################################################
-def tot_PDF(x, dataset, use_double_CB=False, workspace=None):
+def tot_PDF(x, use_double_CB=False, workspace=None):
     funcs = []
 
-    pars_s, funcs_s, sig_pdf = sig_PDF(x, dataset, use_double_CB, workspace)
-    pars_b, funcs_b, bkg_pdf = bkg_PDF(x, dataset)
+    pars_s, funcs_s, sig_pdf = sig_PDF(x, use_double_CB, workspace)
+    pars_b, funcs_b, bkg_pdf = bkg_PDF(x)
 
     conv_factor_calc = ROOT.RooRealVar("conv_factor_calc","Conversion factor (calculated)",13.272) # Conversion factor, calculated
     conv_factor_fit  = ROOT.RooRealVar("conv_factor_fit", "Conversion factor (fit)",13.272) # Conversion factor, fit

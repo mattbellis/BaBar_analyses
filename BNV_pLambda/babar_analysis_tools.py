@@ -20,7 +20,12 @@ import os
 ################################################################################
 def load_datasets(topdir=None, sp_file_tag='Background_and_signal_SP_modes', \
                   collision_file_tag='Data', BNC=False, \
-                  subset='Run1', sp_or_data=None):
+                  subset='Run1', sp_or_data=None, UNBLINDED=False):
+
+    BLINDED_STRING = 'BLINDED'
+    if UNBLINDED is True:
+        BLINDED_STRING = 'UNBLINDED'
+
 
     subset_tag = ""
     if subset=='Run1' or subset=='run1':
@@ -44,7 +49,7 @@ def load_datasets(topdir=None, sp_file_tag='Background_and_signal_SP_modes', \
 
     if sp_or_data=='col' or sp_or_data=='collision' or sp_or_data==None:
         start= time.time()
-        filename= f"{topdir}/{collision_file_tag}{BNC_tag}_{subset_tag}_BLINDED.parquet"
+        filename= f"{topdir}/{collision_file_tag}{BNC_tag}_{subset_tag}_{BLINDED_STRING}.parquet"
         if BNC is True:
             filename= f"{topdir}/{collision_file_tag}{BNC_tag}_{subset_tag}.parquet"
         print(f"Opening {filename}...")
@@ -494,10 +499,14 @@ def fill_histograms_v3(data, subset=None, empty_hists=None, spmodes=['998'], wei
         for spmode in spmodes:
             #print(spmode)
             weight = 1
+            '''
             if spmode=='-999':
                 weight = .005
             else:
                 weight = weights[spmode]
+            '''
+            # Assuming this is passed in OK
+            weight = weights[spmode]
 
             for cutname in cuts.keys():
                 #print(f"filling with {cutname}  for {spmode}   for {key}")
@@ -648,8 +657,8 @@ def plot_histograms(all_hists, vars=[], bkg_spmodes=['998'], datamodes=['0'], si
         height = fixed_grid[1] * 1.5
 
         # For 1 row x 3 columns, not as high
-        width = fixed_grid[0] * 12
-        height = fixed_grid[1] * 0.75
+        #width = fixed_grid[0] * 12
+        #height = fixed_grid[1] * 0.75
 
 
         plt.figure(figsize=(width,height))           
@@ -833,6 +842,65 @@ def PID_masks(data, \
     mask_bool_pion = mask_PID_selection(pibits[d2idx], lampi_selector, pips)
 
     return mask_bool_proton, mask_bool_pion, mask_bool_protonB
+
+
+##########################################################################
+##########################################################################
+def PID_masks_tiny_hydrogen(data, \
+              p_selector='VeryLooseKMProtonSelection', \
+              e_selector='SuperLooseKMElectronMicroSelection', \
+             verbosity=0):
+    # Get these maps first
+    pps = myPIDselector.PIDselector("p")
+    eps = myPIDselector.PIDselector("e")
+
+    if verbosity:
+        print("Names of selectors:\nelectrons")
+        print(eps.selectors)
+        print("\nprotons\n")
+        print(pps.selectors) 
+
+    # Proton and electron information from the neutron decay
+    # These are the index of the proton (d1) and electron (d2) in those lists
+    d1idx = data['nd1Idx']
+    d2idx = data['nd2Idx']
+    
+    d1lund = data['nd1Lund']
+    d2lund = data['nd2Lund']
+    
+    if verbosity==1:
+        print(d1lund)
+        print(d2lund)
+        print(Bd2lund)
+        print()
+        
+        print(d1idx)
+        print(d2idx)
+        print()
+    
+    trkidx_proton = data['pTrkIdx']
+    trk_selector_map_proton = data['pSelectorsMap']
+    
+    trkidx_electron = data['eTrkIdx']
+    trk_selector_map_electron = data['eSelectorsMap']
+    
+    # Proton
+    pbits = calculate_bits_for_PID_selector(trkidx_proton, trk_selector_map_proton, verbose=verbosity)
+    # electron
+    ebits = calculate_bits_for_PID_selector(trkidx_electron, trk_selector_map_electron, verbose=verbosity)
+    
+    
+    #selector_proton = 'TightKMProtonSelection'
+    #selector_pion = 'TightKMPionMicroSelection'
+    #print(f"Now trying to create a mask with {selector_proton}")
+    #print(f"Now trying to create a mask with {selector_pion}")
+    
+    
+    mask_bool_proton = mask_PID_selection(pbits[d1idx], p_selector, pps)
+        
+    mask_bool_electron = mask_PID_selection(ebits[d2idx], e_selector, eps)
+
+    return mask_bool_proton, mask_bool_electron
 
 
 ##########################################################################
@@ -1488,3 +1556,405 @@ def dump_awkward_to_dataframe(arr, fields_to_dump=None, write_to_filename=None):
 
 ##########################################################################
 ##########################################################################
+#def punzi_fom_nn(model_aft_train, sp_data, threshold, sp_998_df, sp_999_df, sig_disc= 4, scaling= 0.3):
+def punzi_fom_nn(df_sp, df_col, sig_sp_mode='-999', region_definitions = None, sigma = 4.0, BNC=False):
+
+    # Collision data
+    mask = (df_col['cut_-1'] == True) 
+    if BNC is True:
+        mask = (df_col['cut_2'] == True) 
+        mask = mask & (df_col['cut_3'] == True) 
+        mask = mask & (df_col['cut_4'] == True) 
+        
+    
+    df_col_tmp = df_col[mask]
+
+    # SP
+    mask = (df_sp['cut_-1'] == True) 
+    if BNC is True:
+        mask = (df_sp['cut_2'] == True) 
+        mask = mask & (df_sp['cut_3'] == True) 
+        mask = mask & (df_sp['cut_4'] == True) 
+
+    mask = mask & (df_sp['spmode'] == sig_sp_mode)
+    mask = mask & (df_sp['used_in_sig_train'] == False)
+    df_sp_tmp = df_sp[mask]
+
+    meslo = region_definitions['signal MES'][0]
+    meshi = region_definitions['signal MES'][1]
+    
+    delo = region_definitions['signal DeltaE'][0]
+    dehi = region_definitions['signal DeltaE'][1]
+
+    messidelo = region_definitions['sideband MES'][0]
+    messidehi = region_definitions['sideband MES'][1]
+    
+    desidelo1 = region_definitions['sideband 1 DeltaE'][0]
+    desidehi1 = region_definitions['sideband 1 DeltaE'][1]
+    
+    desidelo2 = region_definitions['sideband 2 DeltaE'][0]
+    desidehi2 = region_definitions['sideband 2 DeltaE'][1]
+
+    # Print statements
+    print(f'{meslo = }        {meshi = }')
+    print(f'{messidelo = }    {messidehi = }')
+    print(f'{delo = }         {dehi = }')
+    print(f'{desidelo1 = }     {desidehi1 = }')
+    print(f'{desidelo2 = }     {desidehi2 = }')
+    
+    fom_dict = {}
+    fom_dict['thresh'] = []
+    fom_dict['nbkg_sb1'] = []
+    fom_dict['nbkg_sb2'] = []
+    fom_dict['nbkg'] = []
+    fom_dict['nsig'] = []
+
+    # Collision data
+    mes_col = df_col_tmp['BpostFitMes']
+    de_col = df_col_tmp['BpostFitDeltaE']
+
+    mask1_col = (mes_col>messidelo) & (mes_col<messidehi) & (de_col>desidelo1) & (de_col<desidehi1)    
+    mask2_col = (mes_col>messidelo) & (mes_col<messidehi) & (de_col>desidelo2) & (de_col<desidehi2)
+
+    # SP
+    mes_sp = df_sp_tmp['BpostFitMes']
+    de_sp = df_sp_tmp['BpostFitDeltaE']
+
+    mask_sp = (mes_sp>meslo) & (mes_sp<meshi) & (de_sp>delo) & (de_sp<dehi) 
+
+    for thresh in np.arange(0,1,0.01):
+        
+        # Collision data
+        mask_thresh_col = df_col_tmp['proba'] > thresh
+
+        nsb1 = len(df_col_tmp[mask1_col & mask_thresh_col])        
+        nsb2 = len(df_col_tmp[mask2_col & mask_thresh_col])
+    
+        # Collision data
+        mask_thresh_sp = df_sp_tmp['proba'] > thresh
+
+        nsig = len(df_sp_tmp[mask_sp & mask_thresh_sp])        
+    
+        #print(nsb1, nsb2, nsig)
+        
+        fom_dict['thresh'].append(thresh)
+        fom_dict['nbkg_sb1'].append(nsb1)
+        fom_dict['nbkg_sb2'].append(nsb2)
+        #fom_dict['nbkg'].append((nsb1 + nsb2)/2)
+        fom_dict['nbkg'].append(nsb1 + nsb2)
+
+        fom_dict['nsig'].append(nsig)
+
+    df_fom = pd.DataFrame.from_dict(fom_dict)
+    df_fom['sig_pct'] = df_fom['nsig'] / df_fom['nsig'].iloc[0]
+
+    # Number of signal estimation for S / sqrt(S+B)
+    N_S0 = 50
+    df_fom['N_S'] = N_S0*df_fom['sig_pct']
+
+
+    #sigma = 4.0
+    
+    df_fom['fom'] = df_fom['sig_pct'] / (np.sqrt(df_fom['nbkg']) + sigma/2.0)
+    df_fom['fom_std'] = df_fom['N_S'] / np.sqrt(df_fom['N_S'] + df_fom['nbkg'])
+
+    return df_fom
+##########################################################################
+##########################################################################
+def calculate_conversion_factor(df_sp, df_col, decay='BNV', region_definitions=None, sig_eff_after_ML=1.0):
+
+    nBpairs = 470.89e6
+    # Assuming 0.28%
+    #nBpairs_err =  1.32
+    # Assuming 0.6%
+    nBpairs_err =  2.83e6
+
+    #nB_bf = [0.484, 0.484, 0.516, 0.516, 0.516, 0.516, 0.516]
+    #nB_bf_err = [0.006,0.006,0.006,0.006,0.006,0.006]
+
+    # From PDG
+    nB_bf = [0.514]
+    nB_bf_err = [0.006]
+
+    # initial numbers for signal SP
+    #skim_eff = [0.467, 0.504, 0.553, 0.569, 0.553, 0.569]
+    #skim_eff_err = [0.001, 0.001, 0.001, 0.001, 0.001, 0.001]
+
+    # BNC
+    #skim_eff = [0.16] # Is this the efficiency after the skim?
+    skim_eff_due_to_ML = [sig_eff_after_ML] # Is this the efficiency after the skim?
+    skim_eff_due_to_ML_err = [0.0015] # Assuming that we go from ~60000 events to about 20000 after the ML selection
+
+
+    ######### HOW ARE THESE DIFFERENT FROM ABOVE?
+    # initial numbers for signal SP
+    #initial_numbers = [22000, 22000, 28000, 28000, 28000, 28000]
+    #final_numbers =   [12387, 11223, 14536, 13371, 15867, 14760]
+
+    # These are the numbers before and after BtaTupleMaker
+    # BNC
+    initial_numbers = [95243]
+    final_numbers_after_BTM =   [44905]
+    final_numbers =   [44905]
+    if decay=='BNV':
+        initial_numbers = [2*99966] # I put 2 runs of ~100k 
+        # After BtaTupleMaker
+        final_numbers_after_BTM =   [119215]
+        # After rectangular cuts
+        final_numbers =   [59937]
+
+    print("At the skim stage...")
+    print(f"initial numbers (before BTM):       {initial_numbers[0]}")
+    print(f"final   numbers (after BTM):        {final_numbers_after_BTM[0]}")
+    print(f"final   numbers (after rect cuts):  {final_numbers[0]}")
+    print(f"eff (after BTM)                  :  {final_numbers_after_BTM[0]/initial_numbers[0]:.4f}%")
+    print(f"eff (due to rectcuts)            :  {final_numbers[0]/final_numbers_after_BTM[0]:.4f}%")
+    print(f"eff (after rectcuts)             :  {final_numbers[0]/initial_numbers[0]:.4f}%")
+    print()
+
+    nmodes = len(initial_numbers)
+
+    # Baryon branching fractions
+    baryon_bf =     [0.639]
+    baryon_bf_err = [0.005]
+
+    # Tracking errors
+    # http://www.slac.stanford.edu/BFROOT/www/Physics/TrackEfficTaskForce/TauEff/R24/TauEff.html
+    trk_err_per_trk = 0.128/100.0 # percent error
+    trk_err_pct_l0 = 3.0 * trk_err_per_trk # 3 tracks
+    trk_err_pct_lc = 4.0 * trk_err_per_trk # 4 tracks
+
+    #trk_pct_err = [trk_err_pct_lc, trk_err_pct_lc, trk_err_pct_l0, trk_err_pct_l0, trk_err_pct_l0, trk_err_pct_l0]
+    trk_pct_err = [trk_err_pct_l0]
+
+    # PID errors
+    pid_err_p  = 0.010
+    pid_err_pi = 0.010
+    pid_err_k  = 0.012
+    #pid_err_e  = 0.004
+    #pid_err_mu = 0.007
+    pid_err_e  = 0.01
+    pid_err_mu = 0.025
+
+    pid_pct_err = []
+    # Precise
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_k*pid_err_k + pid_err_mu*pid_err_mu))
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_k*pid_err_k + pid_err_e*pid_err_e))
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_mu*pid_err_mu))
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_e*pid_err_e))
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_mu*pid_err_mu))
+    #pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_pi*pid_err_pi + pid_err_e*pid_err_e))
+
+    # BNC or BNV
+    pid_pct_err.append(math.sqrt(pid_err_p*pid_err_p + pid_err_p*pid_err_p + pid_err_pi*pid_err_pi))
+
+
+    # Estimate
+    #pid_pct_err.append(0.025)
+    #pid_pct_err.append(0.025)
+    #pid_pct_err.append(0.020)
+    #pid_pct_err.append(0.020)
+    #pid_pct_err.append(0.020)
+    #pid_pct_err.append(0.020)
+
+    # Eff calculations
+    conv_factors = []
+    conv_factor_errs = []
+    total_efficiencies = []
+    total_efficiency_errs = []
+    for i in range(0,nmodes):
+        n0 = initial_numbers[i]
+        n =  final_numbers[i]
+        eff = n/float(n0)
+        # https://lss.fnal.gov/archive/test-tm/2000/fermilab-tm-2286-cd.pdf
+        #eff_err = math.sqrt((eff*(1.0-eff))/n0)
+        #eff_err = (1/n0) * math.sqrt(n*(1.0-n/n0))
+        eff_err = (1/n0) * math.sqrt(n*(1.0-n/n0))
+
+        pre_ML_eff = eff
+        pre_ML_eff_err = eff_err
+
+        # Total efficiency due to 
+        # BTM
+        # Rectangular cuts
+        # ML cut
+        eff *= skim_eff_due_to_ML[i]
+
+        conv_factor = (nBpairs*2.0*nB_bf[i]) * eff * baryon_bf[i]
+
+        # Calculate all the percent errors. 
+        pct_errs = []
+
+        # number of Bs
+        pct_errs.append(nBpairs_err/float(nBpairs))
+        # B branching fraction
+        pct_errs.append(nB_bf_err[i]/float(nB_bf[i]))
+
+        # Efficiency
+        pct_errs.append(skim_eff_due_to_ML_err[i]/skim_eff_due_to_ML[i])
+        pct_errs.append(pre_ML_eff_err/pre_ML_eff)
+
+        # Branching fractions
+        pct_errs.append(baryon_bf_err[i]/baryon_bf[i])
+
+        # Tracking
+        pct_errs.append(trk_pct_err[i])
+        # PID?
+        pct_errs.append(pid_pct_err[i])
+
+        eff_tot_err =  (eff_err/eff)*(eff_err/eff)
+        eff_tot_err += trk_pct_err[i]*trk_pct_err[i]
+        eff_tot_err += pid_pct_err[i]*pid_pct_err[i]
+
+        tot_pct_err = 0.0
+        for pe in pct_errs:
+            tot_pct_err += pe*pe
+            #print "%f %f %f %f" % (tot_pct_err, math.sqrt(tot_pct_err), pe*pe, pe)
+
+        conv_factor_err = math.sqrt(tot_pct_err)
+        #print "conv_factor_err: %f" % (conv_factor_err)
+
+        # Convert back to a number, rather than a percentage
+        conv_factor_err *= conv_factor
+
+        total_eff = eff
+        #total_eff_err = eff*math.sqrt(eff_tot_err)
+        # Going to use the total fractional uncertainties to calculate the signal efficiency
+        total_eff_err = total_eff * (conv_factor_err/conv_factor)
+
+        output = "%d\ttrk_pct_err: %6.4f\n" % (i, trk_pct_err[i])
+        output += " \tpid_pct_err: %6.4f\n" % (pid_pct_err[i])
+        output += " \tnBpairs_err: %6.4f\n" % (nBpairs_err/float(nBpairs))
+        output += " \tnB_bf_err: %6.4f\n" % (nB_bf_err[i]/float(nB_bf[i]))
+        output += " \tbaryon_bf_err: %6.4f\n\n" % (baryon_bf_err[i]/baryon_bf[i])
+
+        output += f"\tpre_ML_eff: {pre_ML_eff:6.4f} +/- {pre_ML_eff_err:6.4f} ({pre_ML_eff_err/pre_ML_eff:6.4f} frac uncert) (we'll use this for the MC stat error)\n"
+        output += f"\ttotal eff:  {eff:6.4f} +/- {total_eff_err:6.4f}\n\n" 
+                #(pre_skim_eff,eff_err, eff,eff*math.sqrt(eff_tot_err))
+        output += f"\tconv_factor: {conv_factor:6.2f} +/- {conv_factor_err:6.3f} (pct_err: {100*conv_factor_err/conv_factor:6.3f})\n"
+                #(conv_factor,conv_factor_err,100*conv_factor_err/conv_factor)
+
+        print(output)
+        print()
+        output = f"conv_factor: {conv_factor:6.4e} +/- {conv_factor_err:6.3e} (pct_err: {100*conv_factor_err/conv_factor:6.3f})"
+        print(output)
+
+        conv_factors.append(conv_factor)
+        conv_factor_errs.append(conv_factor_err)
+        total_efficiency_errs.append(total_eff_err)
+        total_efficiencies.append(total_eff)
+
+    return total_efficiencies, total_efficiency_errs, conv_factors, conv_factor_errs
+
+##########################################################################
+##########################################################################
+
+#""""
+def add_probas_to_dfs(workspace, df_col, df_sp):
+
+    model = workspace['model']
+    x_train = workspace['x_train']
+    y_train = workspace['y_train']
+    x_test = workspace['x_test']
+    y_test = workspace['y_test']
+
+    #idx_x_train     = workspace['idx_sig_train']
+    #idx_x_not_train = workspace['idx_sig_not_train']
+
+    # Get the training vars
+    training_vars = model.feature_names
+
+    print("Training vars initially: ")
+    print(training_vars)
+    print(len(training_vars))
+
+    remove_these = ['proba', 'used_in_sig_train', 'used_in_bkg_train']
+    #print(type(training_vars))
+    for r in remove_these:
+        print(f"Checking for {r}...")
+        if sum(training_vars.isin([r]).astype(int))>0:
+            idx = training_vars.get_loc(r)
+            print(idx, training_vars)
+            training_vars = training_vars.delete(idx)
+            print(training_vars)
+            print(f"removed {r}")
+
+    print("Training vars finally: ")
+    print(training_vars)
+    print(len(training_vars))
+
+
+    #x_train = df_col[training_vars]#[idx_x_train]
+
+    #### FOR SP
+    #for i in threshold:
+    #    output_df= see_stuff(sig_samp= sig_samp,bkg_samp= bkg_samp, thresh= i, verbose= False, df=MC_data, df_col=coll_data)
+
+    # 3. Scale the test data using the same scaler
+    #scaler = StandardScaler()
+
+    # SHOULD THIS BE THE ACTUAL TRAINING SP
+    #x_dummy = scaler.fit_transform(x_train)
+
+    #print(x_dummy.T[-1])
+    #print(len(x_dummy), len(x_dummy[0]))
+
+    #print("training vars after" )
+    #print(training_vars)
+
+    # Collision
+    x_test  = df_col[training_vars].values#[idx_x_not_train]
+    print(x_test.T[-1])
+
+    #x_test = scaler.transform(x_test)
+
+    proba = model.predict_proba(x_test)
+
+    #print("proba: ")
+    #print(proba)
+
+    df_col['proba'] = proba[:,0]
+
+    #print(df_col.columns)
+
+    # SP
+    # Collision
+    x_test  = df_sp[training_vars].values#[idx_x_not_train]
+    #x_test = scaler.transform(x_test)
+
+    #print(x_test)
+
+    proba = model.predict_proba(x_test)
+
+    #print("proba: ")
+    #print(proba)
+
+    df_sp['proba'] = proba[:,0]
+
+    #print(df_sp.columns)
+
+    idx_bkg_train = workspace['idx_bkg_train']
+    idx_sig_train = workspace['idx_sig_train']
+
+    nentries = len(df_sp)
+    df_sp['used_in_sig_train'] = np.zeros(nentries, dtype=bool)
+    df_sp.loc[idx_sig_train, "used_in_sig_train"] = True
+
+    df_sp['used_in_bkg_train'] = np.zeros(nentries, dtype=bool)
+    df_sp.loc[idx_bkg_train, 'used_in_bkg_train'] = True
+
+
+    #x_col_proba = model.predict_proba(df_col_tmp)
+
+    #### FOR COLLISION
+    #y_proba_col_sig = model.predict_proba()
+
+    #sp998= sp_data["spmode"]== "998"
+    #N_bkg = len(sp_998_df[sp998]) ## total number of background events (sp 998)
+    #signal_before= len(sp_999_df)
+    #signal_after= len(sp_999_df)
+    #efficiency = signal_after/signal_before ## the accuracy of the model after training with the SP
+    #fom = efficiency(threshold)/(np.sqrt(N_bkg(threshold)+sig_disc/2))
+    #return fom
+    return 0
+#"""

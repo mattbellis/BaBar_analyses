@@ -13,8 +13,14 @@
 
 # BNC
 # Need to make sure this is in `smp_decfile` directory as a softlink
-decfile="B+B-_lambdaproton.dec"
-prod_run_name="bnc_plam"
+#decfile="B+B-_lambdaproton.dec"
+#prod_run_name="bnc_plam2"
+#nevents="100000"
+
+# Lam0 Lam0 BNV
+# Need to make sure this is in `smp_decfile` directory as a softlink
+decfile="B0B0bar_Lambda0Lambda0_BNV.dec"
+prod_run_name="bnv_lam0lam0_00"
 nevents="100000"
 
 # Need to make our directory first

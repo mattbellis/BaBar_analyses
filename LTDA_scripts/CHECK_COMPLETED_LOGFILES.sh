@@ -1,4 +1,8 @@
-for filename in log/SP-*LambdaVeryVeryLoose*v03/bnv_analysis/*tcl.sh.log log/SP-991*/bnv_analysis/*tcl.sh.log log/LambdaVeryVeryLoose-Run*/bnv_analysis/*tcl.sh.log ; do
+#subdir="bnv_analysis"
+#subdir="bnv_analysis_bnc_mode"
+subdir="bnv_analysis_lam0lam0"
+
+for filename in log/SP-*LambdaVeryVeryLoose*v03/${subdir}/*tcl.sh.log log/SP-991*/${subdir}/*tcl.sh.log log/LambdaVeryVeryLoose-Run*/${subdir}/*tcl.sh.log ; do
 
 	#echo $filename
 
@@ -16,7 +20,7 @@ for filename in log/SP-*LambdaVeryVeryLoose*v03/bnv_analysis/*tcl.sh.log log/SP-
 
 		job=$(basename $filename .log)
 		# -h for grep supresses the filename that it finds it in
-		grep -h $job submission_scripts/bnv_analysis/*sh
+		grep -h $job submission_scripts/${subdir}/*sh
 	fi
 
 done
