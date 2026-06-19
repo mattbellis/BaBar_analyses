@@ -769,13 +769,22 @@ def get_lambda0_mask(data, region_definitions, flightlenvar='Lambda0FlightLen'):
 
 
 ################################################################################
-def get_duplicates_mask(data):
+def get_duplicates_mask(data, final_state='pLambda'):
 
     # Keep events with only 1 B candidate
     nB = ak.num(data['BMass'])
     nlambda0 = ak.num(data['Lambda0_unc_Mass'])
     
-    mask_event_nlambda0_and_nB = (nlambda0==1) & (nB==1)
+    mask_event_nlambda0_and_nB = None
+
+    if final_state.lower()=='plambda' or  \
+       final_state.lower()=='plam' or  \
+       final_state.lower()=='plam0':
+        mask_event_nlambda0_and_nB = (nlambda0==1) & (nB==1)
+    elif final_state.lower()=='lam0lam0' or  \
+       final_state.lower()=='lambdalambda' or  \
+       final_state.lower()=='lamlam':
+        mask_event_nlambda0_and_nB = (nlambda0==2) & (nB==1)
 
     return mask_event_nlambda0_and_nB
 
@@ -1097,7 +1106,7 @@ def mass_from_spherical(p4s_spherical):
 
 ##########################################################################
 ##########################################################################
-def fill_new_entry_with_tag_side_B(data):
+def fill_new_entry_with_tag_side_B(data, final_state='pLambda'):
     '''
     # This is when I was trying to get the B-tag-side mass to have
     # the same shape as the other event shape variables, which
@@ -1124,7 +1133,7 @@ def fill_new_entry_with_tag_side_B(data):
     '''
 
     # Calculate the tag side B mass for entries with only one B and one Lambda
-    mask_event_duplicates= get_duplicates_mask(data)
+    mask_event_duplicates= get_duplicates_mask(data, final_state=final_state)
     m = tag_side_B(data[mask_event_duplicates], verbose=0, reverse_for_testing=False)
 
     x= -999*ak.ones_like(data['spmode'], dtype=float)
@@ -1307,7 +1316,7 @@ def munge_mask_shapes(mask_larger, mask_smaller):
     return mask
 
 ##########################################################################################
-def get_final_masks(data_temp, region_definitions=None, tag="DEFAULT", IS_MC=True, is_BNC=False):
+def get_final_masks(data_temp, region_definitions=None, tag="DEFAULT", IS_MC=True, is_BNC=False, final_state='pLambda'):
 
     if region_definitions is None:
         print("Need to pass in the region definitions")
@@ -1320,7 +1329,7 @@ def get_final_masks(data_temp, region_definitions=None, tag="DEFAULT", IS_MC=Tru
     #########################################################################
     # First select events without duplicate candidates
     #########################################################################
-    mask_event_duplicates= get_duplicates_mask(data_temp)
+    mask_event_duplicates= get_duplicates_mask(data_temp, final_state=final_state)
 
     ##########################################################################
     # Redefine the data array
