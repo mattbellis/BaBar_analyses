@@ -8,8 +8,12 @@
 #outputdir="bnv_analysis"
 
 # Lambda0 Lambda0
-tclfile="bnv_analysis_lam0lam0.tcl"
-outputdir="bnv_analysis_lam0lam0"
+#tclfile="bnv_analysis_lam0lam0.tcl"
+#outputdir="bnv_analysis_lam0lam0"
+
+# Lambda0 LambdaC
+tclfile="bnv_analysis_lam0lamc.tcl"
+outputdir="bnv_analysis_lam0lamc"
 
 tag1="LambdaVeryVeryLoose"
 tag2="a2-v03"
@@ -23,14 +27,14 @@ tag2="a2-v03"
 #tag2=""
 ##################################################
 
-#for run in $(seq 1 6);
+for run in $(seq 1 6);
 #for run in $(seq 1 );
 #for run in $(seq 2 6);
-#do
-	    #echo $run 
-	    #echo python set_up_everything_to_run_BtaTupleMaker.py -c ${tag1}-Run$run-OnPeak-R24${tag2} -t tclfiles/${tclfile} --data -l /awg/bellis/${outputdir}/
-	    #python set_up_everything_to_run_BtaTupleMaker.py -c ${tag1}-Run$run-OnPeak-R24${tag2} -t tclfiles/${tclfile} --data -l /awg/bellis/${outputdir}/
-#done
+do
+	    echo $run 
+	    echo python set_up_everything_to_run_BtaTupleMaker.py -c ${tag1}-Run$run-OnPeak-R24${tag2} -t tclfiles/${tclfile} --data -l /awg/bellis/${outputdir}/
+	    python set_up_everything_to_run_BtaTupleMaker.py -c ${tag1}-Run$run-OnPeak-R24${tag2} -t tclfiles/${tclfile} --data -l /awg/bellis/${outputdir}/
+done
 
 #exit
 
@@ -55,6 +59,7 @@ do
 	#for sp in 1005;
 	#for sp in 991;
 	#for sp in 1049;
+	#for sp in 1774 1304 3353 5053 5054 5057;
 	do
 	    echo $run $sp
 	    ##echo python set_up_everything_to_run_BtaTupleMaker.py -c SP-${sp}-Run${run}-R24 -t tclfiles/${tclfile} --mc -l /awg/bellis/${outputdir}/

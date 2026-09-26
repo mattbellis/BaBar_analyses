@@ -1,3 +1,16 @@
+###########################################################
+# WARNING!!!!!!!!!!!!!!!!!!
+##########################################################
+#
+# If you need to restart one of the MC generation with the same
+# name (e.g. bnv_lam0lam0_00), make sure to remove that directory
+# first (with the same name) otherwise it will not overwrite the ole
+# one
+#
+##########################################################
+
+
+
 # From within workdir
 #mkdir /awg/bellis/scratch
 #mkdir /awg/bellis/scratch/bellis
@@ -19,8 +32,14 @@
 
 # Lam0 Lam0 BNV
 # Need to make sure this is in `smp_decfile` directory as a softlink
-decfile="B0B0bar_Lambda0Lambda0_BNV.dec"
-prod_run_name="bnv_lam0lam0_00"
+#decfile="B0B0bar_Lambda0Lambda0_BNV.dec"
+#prod_run_name="bnv_lam0lam0_00"
+#nevents="100000"
+
+# Lam0 LamC BNV
+# Need to make sure this is in `smp_decfile` directory as a softlink
+decfile="B+B-_Lambda_c+_Lambda0_BNV.dec"
+prod_run_name="bnv_lam0lamc_02"
 nevents="100000"
 
 # Need to make our directory first
